@@ -1,26 +1,27 @@
 # 용어집
 
-MDSSP Engine에서 사용하는 주요 용어의 현재 의미다.
+이 용어집은 WAIN System 제안서에서 정의한 시스템 역할과 프로토타입 개념을 정리한다. 용어의 구체적인 구현 방식은 별도 설계와 검증을 거쳐 확정한다.
 
-| 용어 | 뜻 | 관련 문서 |
-|---|---|---|
-| **Surface State** | 표면 텍셀에 저장되는 시간에 따른 상태량. State 종류는 `.SRProfile`에서 수집한 Registry가 결정하며 `Wetness`, `Heat`, `Burn`, `Mud`는 기본 demo 예시다. | [[03_Architecture/0002_Surface-State\|표면 상태]] |
-| **Surface Response Profile / SRProfile** | Surface가 각 State에 어떻게 반응하는지 정의하는 공유 프로필. 파일 확장자는 `.SRProfile`. | [[03_Architecture/0002_Surface-State\|표면 상태]], [[03_Architecture/0003_Assets-and-Profiles\|에셋]] |
-| **stateCapacity** | 특정 State가 가질 수 있는 최대 상태량. 상태별 독립 프로필 파라미터. | [[03_Architecture/0002_Surface-State\|표면 상태]] |
-| **Saturation** | `State / stateCapacity`로 계산하는 런타임 파생값. | [[03_Architecture/0002_Surface-State\|표면 상태]] |
-| **State** | 현재 표면에 반영된 상태량. `0 ≤ State ≤ stateCapacity`. | [[03_Architecture/0002_Surface-State\|표면 상태]] |
-| **TempState** | Solver의 중간 계산값. 4주차 GPU 구현에서는 Pass 1의 Registry channel별 `alpha`를 저장하며 Capacity 초과량이 아니다. | [[05_Development/Notes/0003_Surface-State-GPU-Resource\|GPU Resource]] |
-| **Shared Surface Geometry Data** | 같은 Mesh + Normal Map을 사용하는 인스턴스가 공유할 수 있는 정적 형상 데이터. | [[03_Architecture/0005_Surface-Geometry\|형상 정보]] |
-| **Surface Instance State Data** | 특정 Mesh Instance가 개별적으로 가지는 동적 State 데이터. | [[03_Architecture/0002_Surface-State\|표면 상태]] |
-| **SaturationDrive** | 보내는 texel과 받는 texel의 Saturation 차이에 의해 발생하는 전달 구동력. | [[03_Architecture/0004_Surface-State-Update\|Solver]] |
-| **GeometryDrive** | 높이 차이와 중력·표면 방향에 의해 발생하는 전달 구동력. | [[03_Architecture/0004_Surface-State-Update\|Solver]] |
-| **TransferWeight** | 해당 이웃 관계를 실제 State가 얼마나 잘 통과하는지 보정하는 가중치. | [[03_Architecture/0004_Surface-State-Update\|Solver]] |
-| **ProfileBoundaryWeight** | 서로 다른 SRProfile 영역 사이의 전달 정도를 조절하는 가중치. | [[03_Architecture/0004_Surface-State-Update\|Solver]] |
-| **ContactWeight** | 접촉 중심에서의 거리와 반경·falloff에 따라 texel이 외부 입력을 받는 정도. | [[03_Architecture/0004_Surface-State-Update\|Contact Input]] |
-| **Meso Virtual Height** | Normal Map에서 복원한, Macro Geometry 기준의 가상 미세 높이. | [[03_Architecture/0005_Surface-Geometry\|형상 정보]] |
-| **Accumulation Height** | State를 기반으로 계산한 동적 적층 높이. Cavity Filling과 Surface Following으로 구성. | [[03_Architecture/0005_Surface-Geometry\|적층]] |
-| **Wetness** | 재질 내부에 흡수된 수분 상태. 기본적으로 형상 적층을 만들지 않는다. | [[../02_Planning/00_Project-Overview/0002_Demo\|데모]] |
-| **SurfaceWater** | 표면 위에 존재하고 흐르거나 고이는 물. `Wetness`와 구별되는 State이며 Profile/Registry에서 정의할 수 있다. 필요한 동작이 별도 물리 layer를 요구하는지는 별도 결정한다. | [[../02_Planning/00_Project-Overview/0002_Demo\|데모]] |
-| **Simulation UV** | UV-space 상태 시뮬레이션에 사용하는 전용 좌표계. Mesh→Texel mapping과 seam neighbor 생성의 기준이다. | [[05_Development/Notes/0000_Surface-Simulation-Mapping\|Mapping]] |
+| 용어 | 뜻 |
+|---|---|
+| **WAIN System** | 비주얼 노벨의 자유형 자연어 상호작용에서 캐릭터 경험, 게임 세계, 서사 진행을 지속적으로 반영하기 위해 제안한 World-Agent Interactive Narrative System. |
+| **Character Agent** | 캐릭터 상태와 플레이어 입력을 참조하고, 서사 목표와 제약을 고려해 행동 방향 및 LLM 입력 Context를 구성하는 시스템 역할. |
+| **Character State** | 캐릭터의 Persona, 플레이어와의 관계, 현재 감정 등 상호작용에 지속적으로 반영하는 캐릭터 정보. |
+| **Persona** | 캐릭터의 성격, 배경, 가치관과 말투 등 기본 설정. |
+| **Relationship State** | 플레이어와 캐릭터 사이에 누적되는 관계 정보. 제안서 예시에는 친밀도(Affinity)와 신뢰도(Trust)가 포함된다. |
+| **Emotion State** | 상황에 따라 변하는 캐릭터의 감정 상태. |
+| **Memory** | 플레이어와의 과거 상호작용 경험을 기록하고, 이후 관련 경험을 검색해 활용하는 기능. 제안서에서는 경험, Reflection, Plan을 자연어 기반으로 다루는 구상을 제시한다. |
+| **Reflection** | 여러 관련 Memory를 종합해 경험에서 상위 수준의 인식이나 의미를 만드는 과정. |
+| **Planning** | Memory, Reflection, 현재 Context를 바탕으로 이후 행동 방향이나 계획을 만드는 과정. |
+| **World State** | 현재 장소·시간·이벤트·규칙 및 세계의 변화처럼 상호작용에 반영할 게임 세계 정보. |
+| **World State Manager** | World State를 조회·갱신하고 다른 시스템 역할에 제공하는 모듈. |
+| **Narrative State** | 현재 장면과 이야기의 진행 단계, 공개된 정보 등 서사 진행 상황을 나타내는 정보. |
+| **Narrative Manager** | World, Narrative, Character State를 참조해 현재 장면의 Narrative Goal과 Narrative Constraint를 결정하는 시스템 역할. |
+| **Narrative Goal** | 현재 장면에서 달성하려는 서사적 목표. |
+| **Narrative Constraint** | 현재 서사 진행에서 응답이나 행동이 넘어서는 안 되는 제약. |
+| **Context** | Character Agent가 상태, 관련 Memory, 플레이어 입력, Narrative Goal/Constraint 등을 모아 LLM에 전달하는 입력 정보. 구체적인 형식은 미정이다. |
+| **Testbed** | WAIN 플러그인을 적용해 검증하기 위한 별도의 Visual Novel 테스트 프로젝트. 제안서에서는 UI, Scene/Event, Story Data와 Single-Agent 시나리오를 포함하는 구상을 제시한다. |
+| **Single-Agent Prototype** | 초기 프로토타입에서 하나의 Character Agent를 사용해 핵심 기능을 검증하는 범위. |
+| **Multi-Agent Extension** | 여러 Character Agent가 상호작용하는 구조로 확장하는 장기 목표. 초기 프로토타입 범위에는 포함되지 않는다. |
 
-`Overflow`는 과거의 초과 상태량 모델에 속하는 용어이며 현재 상태 저장 모델에서는 사용하지 않는다.
+프로젝트 범위와 역할 설명은 [[../02_Planning/00_Project-Overview/0000_Project-Plan|Project Plan]]을, 시연 예시는 [[../02_Planning/00_Project-Overview/0002_Demo|목표 데모]]를 참고한다. 기준 자료는 [[../07_Assets/26-2_졸업프로젝트_WAIN_제안서.pdf|졸업프로젝트 제안서]]다.

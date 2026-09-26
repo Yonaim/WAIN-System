@@ -1,33 +1,27 @@
-# Roadmap
+# WAIN System 개발 로드맵
 
-상태: **16주 전체 일정 기준** · 프로젝트 목적과 범위는 [[02_Planning/00_Project-Overview/0000_Project-Plan|Project Plan]], 실행 항목은 각 주차 문서를 본다.
+상태: **제안서의 개발 순서를 단계로 재구성** · 목표와 프로토타입 범위는 [[02_Planning/00_Project-Overview/0000_Project-Plan|Project Plan]]을 기준으로 한다.
 
-| 주차 | 주제 | 주요 결과 |
+| 단계 | 작업 | 주요 결과 |
 |---:|---|---|
-| [[02_Planning/01_Weekly-Overview/Week-01\|1주차]] | 전체 구조 설계 | 엔진 모듈 및 Surface State System 범위 정의 |
-| [[02_Planning/01_Weekly-Overview/Week-02\|2주차]] | 시뮬레이션 설계 | 데이터 구조, 갱신식, Solver 흐름과 적층 규칙 정리 |
-| [[02_Planning/01_Weekly-Overview/Week-03\|3주차]] | 렌더링 기반 | Static Mesh, Material, Asset을 표시하는 Vulkan 엔진 기반 |
-| [[02_Planning/01_Weekly-Overview/Week-04\|4주차]] | Surface 데이터 구현 | UV mapping부터 Geometry·GPU·입력까지 최소 검증 경로 |
-| [[02_Planning/01_Weekly-Overview/Week-05\|5주차]] | 기본 Solver | Transport / Decay / Capacity 동작과 테스트 검증 |
-| [[02_Planning/01_Weekly-Overview/Week-06\|6주차]] | Wetness | 수분 상태의 재질별 반응과 외관 표현 |
-| [[02_Planning/01_Weekly-Overview/Week-07\|7주차]] | Mud 및 중간 Demo | Mud 적층을 Wetness와 통합한 중간 결과 |
-| [[02_Planning/01_Weekly-Overview/Week-08\|8주차]] | 중간 결과 검토 | 품질·성능·문제 분석 및 후반 범위 조정 |
-| [[02_Planning/01_Weekly-Overview/Week-09\|9주차]] | Heat | Heat 입력, 전파, cooling과 재질별 반응 |
-| [[02_Planning/01_Weekly-Overview/Week-10\|10주차]] | Heat → Burn | 임계값 기반 상태 전이와 잔류 Burn 표현 |
-| [[02_Planning/01_Weekly-Overview/Week-11\|11주차]] | 형상 반영 개선 | Height·방향·곡률·경계에 따른 계산 개선 |
-| [[02_Planning/01_Weekly-Overview/Week-12\|12주차]] | 상태 통합 | 네 기본 상태를 하나의 System / Solver로 통합 |
-| [[02_Planning/01_Weekly-Overview/Week-13\|13주차]] | GPU 최적화 | 측정된 병목과 GPU pass·memory 접근 개선 |
-| [[02_Planning/01_Weekly-Overview/Week-14\|14주차]] | 성능 실험 | 해상도·Instance·갱신 조건별 FPS·GPU·메모리 측정 |
-| [[02_Planning/01_Weekly-Overview/Week-15\|15주차]] | 비교와 실패 분석 | 품질 비교, 실패 조건 및 한계 정리 |
-| [[02_Planning/01_Weekly-Overview/Week-16\|16주차]] | 최종 결과 | Repository, 보고서, Demo 영상, 발표 자료 완성 |
+| 1. 기반 구성 | Unreal Engine C++ 개발 환경과 Plugin 구조를 마련하고, LLM API 연동 및 Character / World / Narrative State 데이터 구조를 설계한다. | 실행 가능한 플러그인 기반과 핵심 데이터 모델 |
+| 2. Character Agent | Character State 관리, Memory 저장·검색, Reflection과 Planning 흐름을 구현한다. Relationship / Emotion State가 이후 반응에 반영되는지 확인한다. | 경험이 축적되고 캐릭터 반응에 이어지는 단일 Agent |
+| 3. 세계·서사 관리 | World State Manager와 Narrative Manager를 구현하고, Goal / Constraint를 Character Agent에 전달한다. | 게임 세계 및 서사 진행을 반영하는 상호작용 흐름 |
+| 4. Testbed 통합 | 플러그인을 별도 Visual Novel Testbed에 연결하고, UI·Scene/Event·Story Data가 있는 Single-Agent 시나리오에서 동작시킨다. | 재현 가능한 통합 데모 경로 |
+| 5. 검증·평가·제출 | 같은 시나리오의 A–D 구성 비교, 자동 검증과 응답 품질 평가를 수행하고 문서·소스·시연 결과를 정리한다. | 테스트 및 평가 결과와 최종 프로토타입 산출물 |
 
-## 주요 Milestone
+## 단계 간 흐름
 
-1. **4주차 — 최소 수직 경로**: 준비한 UV가 있는 테스트 Mesh에서 Mapping → Geometry → GPU State → Solver → Contact Input을 확인한다. 자동 unwrap은 범위에서 제외한다.
-2. **7주차 — 중간 Demo**: Wetness와 Mud의 상태 갱신·외관·적층을 통합해 시연한다.
-3. **8주차 — 중간 검토**: 결과와 위험 요소를 바탕으로 후반 구현 범위를 재조정한다.
-4. **12주차 — 상태 통합**: `Wetness`, `Mud`, `Heat`, `Burn`을 공통 Surface State System에서 처리한다.
-5. **13–15주차 — 최적화·평가**: 성능을 측정하고 비교 실험과 실패 사례를 문서화한다.
-6. **16주차 — 제출 결과**: 실행 가능한 저장소, 최종 보고서, Demo 영상과 발표 자료를 정리한다.
+```text
+Plugin / State 기반
+  → Character Agent와 경험 처리
+  → World / Narrative Manager
+  → VN Testbed 통합
+  → A–D 비교 평가와 결과 정리
+```
 
-주차별 목표 요약은 `01_Weekly-Overview/`에, 세부 실행 계획은 `02_Weekly-Details/Week-XX/`에 둔다. 일정 변경은 Roadmap과 영향을 받는 주차 문서를 함께 수정한다.
+## 일정과 진척
+
+제안서에는 9–16주차 계획이 들어 있지만, 해당 주차는 제안 당시 일정이다. 이 로드맵은 구현 의존성을 보여주는 단계 기준이며 현재 달력 일정이나 완료 상태를 뜻하지 않는다. 실제 주차별 목표는 [[00_Start/Templates/0006_Weekly-Overview|Weekly Overview 템플릿]]으로, 상세 작업은 [[00_Start/Templates/0007_Weekly-Details|Weekly Details 템플릿]]으로 새로 작성한다.
+
+각 단계의 완료 여부는 코드와 재현 가능한 검증으로 확인하고 [[TODO|TODO]]에 반영한다. 범위나 순서가 바뀌면 이 문서와 영향을 받는 주차 계획을 함께 갱신한다.

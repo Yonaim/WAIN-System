@@ -1,17 +1,12 @@
 # 주차별 구현 상세
 
-`01_Weekly-Overview/`에는 전체 주차의 목표와 산출물을 요약한다. 이 디렉터리에는 주차별 구현 계획, 브랜치 분할, 기술 작업 순서를 기록한다.
+`01_Weekly-Overview/`에는 각 주차의 목표와 산출물을 짧게 요약하고, 이 디렉터리에는 구현 순서·선행 조건·검증 기준을 상세히 기록한다. 전체 단계의 기준은 [[../00_Project-Overview/0001_Roadmap|Roadmap]]이다.
 
-## 주차별 디렉터리
+## 새 계획 작성
 
-세부 계획은 해당 주차 디렉터리에 작성한다.
+1. 해당 주차의 overview가 없으면 [[00_Start/Templates/0006_Weekly-Overview|Weekly Overview 템플릿]]을 복사해 `01_Weekly-Overview/Week-XX.md`로 작성한다.
+2. [[00_Start/Templates/0007_Weekly-Details|Weekly Details 템플릿]]을 복사해 `Week-XX/0000_WeekXX-Plan.md`로 작성한다.
+3. 계획은 제안서의 목표와 현재 코드 상태를 구분한다. 실제 구현을 확인하기 전에는 완료로 표시하지 않는다.
+4. Roadmap이나 제안 범위가 바뀌면 Project Plan과 영향을 받는 주차 문서도 함께 갱신한다.
 
-- `Week-01/`, `Week-02/`, `Week-03/`, `Week-04/`, `Week-05/`, `Week-06/`, `Week-07/`, `Week-08/`
-- `Week-09/`, `Week-10/`, `Week-11/`, `Week-12/`, `Week-13/`, `Week-14/`, `Week-15/`, `Week-16/`
-- 현재 작성된 상세 계획: [[02_Planning/02_Weekly-Details/Week-04/0000_Week4-Branch-Plan|4주차 브랜치 계획]], [[02_Planning/02_Weekly-Details/Week-05/0000_Week5-Branch-Plan|5주차 구현 상세 계획]], [[02_Planning/02_Weekly-Details/Week-06/0000_Week6-Branch-Plan|6주차 Wetness 브랜치 계획]]
-
-전체 목표 요약은 `01_Weekly-Overview/`에 유지하고, 구체적인 구현 순서와 브랜치별 계획은 이 디렉터리에 둬 두 단계의 계획이 섞이지 않게 한다.
-
-새 주차 상세 계획은 [[00_Start/Templates/0007_Weekly-Details|Weekly Details 템플릿]]을 복사해 해당 `Week-XX/` 폴더에 작성한다. 주차 목표 요약은 [[00_Start/Templates/0006_Weekly-Overview|Weekly Overview 템플릿]]을 사용한다.
-
-5주차 구현 순서와 브랜치별 작업은 [[02_Planning/02_Weekly-Details/Week-05/0000_Week5-Branch-Plan|5주차 브랜치 계획]]에서 확인한다. 각 브랜치의 범위와 완료 조건은 해당 Week-05 상세 문서에 분리해 기록한다.
+현재 이 폴더에는 주차별 상세 계획이 없다. 구체적인 일정과 구현 순서를 정한 뒤 필요한 주차 폴더와 문서를 만든다.
