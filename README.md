@@ -1,8 +1,8 @@
 # WAIN System
 
-**A World-Agent Interactive Narrative System for Visual Novels**
+**A World-Agent Interactive Narrative System for Visual Novels: WAIN**
 
-WAIN is an Unreal Engine plugin for LLM-driven visual novels. It maintains persistent narrative state outside the LLM to guide characters and generated responses over long interactions. This individual graduation project is developed at Konkuk University.
+WAIN is a World-Agent Interactive Narrative System for LLM-driven visual novels. It manages persistent character, world, and narrative state outside the LLM to support coherent long-term interactions. This project is being developed as an individual graduation project.
 
 ## Overview
 
@@ -35,25 +35,13 @@ This is the main project repository for the **WAIN System**. The core Unreal Eng
 
 The project proposal and engineering notes are kept with the repository. Game-specific content, visual novel assets, and the Unreal testbed project used for integration and evaluation are maintained separately.
 
-### Repository Layout
-
-```text
-WAIN-System/
-├── Docs/
-│   └── WAIN-Vault/        Project docs and proposal under 07_Assets/
-├── Plugins/
-│   └── WAINSystem/        Core Unreal Engine plugin source
-└── README.md
-```
 
 ## Academic Information
 
-This repository is an individual graduation project developed at **Konkuk University**.
-
 - **Institution:** Konkuk University
 - **Project Type:** Individual Graduation Project
-- **Project Name:** WAIN System
-- **Full Title:** A World-Agent Interactive Narrative System for Visual Novels
+- **Project Period:** 2026.09 ~ 2027.08
+- **Project Name:** WAIN System (Full Title: A World-Agent Interactive Narrative System for Visual Novels)
 
 ## License
 
