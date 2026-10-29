@@ -12,7 +12,7 @@ WAIN keeps persistent narrative state outside the LLM and uses it to guide long-
 - **Behavior:** Memory, Reflection, Planning, and narrative goal control
 - **Interaction:** Free-form dialogue with context built from the current state
 
-The [graduation project proposal (PDF)](Docs/WAIN-Vault/07_Assets/26-2_졸업프로젝트_WAIN_제안서.pdf) outlines the original project concept and scope.
+The [graduation project proposal (PDF)](Docs/WAIN-System-Vault/06_Assets/260923_WAIN_Proposal-Presentation.pdf) outlines the original project concept and scope.
 
 ## Project Status
 
