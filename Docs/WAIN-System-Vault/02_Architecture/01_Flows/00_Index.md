@@ -1,14 +1,12 @@
-# 실행 흐름 색인
+# Interaction 흐름 색인
 
-> **한 줄 요약:** 현재 구현된 흐름과 계획된 통합 흐름을 구분해 안내한다.
+> WAIN의 기본 실행 단위는 한 번의 Player Input을 끝까지 처리하는 Turn-Based Interaction이다.
 
-상태: **계획 흐름만 확인됨** · 마지막 확인: 2026-10-29
-
-| 흐름 | 문서 | 상태 |
+| 단계 | 문서 | 결과 |
 |---|---|---|
-| Unreal 프로젝트 시작 | 프로젝트 `Source/WAINTestbed/WAINTestbed.cpp`, `Config/DefaultEngine.ini` | 기본 게임 모듈 확인, 기본 Entry 맵 |
-| VN Testbed 화면과 입력 | 구현 문서 추가 예정 | 계획됨, 현 구현 미확인 |
-| Testbed Adapter와 WAIN 플러그인 연결 | 구현 문서 추가 예정 | 플러그인 코드 추가 후 설계·구현 예정 |
-| LLM 요청·상태 갱신·응답 표시 | 구현 문서 추가 예정 | 미구현/미확인 |
+| Player Input부터 VN 출력까지 | [[01_Interaction-Pipeline|Interaction Pipeline]] | 검증된 Proposal을 Commit한 뒤 확정 결과를 VN에 전달 |
+| State 참조·Context 구성 | [[../02_Contracts/01_Character-Agent|Character Agent]] · [[../02_Contracts/02_Memory-Reflection-Planning|Memory]] · [[../02_Contracts/03_World-State-Manager|World State]] · [[../02_Contracts/04_Narrative-Manager|Narrative]] | 현재 턴에 필요한 Context |
+| 검증·서사 판정·확정 | [[../02_Contracts/05_Response-Validation-and-Commit|Validation and Commit]] | 적용 가능한 변경과 다음 Active Beat |
+| 구현 파일 연결 | [[../03_Source/00_Index|Source Index]] | 현재 구현 여부와 실제 코드 위치 |
 
-플러그인 모듈이 추가되면 실제 호출 순서, 비동기 처리, 실패 경로, 데이터 전달 계약을 근거와 함께 세부 문서로 분리한다.
+이 흐름은 설계 기준이다. 각 단계의 실행 여부와 테스트 결과는 Source 및 Experiments에서 확인한다.

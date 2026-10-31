@@ -1,15 +1,14 @@
-# 시스템 계약 색인
+# 아키텍처 계약 색인
 
-> **한 줄 요약:** 플러그인 공통 기능과 Testbed 고유 기능의 경계를 추적한다.
-
-상태: **책임 경계는 README 기준 · 런타임 계약 미작성** · 마지막 확인: 2026-10-29
-
-| 계약 | 확인된 내용 | 상태 |
+| 계약 | 문서 | 결정 상태 |
 |---|---|---|
-| 공통 시스템 vs 게임별 책임 | 플러그인에 공통 Agent/Manager/Orchestrator/Validator, Testbed에 화면·입력·게임 상태·시나리오·Adapter | README의 의도, 코드 계약은 미확인 |
-| 상태·컨텍스트 데이터 | JSON 기반 상태/컨텍스트가 Tech Stack으로 명시됨 | 스키마·직렬화 규약 미작성 |
-| LLM 외부 연동 | LLM API integration이 목표 기술 스택에 기재됨 | provider·요청·응답·오류 계약 미작성 |
-| 프로젝트 시작 맵 | 현재 `Entry`; README는 Testbed 맵 생성 후 설정 변경 안내 | ini 확인됨 |
-| 에셋 관리 | `.uasset`, `.umap`은 Git LFS 사용 안내 | 저장소 설정과 실제 추적은 별도 확인 필요 |
+| Character Agent와 State | [[01_Character-Agent|Character Agent]] | 책임·상태 개념 설계됨, 수치 정책 미확정 |
+| Memory, Reflection, Planning | [[02_Memory-Reflection-Planning|Memory / Reasoning]] | 구조·흐름 설계됨, 임계값·검색 설정 미확정 |
+| World State와 외부 Adapter | [[03_World-State-Manager|World State Manager]] | 소유권·Hybrid Model 설계됨, UE API 미확정 |
+| Narrative Definition과 Beat Graph | [[04_Narrative-Manager|Narrative Manager]] | 계층·조건부 전이 설계됨, 데이터 형식 미확정 |
+| Proposal, Validation, Commit | [[05_Response-Validation-and-Commit|Validation and Commit]] | 순서·원칙 설계됨, Schema·실패 정책 미확정 |
+| LLM / Embedding 서비스 | [[06_Shared-AI-Services|Shared AI Services]] | 역할 설계됨, Provider·구현 미확정 |
+| 요청·결과·상태 데이터 구분 | [[07_Data-Contracts|Data Contracts]] | 개념 필드만 정의, 최종 C++ 계약 아님 |
+| 디버그와 개발 도구 | [[08_Debugging-and-Dev-Tools|WAIN Debugging and Dev Tools]] | 상태 검사·재현·데이터 검사·7단계 Trace 제안, 미구현 |
 
-기능 계약은 플러그인 소스와 승인된 요구사항을 확인해 작성한다. README의 설계 의도와 구현 사실을 같은 상태로 표시하지 않는다.
+> 이 문서들은 설계 기준을 설명한다. 구현 여부는 [[../03_Source/00_Index|Source Index]]에서 별도로 확인한다.

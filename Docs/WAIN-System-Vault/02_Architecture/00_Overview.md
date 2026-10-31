@@ -1,29 +1,50 @@
-# WAIN System / Testbed 아키텍처
+# WAIN System 아키텍처
 
-> WAIN 공통 시스템은 플러그인으로, 비주얼 노벨 표시·입력·게임 상태와 어댑터는 Testbed에 둔다는 책임 분리를 따른다.
+> **핵심:** Orchestrator가 턴 순서를 조율하고 Character, World, Narrative 모듈은 각자 소유한 State와 책임을 유지한다. LLM 결과는 검증 전 Proposal이다.
 
-상태: **초기 구조 확인됨 · 통합 구현 전** · 마지막 확인: 2026-10-29
+상태: **기본 아키텍처 설계 기준** · 구현 확인: 미완료
 
-## 무엇을 어디서 읽는가
+## 목표와 범위
 
-| 목적 | 문서 |
-|---|---|
-| 초기화·실행·통합 흐름 | [[01_Flows/00_Index|Flows 단계별 지도]] |
-| 현재 모듈 경계와 확인된 설정 | [[02_Contracts/00_Index|Contracts 색인]] |
-| 실제 파일과 모듈 | [[03_Source/00_Index|Source 색인]] |
-| 미완료 통합 작업 | [[../03_Development/01_Current-Work|Current Work]] |
-| WAIN System 프로젝트 정의와 계획 | [플러그인 WAIN-Vault](../../../Plugins/WAINSystem/Docs/WAIN-Vault/02_Planning/00_Project-Overview/0000_Project-Plan.md) |
+WAIN은 비주얼 노벨의 사전 정의 선택지 상호작용을 자유형 자연어 대화로 확장하면서 캐릭터의 지속 경험, World State와 Narrative Progress를 일관되게 유지하려는 재사용 가능한 Unreal Engine C++ Plugin이다.
 
-## 현재 구성
+초기 프로토타입은 **Single-Agent, Turn-Based Interaction**에 한정한다. 상태 변경은 대화 상호작용에서 발생한 것으로 제한하며 독립 실시간 World Event, NPC 자율 행동, Multi-Agent 동시 실행은 범위에서 제외한다. 비동기 LLM 호출은 허용하지만 동시에 여러 턴이 State를 바꾸는 구조를 목표로 하지는 않는다.
 
-- **WAINTestbed Unreal 프로젝트:** 단일 에이전트 시나리오를 우선 검증하려는 통합 Testbed다. 정적 배경·캐릭터 이미지는 우선 UMG 위젯에 표시하도록 프로젝트 README가 설명한다.
-- **WAINSystem 플러그인 서브모듈:** 공통 Character Agent, State Manager, Narrative Manager, Orchestrator, Validator와 외부 연동 인터페이스를 둘 목표다. 플러그인 README는 현재 저장소에 문서와 빈 플러그인 폴더만 있으며 `.uplugin`과 C++ 모듈이 아직 추가되지 않았다고 명시한다.
-- **게임별 Testbed:** VN 화면·입력·실제 게임 상태·시나리오 데이터·게임별 Adapter 구현을 둘 책임이다. 현재 이 작업 공간에서 확인한 Testbed C++는 Unreal 기본 게임 모듈 초기화 코드 수준이다.
+## 핵심 모듈과 책임
 
-## 현재 한계와 확인 필요
+| 모듈 | 책임 | 소유하지 않는 것 |
+|---|---|---|
+| Interaction Orchestrator | 한 Interaction의 입력부터 Commit·VN 출력까지 순서와 호출 조율 | Character·World·Narrative State의 직접 소유 |
+| Character Agent | Persona, Relationship, Emotion, Memory, Plan을 바탕으로 Context와 응답 Proposal 구성 | World State 및 Narrative Progress의 최종 결정 |
+| World State Manager | WAIN 내부 World State, Schema, 외부 Game State 접근, 승인 변경 적용 | 게임이 소유하는 State의 중복 복제 |
+| Narrative Manager | Narrative Definition, Active Beat, Goal·Constraint, Completion·Transition 판단 | LLM 출력만으로 진행 확정 |
+| Response Validator | Proposal Schema, 게임 규칙, 서사 제약 검증 | 검증 실패 결과의 Commit |
+| Shared AI Services | 비동기 LLM 및 Embedding Provider 추상화, 오류·사용량·지연 관측 | 기능별 Prompt 및 결과 의미 해석 |
 
-- `Config/DefaultEngine.ini`의 시작 맵은 `/Engine/Maps/Entry`다. README는 `/Game/Maps/L_Testbed`를 만든 뒤 맵 설정을 변경하도록 안내한다.
-- WAIN 플러그인 런타임 기능, LLM 호출, JSON 상태 흐름, UI 시나리오는 이 저장소에서 아직 구현된 것으로 확인되지 않았다.
-- 위 내용은 저장소 README와 현재 파일을 기준으로 한 시점 기록이다. 변경 시 코드와 설정을 재확인한다.
+## 턴 데이터 흐름
 
+```mermaid
+flowchart LR
+    Input[Player Input] --> Context[Context Preparation]
+    Context --> Agent[Character Agent]
+    Agent --> Proposal[Response Proposal]
+    Proposal --> Validate[Response Validation]
+    Validate --> Narrative[Narrative Evaluation]
+    Narrative --> Commit[State Commit]
+    Commit --> VN[VN Response]
+    Commit --> Next[다음 턴 State]
+    Next --> Context
+    Agent -. LLM / Embedding .-> AI[Shared AI Services]
+    Context --> World[World State Manager]
+    Context --> Story[Narrative Manager]
+    Validate --> World
+    Narrative --> Story
+```
 
+## State 소유권
+
+Persona, Relationship, Emotion, Character Memory는 Character Agent 영역이다. WAIN이 직접 관리하기로 한 World Facts는 Internal State Store가 소유한다. Inventory·Quest·Actor 상태 등 게임 고유 상태는 원래 게임 시스템이 소유하며 Adapter를 통해 접근한다. Active Beat, Completed Beat, Beat History는 Narrative Manager가 관리한다. Orchestrator는 요청을 조율할 뿐 각 Source of Truth를 대체하지 않는다.
+
+## 설계 기준과 구현 상태
+
+이 페이지와 Contracts는 `설계.md` 및 2026-10-28 중간발표 PDF·대본의 설계 기준을 정리한다. 플러그인 경로에서 README와 문서/자료만 확인했고 `.uplugin` 및 런타임 C++ 소스는 확인하지 못했다. 미결 사항은 [[../03_Development/01_Current-Work|Current Work]]를 본다.
