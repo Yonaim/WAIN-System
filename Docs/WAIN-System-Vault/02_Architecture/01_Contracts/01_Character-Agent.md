@@ -36,3 +36,11 @@
 - 이 단계는 **Agent의 상태 처리 기반**이며 Persona, 실제 LLM Context 생성, 메모리·감정 자연 감쇠는 여전히 구현 범위 밖이다.
 
 [Character Delta Implementation](../../04_Development/05_Character-Delta-Implementation.md) · [ADR-002](../../03_Decisions/02_ADR-002-Emotion-Expression.md)
+
+## Phase 2 — Persona & Character Context Assembly (신규)
+
+[ADR-007](../../03_Decisions/07_ADR-007-Read-Only-Character-Context.md)에 따라 Host가 `IWAINPersonaSource`로 Persona를 읽기 전용 제공한다. `FWAINCharacterContextBuilder`는 Current Session Root의 해당 Character에서 Trust/6축 Emotion 및 Active Beat/Revision을 조회해 복사한 Context를 구성한다. Context Preparation 실패는 Proposal/Commit 전 거절된다. 기존 문서 상단의 Persona·Context 미구현 문장은 **이 단계 이전 상태**다.
+
+새 `IWAINProposalProvider::GenerateWithContext`는 Source가 주입된 경우 Context를 사용하는 Provider의 구현이 필요하다. Source가 없으면 기존 Mock `Generate`를 유지한다. Persona 문자열을 곧바로 LLM Prompt로 직렬화하는 단계는 아직 구현되지 않았다. 서사상의 비밀을 포함하는 Persona 필드의 노출은 Host가 Active Beat/정책에 맞춰 제한해야 한다.
+
+[Phase 2 Context Implementation](../../04_Development/06_Character-Context-Implementation.md)

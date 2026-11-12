@@ -42,6 +42,7 @@
         InvalidRequest,
         DuplicateTurnConflict,
         ProposalGenerationFailed,
+        ContextPreparationFailed,
         InvalidProposal,
         UnsupportedMutation,
         GamePrepareFailed,

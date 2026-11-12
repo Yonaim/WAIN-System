@@ -8,6 +8,7 @@
 #include "Core/WAINStateStore.h"
 #include "Core/WAINTransactionCoordinator.h"
 #include "CoreMinimal.h"
+#include "Character/WAINCharacterContextBuilder.h"
 #include "WAINInterfaces.h"
 
 class FWAINInteractionProcessor final
@@ -20,7 +21,8 @@ class FWAINInteractionProcessor final
 
     FWAINInteractionProcessor(TSharedRef<IWAINGameSnapshotAdapter> InGameAdapter,
                               TSharedRef<IWAINProposalProvider>    InProposalProvider,
-                              TSharedRef<IWAINNarrativeEvaluator>  InNarrativeEvaluator);
+                              TSharedRef<IWAINNarrativeEvaluator>  InNarrativeEvaluator,
+                              TSharedPtr<const IWAINPersonaSource> InPersonaSource = nullptr);
 
     bool StartSession(const FWAINStateSnapshot &InitialWAIN, FString &OutError);
 
@@ -61,6 +63,8 @@ class FWAINInteractionProcessor final
     TSharedRef<IWAINGameSnapshotAdapter> GameAdapter;
     TSharedRef<IWAINProposalProvider>    ProposalProvider;
     TSharedRef<IWAINNarrativeEvaluator>  NarrativeEvaluator;
+    TSharedPtr<const IWAINPersonaSource> PersonaSource;
+    FWAINCharacterContextBuilder ContextBuilder;
 
     FWAINStateStore             StateStore;
     FWAINTransactionCoordinator Coordinator;

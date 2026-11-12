@@ -48,3 +48,14 @@
 - Character별 Persona, 대화 Context 생성, Reflection, Memory는 별도 Phase 2 단계로 남겨두었다.
 
 [Implementation Detail](../../04_Development/05_Character-Delta-Implementation.md)
+
+## 40. Phase 2 Persona / Context Assembly 확장
+
+- `Public/WAINCharacterContext.h`: Host Persona DTO/Source 계약과 한 턴의 읽기 전용 Character Context.
+- `Private/Character/WAINCharacterContextBuilder.{h,cpp}`: Current Root 복사 → Persona 조회/검증 → Context 완성.
+- `IWAINProposalProvider::GenerateWithContext`는 Host Persona Source가 없을 때만 이전 `Generate`와 호환된다.
+- `WAINInteractionProcessor::ExecuteTurn`의 상위 흐름은 Current 조회 → Context Build → Proposal 생성 → Transaction Execute로 확장됐다.
+- `UWAINRuntimeSubsystem::StartSession`은 마지막 인자로 선택적 Persona Source를 받는다. 별도 JSON 파싱이나 실제 LLM 연동은 없다.
+- 테스트 `Private/Tests/WAINCharacterContextTests.cpp` 7개를 추가했다. 기존 12개를 유지해 **19개 테스트 코드를 작성**했다(UE 실행 미검증).
+
+[ADR-007](../../03_Decisions/07_ADR-007-Read-Only-Character-Context.md) · [Details](../../04_Development/06_Character-Context-Implementation.md)

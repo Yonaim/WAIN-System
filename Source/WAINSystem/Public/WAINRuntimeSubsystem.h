@@ -32,7 +32,8 @@ class WAINSYSTEM_API UWAINRuntimeSubsystem : public UGameInstanceSubsystem
                       TSharedRef<IWAINGameSnapshotAdapter> GameAdapter,
                       TSharedRef<IWAINProposalProvider>    ProposalProvider,
                       TSharedRef<IWAINNarrativeEvaluator>  NarrativeEvaluator,
-                      FString                             &OutError);
+                      FString                             &OutError,
+                      TSharedPtr<const IWAINPersonaSource> PersonaSource = nullptr);
 
     FWAINInteractionResult ProcessMockTurn(const FWAINInteractionRequest &Request);
 

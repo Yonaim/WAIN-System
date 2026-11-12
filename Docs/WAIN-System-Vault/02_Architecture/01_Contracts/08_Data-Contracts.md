@@ -81,3 +81,13 @@ Testbed Content JSON의 기존 `schema_version: 1`은 신규 Schema를 자동 �
 **예:** `FloatValue=+0.4`는 `emotion.joy`에만 추가한다. 동일 턴에 `joy=0.4`, `sadness=0.3`, `anxiety=0.5`가 공존할 수 있으며 합계가 1을 넘어도 유효하다.
 
 **검증 상태:** Phase 1은 사용자 제공 검증본 기준. Phase 2 변경분은 Automation Test 코드만 추가했으며 현재 환경에서 Unreal 빌드·실행은 하지 않았다.
+
+## Phase 2 코드 계약 — Character Context (2026-11-10)
+
+- `FWAINCharacterPersona`: `CharacterId:FName`, `DisplayName:FString`, `Traits:TArray<FString>`, `SpeechStyle:FString`, `Background:FString`, `Preferences:TArray<FString>` (Host-owned 정의 콘텐츠; WAIN State 아님).
+- `FWAINCharacterContext`: `CharacterId`, `SceneId`, `ActiveBeatId`, `StateRevision`, `TurnCount`, `FWAINCharacterState State`, `bHasPersona`, `FWAINCharacterPersona Persona`.
+- `IWAINPersonaSource::GetPersona`는 Host 소유/캐시된 Persona 데이터를 조회만 한다. Source가 주입된 경우 조회 실패·Character ID 불일치는 `ContextPreparationFailed`로 Commit을 막는다.
+- `IWAINProposalProvider::GenerateWithContext` 기본 구현은 **Persona Source가 없는 구형 Mock 경로에서만** `Generate`로 위임한다. Source가 있으면 실제 Provider가 새 메서드를 구현해야 한다.
+- **지원하지 않음:** Persona JSON Parser, Prompt Template, Character Memory/World/Presentation Context, LLM, 비동기 처리. Host의 게임별 `ManaPersona.json` 구조는 Plugin에 고정하지 않았다.
+
+[ADR-007](../../03_Decisions/07_ADR-007-Read-Only-Character-Context.md) · [Implementation](../../04_Development/06_Character-Context-Implementation.md)

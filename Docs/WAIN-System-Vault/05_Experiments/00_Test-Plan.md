@@ -53,3 +53,18 @@ A: LLM Only → B: A+Character Agent → C: B+World State Manager → D: C+Narra
 | `WAIN.Character.DuplicateTurnDoesNotReapplyEmotion` | 동일 TurnId 재전송 시 Emotion 중복 반영 방지 | 코드 작성 / 미실행 |
 
 **회귀 검증:** 기존 `WAIN.Transaction.*` 6개도 함께 실행. 완료 수치는 총 12개 테스트 *코드 작성*이며, **Phase 2 테스트 실행 성공을 의미하지 않는다**.
+
+## Phase 2 Character Context Tests — 작성, Unreal 실행 전
+
+| Test Name | 기대 동작 | 현재 |
+|---|---|---|
+| `WAIN.CharacterContext.UsesCommittedState` | Persona·이전 Trust/Emotion/Beat/Revision 조회, 이전 Root 불변 | 코드 작성 / 미실행 |
+| `WAIN.CharacterContext.RefreshAfterCommit` | 새 Turn은 직전 Commit 후 State/Revision 확인 | 코드 작성 / 미실행 |
+| `WAIN.CharacterContext.MissingPersonaNoCommit` | Host 조회 실패 시 Proposal 미호출·No Commit | 코드 작성 / 미실행 |
+| `WAIN.CharacterContext.WrongIdentityNoCommit` | Character ID 불일치 시 No Commit | 코드 작성 / 미실행 |
+| `WAIN.CharacterContext.LegacyProviderFallback` | Source 미주입 기존 Mock Provider와의 호환 | 코드 작성 / 미실행 |
+| `WAIN.CharacterContext.LegacyProviderRejectsPersona` | Persona 제공되는데 미지원 Provider는 명시적 실패 | 코드 작성 / 미실행 |
+| `WAIN.CharacterContext.ReplaySkipsAssembly` | 같은 Turn ID 재전송 시 Persona/Context 재조회 없음 | 코드 작성 / 미실행 |
+
+현재 등록된 Unreal Automation Test 코드는 **기존 12 + 신규 7 = 총 19개**다. `WAIN.Transaction.*`, `WAIN.Character.*`, `WAIN.CharacterContext.*`를 함께 실행하고 결과 로그를 기록한다.
+

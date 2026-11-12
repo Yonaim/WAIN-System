@@ -12,10 +12,12 @@
 
     FWAINInteractionProcessor::FWAINInteractionProcessor(TSharedRef<IWAINGameSnapshotAdapter> InGameAdapter,
                                                          TSharedRef<IWAINProposalProvider>    InProposalProvider,
-                                                         TSharedRef<IWAINNarrativeEvaluator>  InNarrativeEvaluator)
+                                                         TSharedRef<IWAINNarrativeEvaluator>  InNarrativeEvaluator,
+                                                         TSharedPtr<const IWAINPersonaSource> InPersonaSource)
         : GameAdapter(MoveTemp(InGameAdapter)),
           ProposalProvider(MoveTemp(InProposalProvider)),
-          NarrativeEvaluator(MoveTemp(InNarrativeEvaluator))
+          NarrativeEvaluator(MoveTemp(InNarrativeEvaluator)),
+          PersonaSource(MoveTemp(InPersonaSource))
     {
     }
 
@@ -97,9 +99,15 @@
             return Fail(Request, EWAINInteractionError::SessionNotStarted, TEXT("WAIN 세션이 시작되지 않았습니다."));
         }
 
+        FWAINCharacterContext Context;
+        FString Error;
+        if (!ContextBuilder.Build(Request, *Current, PersonaSource.Get(), Context, Error))
+        {
+            return Fail(Request, EWAINInteractionError::ContextPreparationFailed, Error);
+        }
+
         FWAINResponseProposal Proposal;
-        FString               Error;
-        if (!ProposalProvider->Generate(Request, *Current, Proposal, Error))
+        if (!ProposalProvider->GenerateWithContext(Request, *Current, Context, Proposal, Error))
         {
             return Fail(Request, EWAINInteractionError::ProposalGenerationFailed, Error);
         }

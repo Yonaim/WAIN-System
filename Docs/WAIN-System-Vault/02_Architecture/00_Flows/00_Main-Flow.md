@@ -45,3 +45,9 @@ flowchart TD
 현재 구현된 것은 `ProcessMockTurn → ValidateRequest → ProposalProvider.Generate → TransactionCoordinator.Execute → CommitResult → StateCommitted delegate → Result` 흐름이다. **Context Preparation / Presentation Query / 실제 LLM 생성 / 응답 표시**는 아직 없다. Sequence diagram의 전체 설계와 현재 구현을 구별한다.
 
 사용되는 게임 State Adapter는 테스트 코드의 메모리 Map Snapshot이며, 실제 Testbed의 Actor/Widget/JSON을 변경하지 않았다. [Source Map](../02_Source/00_Source-Map.md).
+
+## Phase 2 Character Context 구현 구간
+
+`Context Preparation` 중 **Character 부분만** 구현되었다. 현재 `ProcessTurn`은 확정된 Root에서 Character State를 복사하고, 선택적으로 Host Persona Source를 조회·검증한 후 `GenerateWithContext`를 호출한다. 이전 절의 `Context Preparation 미구현` 표시는 Phase 1 당시 이력이다. 아직 Memory·World·Narrative Constraint·Presentation Catalog를 합친 완전한 Context는 아니며, 실제 LLM 호출 및 UI도 미지원이다.
+
+[Context 구현 문서](../../04_Development/06_Character-Context-Implementation.md)

@@ -35,3 +35,10 @@
 - **단계 4 일부:** Character Relationship `Trust`와 6축 Emotion `AddFloat` 적용 로직 및 검증 테스트 코드 작성 완료. Persona·Context Assembly는 미구현, Phase 2 부분 완료.
 - **단계 5 이후:** 기존 로드맵 유지. Game-owned 상태에 일반 목적 float Mutation은 아직 허용하지 않음.
 - **개발 환경 확인 필요:** Phase 2 신규 코드의 Unreal 컴파일 및 `WAIN.Transaction.*`, `WAIN.Character.*` Automation Tests 실행.
+
+## Phase 2 Persona/Context 업데이트 (2026-11-10)
+
+- 단계 4 확장: Host Persona 읽기 전용 Source·Context Builder·Context-aware Proposal Provider 계약과 Automation Tests 작성. Character Context의 **일부만** 구현, Unreal 실행 미검증.
+- 단계 5 Presentation Catalog, 단계 6 Memory, 단계 7 Narrative, 단계 8 LLM/Prompt는 아직 구현하지 않았다.
+- 초기 Context는 현재 확정 State 기반이며, Game-owned World State 및 장기 Memory는 포함하지 않는다.
+

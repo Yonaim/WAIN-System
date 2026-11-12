@@ -8,6 +8,7 @@
 #include "CoreMinimal.h"
 #include "Templates/SharedPointer.h"
 #include "WAINRuntimeTypes.h"
+#include "WAINCharacterContext.h"
 
 // ============================================================
 // 00. Session Root And Game Snapshot
@@ -80,6 +81,23 @@
                               const FWAINSessionRoot        &Current,
                               FWAINResponseProposal         &OutProposal,
                               FString                       &OutError) const = 0;
+
+        /** @brief Persona가 전달되면 Context-aware Provider가 반드시 Override해야 한다. */
+        virtual bool GenerateWithContext(const FWAINInteractionRequest &Request,
+                                         const FWAINSessionRoot &Current,
+                                         const FWAINCharacterContext &Context,
+                                         FWAINResponseProposal &OutProposal,
+                                         FString &OutError) const
+        {
+            // Persona가 제공됐는데 무시한 채 대화를 생성하지 않도록 명시적으로 실패시킨다.
+            if (Context.bHasPersona)
+            {
+                OutError = TEXT("Persona를 사용하는 Provider는 GenerateWithContext를 구현해야 합니다.");
+                return false;
+            }
+
+            return Generate(Request, Current, OutProposal, OutError);
+        }
     };
 
 #pragma endregion

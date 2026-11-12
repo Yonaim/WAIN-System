@@ -47,3 +47,13 @@
 - **다음:** 사용자 Unreal 환경에서 `WAIN.Transaction.*`, `WAIN.Character.*` 전체 테스트 실행 및 Persona/Context 설계 연결.
 
 [Character Delta 구현 문서](05_Character-Delta-Implementation.md)
+
+## 2026-11-10 — Phase 2 Persona + Character Context Assembly
+
+- **구현:** Host-owned `IWAINPersonaSource`, `FWAINCharacterPersona`, 읽기 전용 `FWAINCharacterContext`, `FWAINCharacterContextBuilder` 및 `GenerateWithContext` 실행 경로.
+- **호환성:** Source 미주입 기존 Mock Provider 동작 유지. Source가 주입됐는데 Context 미지원 Provider를 쓰면 Persona를 무시하지 않고 `ProposalGenerationFailed` 반환.
+- **구현 범위:** 현재 Trust·6차원 Emotion·Active Beat·Revision·Scene/Turn Count와 Host Persona만 합성. Memory/World/Expression Catalog/LLM/JSON Loader 없음.
+- **테스트:** Persona 및 Committed State 포함, 다음 Revision 갱신, Persona 실패/ID 불일치 No Commit, 기존 Provider 호환/거절, Replay 시 재조회 없음 등 7개 테스트 코드를 작성(총 19개).
+- **검증:** Python 기반 정적 검사 예정. Unreal 5.8 컴파일과 Automation Test 실행은 미검증.
+
+[ADR-007](../03_Decisions/07_ADR-007-Read-Only-Character-Context.md) · [Implementation](06_Character-Context-Implementation.md)

@@ -8,6 +8,7 @@
 | **Plugin 초기 설정 / 빌드 전 포맷** | [Project Setup](00_Engineering-Standards/03_Workflow/04_Project-Setup.md), [Pre-Build Formatting](00_Engineering-Standards/03_Workflow/03_Pre-Build-Formatting.md), [UBT Integration](Assets/Build/Unreal/Build-Integration.md) | Constraints·Source Map·실제 Hook 검증·Work Log |
 | Unreal C++ 구조/타입/명명 | [CPP](00_Engineering-Standards/01_Languages/01_CPP.md), [Code Style](00_Engineering-Standards/00_Core/00_Code-Style.md), [Source Map](02_Architecture/02_Source/00_Source-Map.md) | 관련 Contract·Work Log |
 | 입력→Commit→VN 출력 순서 | [Main Flow](02_Architecture/00_Flows/00_Main-Flow.md), [Commit Contract](02_Architecture/01_Contracts/05_Response-Validation-Commit.md) | ADR-003·Validation Tests |
+| Host Persona 및 Character Context | [ADR-007](03_Decisions/07_ADR-007-Read-Only-Character-Context.md), [Character Context Implementation](04_Development/06_Character-Context-Implementation.md) | Character Contract·Source Map·Context 테스트 |
 | Persona/Relationship/Emotion | [Character Agent](02_Architecture/01_Contracts/01_Character-Agent.md), [Emotion Boundary](02_Architecture/01_Contracts/07_Emotion-Expression-Boundary.md) | Testbed 표현 계약·State 테스트 |
 | Memory/Reflection/Planning | [Memory](02_Architecture/01_Contracts/02_Memory-Reflection-Planning.md) | Test Plan·개발 기록 |
 | Snapshot / Game Transaction 확장 | [Snapshot ADR](03_Decisions/04_ADR-004-Snapshot-State.md), [MVP Adapter ADR](03_Decisions/05_ADR-005-Minimal-Game-Adapter.md), [Commit](02_Architecture/01_Contracts/05_Response-Validation-Commit.md) | 실패 주입·Atomic State 테스트 |

@@ -66,3 +66,7 @@ Unreal-specific Host code and character assets remain outside the reusable plugi
 ## Phase 1 코드 스타일 보완 (2026-11-10)
 
 역할별 탐색이 필요한 파일에 공통 표준의 세 줄 구분 주석과 번호 `#pragma region`을 적용했습니다. 작은 단일 기능 파일에는 강제하지 않았습니다. LLM Key/Provider 설정은 **현재 미구현**이며 `Docs/WAIN-System-Vault/04_Development/04_LLM-Configuration-Plan.md`에 구현 계획을 기록했습니다.
+
+## Phase 2 — Character Context (2026-11-10)
+
+`IWAINPersonaSource`를 선택적으로 `UWAINRuntimeSubsystem::StartSession`의 마지막 인자에 주입할 수 있다. Persona를 주입한 Provider는 `GenerateWithContext`를 구현해야 하며, 기존 `Generate`만 지원하는 Mock Provider는 Source 미주입 시에만 호환 호출된다. Unreal 5.8 컴파일·Automation 실행은 별도 검증이 필요하다. 자세한 사항은 `Docs/WAIN-System-Vault/04_Development/06_Character-Context-Implementation.md` 참조.

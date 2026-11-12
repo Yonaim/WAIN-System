@@ -42,3 +42,13 @@
 - 구현: six-dimensional independent Emotion Delta(유한 float, 0~1 Clamp), Trust 범위 유지, 불량 변경 No Commit, Region 구획 및 Top-Down 처리.
 - 회귀 시험: Phase 1 테스트 6개 보존, Character Automation Tests 6개 추가(코드만 작성).
 - 검증: 업로드 소스와 신규 변경분의 파일·헤더 경로·Region 짝·테스트 등록을 정적으로 확인. Unreal 5.8 Build/Automation 테스트는 **이 환경에서 수행하지 않음**.
+
+## 2026-11-10 — Phase 2 Character Context 확장
+
+- 입력: 직전 Phase 2 검증 전 코드 패키지(`WAINSystem-Phase2-Plugin-and-Vault.zip`)를 변경 기준본으로 사용. Phase 1 검증 기반을 보존.
+- 코드: Host Persona Source 및 Context DTO/Builder 추가, `WAINInteractionProcessor`에 Context Build를 Proposal 이전에 삽입, 기존 `StartSession`에 Source 선택 인자 추가, `IWAINProposalProvider`의 Context-aware 생성 경로 확장.
+- 결정: Host Persona 정본과 WAIN State 정본의 분리 및 Persona 주입 시 무시 금지 정책을 [ADR-007](../03_Decisions/07_ADR-007-Read-Only-Character-Context.md)로 기록.
+- 테스트: Context 관련 7개 Automation Tests 작성. 기존 12개는 소스 변경 없이 유지.
+- 불변 범위: WAIN Transaction Coordinator/State Store/Character Mutation, Host Testbed 소스·JSON, Obsidian 설정 전부 변경하지 않음.
+- 미검증: Unreal Engine 5.8 Build, 실제 테스트 실행, JSON Loader/Prompt/LLM 연동.
+
