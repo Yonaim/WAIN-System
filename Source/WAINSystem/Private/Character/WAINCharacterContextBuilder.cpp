@@ -4,20 +4,20 @@
  */
 
 #include "Character/WAINCharacterContextBuilder.h"
-#include "Presentation/WAINPresentationValidator.h"
 #include "Memory/WAINMemoryRetriever.h"
+#include "Presentation/WAINPresentationValidator.h"
 
 // ============================================================
 // 00. Context Assembly
 // ============================================================
 #pragma region 00_Context_Assembly
 
-    bool FWAINCharacterContextBuilder::Build(const FWAINInteractionRequest &Request,
-                                             const FWAINSessionRoot &Current,
-                                             const IWAINPersonaSource *PersonaSource,
+    bool FWAINCharacterContextBuilder::Build(const FWAINInteractionRequest  &Request,
+                                             const FWAINSessionRoot         &Current,
+                                             const IWAINPersonaSource       *PersonaSource,
                                              const IWAINPresentationCatalog *PresentationCatalog,
-                                             FWAINCharacterContext &OutContext,
-                                             FString &OutError) const
+                                             FWAINCharacterContext          &OutContext,
+                                             FString                        &OutError) const
     {
         const FWAINCharacterState *Character = Current.WAIN.Characters.Find(Request.CharacterId);
         if (!Character)
@@ -61,10 +61,10 @@
 // ============================================================
 #pragma region 01_Host_Persona_Lookup_And_Validation
 
-    bool FWAINCharacterContextBuilder::LoadPersona(FName CharacterId,
+    bool FWAINCharacterContextBuilder::LoadPersona(FName                     CharacterId,
                                                    const IWAINPersonaSource *PersonaSource,
-                                                   FWAINCharacterContext &Context,
-                                                   FString &OutError) const
+                                                   FWAINCharacterContext    &Context,
+                                                   FString                  &OutError) const
     {
         // Phase 1의 Persona 미주입 Mock 경로를 유지한다. 주입된 Source는 실패 시 조용히 무시하지 않는다.
         if (!PersonaSource)
@@ -93,8 +93,8 @@
     }
 
     bool FWAINCharacterContextBuilder::ValidatePersona(const FWAINCharacterPersona &Persona,
-                                                        const FName ExpectedCharacterId,
-                                                        FString &OutError)
+                                                       const FName                  ExpectedCharacterId,
+                                                       FString                     &OutError)
     {
         if (Persona.CharacterId != ExpectedCharacterId || Persona.DisplayName.TrimStartAndEnd().IsEmpty())
         {
@@ -130,10 +130,10 @@
 // ============================================================
 #pragma region 02_Host_Presentation_Catalog_Lookup
 
-    bool FWAINCharacterContextBuilder::LoadPresentations(const FWAINPresentationQuery &Query,
+    bool FWAINCharacterContextBuilder::LoadPresentations(const FWAINPresentationQuery   &Query,
                                                          const IWAINPresentationCatalog *PresentationCatalog,
-                                                         FWAINCharacterContext &Context,
-                                                         FString &OutError) const
+                                                         FWAINCharacterContext          &Context,
+                                                         FString                        &OutError) const
     {
         if (!PresentationCatalog)
         {

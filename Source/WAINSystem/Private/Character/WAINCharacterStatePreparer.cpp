@@ -10,10 +10,10 @@
 // ============================================================
 #pragma region 00_Prepared_Character_Mutation_Pipeline
 
-    bool FWAINCharacterStatePreparer::Apply(const FName CharacterId,
-                                           const TArray<FWAINStateMutation> &Mutations,
-                                           FWAINStateSnapshot &Prepared,
-                                           FString &OutError) const
+    bool FWAINCharacterStatePreparer::Apply(const FName                       CharacterId,
+                                            const TArray<FWAINStateMutation> &Mutations,
+                                            FWAINStateSnapshot               &Prepared,
+                                            FString                          &OutError) const
     {
         FWAINCharacterState *Character = Prepared.Characters.Find(CharacterId);
         if (!Character)
@@ -39,8 +39,8 @@
     }
 
     bool FWAINCharacterStatePreparer::ApplyMutation(const FWAINStateMutation &Mutation,
-                                                   FWAINCharacterState &Character,
-                                                   FString &OutError) const
+                                                    FWAINCharacterState      &Character,
+                                                    FString                  &OutError) const
     {
         if (Mutation.TargetId == TEXT("relationship.trust"))
         {
@@ -58,8 +58,8 @@
 #pragma region 01_Relationship_Update
 
     bool FWAINCharacterStatePreparer::ApplyTrust(const FWAINStateMutation &Mutation,
-                                                FWAINCharacterState &Character,
-                                                FString &OutError) const
+                                                 FWAINCharacterState      &Character,
+                                                 FString                  &OutError) const
     {
         if (Mutation.Operation != EWAINMutationOperation::AddInteger &&
             Mutation.Operation != EWAINMutationOperation::SetInteger)
@@ -89,8 +89,8 @@
 #pragma region 02_Emotion_Delta_Update
 
     bool FWAINCharacterStatePreparer::ApplyEmotionDelta(const FWAINStateMutation &Mutation,
-                                                       FWAINCharacterState &Character,
-                                                       FString &OutError) const
+                                                        FWAINCharacterState      &Character,
+                                                        FString                  &OutError) const
     {
         float *Dimension = FindEmotionDimension(Character.Emotion, Mutation.TargetId);
         if (!Dimension)

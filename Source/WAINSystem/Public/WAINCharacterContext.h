@@ -6,9 +6,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "WAINRuntimeTypes.h"
-#include "WAINPresentationCatalog.h"
 #include "WAINNarrativeTypes.h"
+#include "WAINPresentationCatalog.h"
+#include "WAINRuntimeTypes.h"
 #include "WAINWorldTypes.h"
 
 // ============================================================
@@ -19,11 +19,11 @@
     /** @brief Host가 제공하는 고정 캐릭터 정의. 런타임 State나 공개 불가 서사 정보는 포함하지 않는다. */
     struct FWAINCharacterPersona
     {
-        FName CharacterId;
-        FString DisplayName;
+        FName           CharacterId;
+        FString         DisplayName;
         TArray<FString> Traits;
-        FString SpeechStyle;
-        FString Background;
+        FString         SpeechStyle;
+        FString         Background;
         TArray<FString> Preferences;
     };
 
@@ -46,21 +46,21 @@
     /** @brief 현재 확정된 Character State·Host 정의·검색된 Memory를 포함한 읽기 전용 Context. */
     struct FWAINCharacterContext
     {
-        FName CharacterId;
-        FName SceneId;
-        FName ActiveBeatId;
-        uint64 StateRevision = 0;
-        int32 TurnCount = 0;
-        FWAINCharacterState State;
+        FName                     CharacterId;
+        FName                     SceneId;
+        FName                     ActiveBeatId;
+        uint64                    StateRevision = 0;
+        int32                     TurnCount = 0;
+        FWAINCharacterState       State;
         TArray<FWAINMemoryRecord> RelevantMemories;
-        bool bHasPersona = false;
-        FWAINCharacterPersona Persona;
-        bool bHasPresentationCatalog = false;
-        FWAINPresentationOptions AvailablePresentations;
-        bool bHasNarrativeContext = false;
-        FWAINNarrativeContext Narrative;
-        bool bHasWorldContext = false;
-        FWAINWorldContext World;
+        bool                      bHasPersona = false;
+        FWAINCharacterPersona     Persona;
+        bool                      bHasPresentationCatalog = false;
+        FWAINPresentationOptions  AvailablePresentations;
+        bool                      bHasNarrativeContext = false;
+        FWAINNarrativeContext     Narrative;
+        bool                      bHasWorldContext = false;
+        FWAINWorldContext         World;
     };
 
 #pragma endregion

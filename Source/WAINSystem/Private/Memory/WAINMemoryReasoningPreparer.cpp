@@ -3,8 +3,8 @@
  * @brief Reflection/Plan Trigger, 근거 연결 및 Prepared Snapshot 변경을 조율한다.
  */
 
-#include "Algo/Reverse.h"
 #include "Memory/WAINMemoryReasoningPreparer.h"
+#include "Algo/Reverse.h"
 
 namespace WAINMemoryReasoning
 {
@@ -12,7 +12,7 @@ namespace WAINMemoryReasoning
     constexpr int32 MaxReflectionSources = 12;
     constexpr int32 MaxPlanSources = 6;
     constexpr int32 MaxPlanSteps = 8;
-}
+} // namespace WAINMemoryReasoning
 
 // ============================================================
 // 00. Reasoning Pipeline
@@ -22,9 +22,9 @@ namespace WAINMemoryReasoning
     // 턴의 Reasoning 처리 순서를 Reflection 평가와 Plan 평가로 분리한다.
 
     bool FWAINMemoryReasoningPreparer::Prepare(const FWAINInteractionRequest &Request,
-                                              FWAINStateSnapshot &Prepared,
-                                              const IWAINMemoryReasoner &Reasoner,
-                                              FString &OutError) const
+                                               FWAINStateSnapshot            &Prepared,
+                                               const IWAINMemoryReasoner     &Reasoner,
+                                               FString                       &OutError) const
     {
         if (!PrepareReflection(Request, Prepared, Reasoner, OutError))
         {
@@ -44,12 +44,12 @@ namespace WAINMemoryReasoning
     // 새 Observation의 중요도 누적량이 임계값을 넘으면 출처가 연결된 Reflection 후보를 생성한다.
 
     bool FWAINMemoryReasoningPreparer::PrepareReflection(const FWAINInteractionRequest &Request,
-                                                 FWAINStateSnapshot &Prepared,
-                                                 const IWAINMemoryReasoner &Reasoner,
-                                                 FString &OutError)
+                                                         FWAINStateSnapshot            &Prepared,
+                                                         const IWAINMemoryReasoner     &Reasoner,
+                                                         FString                       &OutError)
     {
         const TArray<FWAINMemoryRecord> Sources = CollectUnreflectedObservations(Request.CharacterId, Prepared);
-        float TotalImportance = 0.0F;
+        float                           TotalImportance = 0.0F;
         for (const FWAINMemoryRecord &Memory : Sources)
         {
             TotalImportance += Memory.Importance;
@@ -61,10 +61,10 @@ namespace WAINMemoryReasoning
         }
 
         FString Insight;
-        if (!Reasoner.GenerateReflection(Request, Sources, Insight, OutError) ||
-            !ValidateDraftContent(Insight, OutError))
+        if (!Reasoner.GenerateReflection(Request, Sources, Insight, OutError) || !ValidateDraftContent(Insight, OutError))
         {
-            if (OutError.IsEmpty()) OutError = TEXT("Reflection을 생성하지 못했습니다.");
+            if (OutError.IsEmpty())
+                OutError = TEXT("Reflection을 생성하지 못했습니다.");
             return false;
         }
 
@@ -84,8 +84,9 @@ namespace WAINMemoryReasoning
         return AppendDerivedMemory(MoveTemp(Reflection), Prepared, OutError);
     }
 
-    TArray<FWAINMemoryRecord> FWAINMemoryReasoningPreparer::CollectUnreflectedObservations(
-        const FName CharacterId, const FWAINStateSnapshot &Prepared)
+    TArray<FWAINMemoryRecord>
+    FWAINMemoryReasoningPreparer::CollectUnreflectedObservations(const FName               CharacterId,
+                                                                 const FWAINStateSnapshot &Prepared)
     {
         int32 LastReflectionTurn = INDEX_NONE;
         for (const FWAINMemoryRecord &Memory : Prepared.MemoryStream)
@@ -98,7 +99,8 @@ namespace WAINMemoryReasoning
 
         TArray<FWAINMemoryRecord> Sources;
         for (int32 Index = Prepared.MemoryStream.Num() - 1;
-             Index >= 0 && Sources.Num() < WAINMemoryReasoning::MaxReflectionSources; --Index)
+             Index >= 0 && Sources.Num() < WAINMemoryReasoning::MaxReflectionSources;
+             --Index)
         {
             const FWAINMemoryRecord &Memory = Prepared.MemoryStream[Index];
             if (Memory.CharacterId == CharacterId && Memory.Type == EWAINMemoryType::Observation &&
@@ -121,9 +123,9 @@ namespace WAINMemoryReasoning
     // 기존 Plan의 Scene/Beat 유효성을 확인한 뒤 필요할 때만 새 Plan 후보를 준비한다.
 
     bool FWAINMemoryReasoningPreparer::PreparePlan(const FWAINInteractionRequest &Request,
-                                           FWAINStateSnapshot &Prepared,
-                                           const IWAINMemoryReasoner &Reasoner,
-                                           FString &OutError)
+                                                   FWAINStateSnapshot            &Prepared,
+                                                   const IWAINMemoryReasoner     &Reasoner,
+                                                   FString                       &OutError)
     {
         if (!RequiresPlan(Request, Prepared))
         {
@@ -141,7 +143,8 @@ namespace WAINMemoryReasoning
         if (!Reasoner.GeneratePlan(Request, Prepared.ActiveBeatId, Sources, Draft, OutError) ||
             !ValidateDraftContent(Draft.Summary, OutError))
         {
-            if (OutError.IsEmpty()) OutError = TEXT("Plan을 생성하지 못했습니다.");
+            if (OutError.IsEmpty())
+                OutError = TEXT("Plan을 생성하지 못했습니다.");
             return false;
         }
 
@@ -152,7 +155,8 @@ namespace WAINMemoryReasoning
         }
         for (const FString &Step : Draft.Steps)
         {
-            if (!ValidateDraftContent(Step, OutError)) return false;
+            if (!ValidateDraftContent(Step, OutError))
+                return false;
         }
 
         FWAINMemoryRecord Plan;
@@ -182,15 +186,15 @@ namespace WAINMemoryReasoning
     }
 
     bool FWAINMemoryReasoningPreparer::RequiresPlan(const FWAINInteractionRequest &Request,
-                                           const FWAINStateSnapshot &Prepared)
+                                                    const FWAINStateSnapshot      &Prepared)
     {
         const FGuid *PlanId = Prepared.ActivePlanIds.Find(Request.CharacterId);
-        if (!PlanId) return true;
+        if (!PlanId)
+            return true;
 
         for (const FWAINMemoryRecord &Memory : Prepared.MemoryStream)
         {
-            if (Memory.Id == *PlanId && Memory.CharacterId == Request.CharacterId &&
-                Memory.Type == EWAINMemoryType::Plan)
+            if (Memory.Id == *PlanId && Memory.CharacterId == Request.CharacterId && Memory.Type == EWAINMemoryType::Plan)
             {
                 return Memory.SceneId != Request.SceneId || Memory.BeatId != Prepared.ActiveBeatId;
             }
@@ -198,12 +202,13 @@ namespace WAINMemoryReasoning
         return true;
     }
 
-    TArray<FWAINMemoryRecord> FWAINMemoryReasoningPreparer::CollectPlanSources(const FName CharacterId,
-                                                                       const FWAINStateSnapshot &Prepared)
+    TArray<FWAINMemoryRecord> FWAINMemoryReasoningPreparer::CollectPlanSources(const FName               CharacterId,
+                                                                               const FWAINStateSnapshot &Prepared)
     {
         TArray<FWAINMemoryRecord> Sources;
         for (int32 Index = Prepared.MemoryStream.Num() - 1;
-             Index >= 0 && Sources.Num() < WAINMemoryReasoning::MaxPlanSources; --Index)
+             Index >= 0 && Sources.Num() < WAINMemoryReasoning::MaxPlanSources;
+             --Index)
         {
             const FWAINMemoryRecord &Memory = Prepared.MemoryStream[Index];
             if (Memory.CharacterId == CharacterId && Memory.Type != EWAINMemoryType::Plan)
@@ -235,8 +240,8 @@ namespace WAINMemoryReasoning
     }
 
     bool FWAINMemoryReasoningPreparer::AppendDerivedMemory(FWAINMemoryRecord &&Record,
-                                                    FWAINStateSnapshot &Prepared,
-                                                    FString &OutError)
+                                                           FWAINStateSnapshot &Prepared,
+                                                           FString            &OutError)
     {
         if (Prepared.MemoryStream.Num() >= 2000)
         {

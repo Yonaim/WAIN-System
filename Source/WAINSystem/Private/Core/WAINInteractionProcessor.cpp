@@ -10,13 +10,13 @@
 // ============================================================
 #pragma region 00_Session_And_Public_API
 
-    FWAINInteractionProcessor::FWAINInteractionProcessor(TSharedRef<IWAINGameSnapshotAdapter> InGameAdapter,
-                                                         TSharedRef<IWAINProposalProvider>    InProposalProvider,
-                                                         TSharedRef<IWAINNarrativeEvaluator>  InNarrativeEvaluator,
-                                                         TSharedPtr<const IWAINPersonaSource> InPersonaSource,
+    FWAINInteractionProcessor::FWAINInteractionProcessor(TSharedRef<IWAINGameSnapshotAdapter>       InGameAdapter,
+                                                         TSharedRef<IWAINProposalProvider>          InProposalProvider,
+                                                         TSharedRef<IWAINNarrativeEvaluator>        InNarrativeEvaluator,
+                                                         TSharedPtr<const IWAINPersonaSource>       InPersonaSource,
                                                          TSharedPtr<const IWAINPresentationCatalog> InPresentationCatalog,
-                                                         TSharedPtr<const IWAINMemoryReasoner> InMemoryReasoner,
-                                                         TSharedPtr<const FWAINWorldStateManager> InWorldManager)
+                                                         TSharedPtr<const IWAINMemoryReasoner>      InMemoryReasoner,
+                                                         TSharedPtr<const FWAINWorldStateManager>   InWorldManager)
         : GameAdapter(MoveTemp(InGameAdapter)),
           ProposalProvider(MoveTemp(InProposalProvider)),
           NarrativeEvaluator(MoveTemp(InNarrativeEvaluator)),
@@ -116,7 +116,7 @@
         }
 
         FWAINCharacterContext Context;
-        FString Error;
+        FString               Error;
         if (!ContextBuilder.Build(Request, *Current, PersonaSource.Get(), PresentationCatalog.Get(), Context, Error))
         {
             return Fail(Request, EWAINInteractionError::ContextPreparationFailed, Error);
@@ -144,9 +144,14 @@
         }
 
         const FWAINCommitOutcome Commit =
-            Coordinator.Execute(Request, Proposal, StateStore, *GameAdapter, *NarrativeEvaluator,
+            Coordinator.Execute(Request,
+                                Proposal,
+                                StateStore,
+                                *GameAdapter,
+                                *NarrativeEvaluator,
                                 Context.bHasPresentationCatalog ? &Context.AvailablePresentations : nullptr,
-                                MemoryReasoner.Get(), WorldManager.Get());
+                                MemoryReasoner.Get(),
+                                WorldManager.Get());
         if (!Commit.Succeeded())
         {
             return Fail(Request, Commit.Error, Commit.Message);
@@ -182,7 +187,8 @@
             return false;
         }
 
-        if ((Request.InputKind == EWAINInputKind::Text && (Request.Text.TrimStartAndEnd().IsEmpty() || Request.Text.Len() > 4096)) ||
+        if ((Request.InputKind == EWAINInputKind::Text &&
+             (Request.Text.TrimStartAndEnd().IsEmpty() || Request.Text.Len() > 4096)) ||
             (Request.InputKind == EWAINInputKind::Silence && !Request.Text.IsEmpty()))
         {
             OutError = TEXT("Text와 Silence 입력 형식이 일치하지 않습니다.");

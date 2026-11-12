@@ -22,23 +22,23 @@
         {
             public:
             mutable TArray<FWAINCharacterContext> Contexts;
-            bool bInvalidGameMutation = false;
-            bool bEmptyDialogue = false;
+            bool                                  bInvalidGameMutation = false;
+            bool                                  bEmptyDialogue = false;
 
             virtual bool Generate(const FWAINInteractionRequest &Request,
-                                  const FWAINSessionRoot &Current,
-                                  FWAINResponseProposal &OutProposal,
-                                  FString &OutError) const override
+                                  const FWAINSessionRoot        &Current,
+                                  FWAINResponseProposal         &OutProposal,
+                                  FString                       &OutError) const override
             {
                 OutError = TEXT("Memory 테스트는 Context-aware 경로를 사용합니다.");
                 return false;
             }
 
             virtual bool GenerateWithContext(const FWAINInteractionRequest &Request,
-                                             const FWAINSessionRoot &Current,
-                                             const FWAINCharacterContext &Context,
-                                             FWAINResponseProposal &OutProposal,
-                                             FString &OutError) const override
+                                             const FWAINSessionRoot        &Current,
+                                             const FWAINCharacterContext   &Context,
+                                             FWAINResponseProposal         &OutProposal,
+                                             FString                       &OutError) const override
             {
                 Contexts.Add(Context);
                 OutProposal.Dialogue = bEmptyDialogue ? TEXT("") : TEXT("그래, 기억할게.");
@@ -64,7 +64,7 @@
             return State;
         }
 
-        FWAINInteractionRequest MakeRequest(const FName CharacterId = TEXT("MANA"),
+        FWAINInteractionRequest MakeRequest(const FName    CharacterId = TEXT("MANA"),
                                             const FString &Text = TEXT("약속 기억해"))
         {
             FWAINInteractionRequest Request;
@@ -87,16 +87,16 @@
             return Memory;
         }
 
-        TUniquePtr<FWAINInteractionProcessor> MakeProcessor(
-            TSharedRef<IWAINProposalProvider> Provider,
-            FString &OutError,
-            const FWAINStateSnapshot *Initial = nullptr)
+        TUniquePtr<FWAINInteractionProcessor> MakeProcessor(TSharedRef<IWAINProposalProvider> Provider,
+                                                            FString                          &OutError,
+                                                            const FWAINStateSnapshot         *Initial = nullptr)
         {
             TMap<FName, int32> Values;
             Values.Add(TEXT("inventory.gift"), 2);
             auto Adapter = MakeShared<FWAINMapGameAdapter>(MoveTemp(Values));
-            auto Processor = MakeUnique<FWAINInteractionProcessor>(
-                Adapter, MoveTemp(Provider), MakeShared<FWAINNoOpNarrativeEvaluator>());
+            auto Processor = MakeUnique<FWAINInteractionProcessor>(Adapter,
+                                                                   MoveTemp(Provider),
+                                                                   MakeShared<FWAINNoOpNarrativeEvaluator>());
             const FWAINStateSnapshot DefaultState = MakeState();
             if (!Processor->StartSession(Initial ? *Initial : DefaultState, OutError))
             {
@@ -119,10 +119,11 @@
 
     bool FWAINMemoryObservationCommitTest::RunTest(const FString &Parameters)
     {
-        auto Provider = MakeShared<WAINMemoryTests::FCapturingProvider>();
+        auto    Provider = MakeShared<WAINMemoryTests::FCapturingProvider>();
         FString Error;
-        auto Processor = WAINMemoryTests::MakeProcessor(Provider, Error);
-        if (!TestTrue(TEXT("세션 시작"), Processor != nullptr)) return false;
+        auto    Processor = WAINMemoryTests::MakeProcessor(Provider, Error);
+        if (!TestTrue(TEXT("세션 시작"), Processor != nullptr))
+            return false;
 
         const auto Before = Processor->GetSnapshot();
         const auto Result = Processor->ProcessTurn(WAINMemoryTests::MakeRequest());
@@ -144,10 +145,11 @@
 
     bool FWAINMemoryNextTurnContextTest::RunTest(const FString &Parameters)
     {
-        auto Provider = MakeShared<WAINMemoryTests::FCapturingProvider>();
+        auto    Provider = MakeShared<WAINMemoryTests::FCapturingProvider>();
         FString Error;
-        auto Processor = WAINMemoryTests::MakeProcessor(Provider, Error);
-        if (!TestTrue(TEXT("세션 시작"), Processor != nullptr)) return false;
+        auto    Processor = WAINMemoryTests::MakeProcessor(Provider, Error);
+        if (!TestTrue(TEXT("세션 시작"), Processor != nullptr))
+            return false;
 
         const auto First = Processor->ProcessTurn(WAINMemoryTests::MakeRequest());
         const auto Second = Processor->ProcessTurn(WAINMemoryTests::MakeRequest(TEXT("MANA"), TEXT("약속")));
@@ -166,10 +168,11 @@
 
     bool FWAINMemoryCharacterIsolationTest::RunTest(const FString &Parameters)
     {
-        auto Provider = MakeShared<WAINMemoryTests::FCapturingProvider>();
+        auto    Provider = MakeShared<WAINMemoryTests::FCapturingProvider>();
         FString Error;
-        auto Processor = WAINMemoryTests::MakeProcessor(Provider, Error);
-        if (!TestTrue(TEXT("세션 시작"), Processor != nullptr)) return false;
+        auto    Processor = WAINMemoryTests::MakeProcessor(Provider, Error);
+        if (!TestTrue(TEXT("세션 시작"), Processor != nullptr))
+            return false;
 
         Processor->ProcessTurn(WAINMemoryTests::MakeRequest(TEXT("MANA"), TEXT("마나만 아는 약속")));
         const auto Other = Processor->ProcessTurn(WAINMemoryTests::MakeRequest(TEXT("HANA"), TEXT("다른 사람")));
@@ -191,8 +194,8 @@
         State.MemoryStream.Add(WAINMemoryTests::MakeMemory(TEXT("MANA"), TEXT("딸기우유를 나눔"), 2));
         State.MemoryStream.Add(WAINMemoryTests::MakeMemory(TEXT("HANA"), TEXT("딸기우유 이야기"), 5));
 
-        const auto Found = FWAINMemoryRetriever().Retrieve(
-            WAINMemoryTests::MakeRequest(TEXT("MANA"), TEXT("딸기우유")), State);
+        const auto Found =
+            FWAINMemoryRetriever().Retrieve(WAINMemoryTests::MakeRequest(TEXT("MANA"), TEXT("딸기우유")), State);
         TestEqual(TEXT("MANA의 기록만 검색"), Found.Num(), 2);
         if (Found.Num() == 2)
         {
@@ -217,8 +220,9 @@
         auto Provider = MakeShared<WAINMemoryTests::FCapturingProvider>();
         Provider->bInvalidGameMutation = true;
         FString Error;
-        auto Processor = WAINMemoryTests::MakeProcessor(Provider, Error);
-        if (!TestTrue(TEXT("세션 시작"), Processor != nullptr)) return false;
+        auto    Processor = WAINMemoryTests::MakeProcessor(Provider, Error);
+        if (!TestTrue(TEXT("세션 시작"), Processor != nullptr))
+            return false;
 
         const auto Result = Processor->ProcessTurn(WAINMemoryTests::MakeRequest());
         const auto Current = Processor->GetSnapshot();
@@ -237,8 +241,9 @@
         auto Provider = MakeShared<WAINMemoryTests::FCapturingProvider>();
         Provider->bEmptyDialogue = true;
         FString Error;
-        auto Processor = WAINMemoryTests::MakeProcessor(Provider, Error);
-        if (!TestTrue(TEXT("세션 시작"), Processor != nullptr)) return false;
+        auto    Processor = WAINMemoryTests::MakeProcessor(Provider, Error);
+        if (!TestTrue(TEXT("세션 시작"), Processor != nullptr))
+            return false;
 
         const auto Result = Processor->ProcessTurn(WAINMemoryTests::MakeRequest());
         TestTrue(TEXT("잘못된 Proposal 오류"), Result.Error == EWAINInteractionError::InvalidProposal);
@@ -252,10 +257,11 @@
 
     bool FWAINMemoryDuplicateTurnTest::RunTest(const FString &Parameters)
     {
-        auto Provider = MakeShared<WAINMemoryTests::FCapturingProvider>();
+        auto    Provider = MakeShared<WAINMemoryTests::FCapturingProvider>();
         FString Error;
-        auto Processor = WAINMemoryTests::MakeProcessor(Provider, Error);
-        if (!TestTrue(TEXT("세션 시작"), Processor != nullptr)) return false;
+        auto    Processor = WAINMemoryTests::MakeProcessor(Provider, Error);
+        if (!TestTrue(TEXT("세션 시작"), Processor != nullptr))
+            return false;
 
         const auto Request = WAINMemoryTests::MakeRequest();
         const auto First = Processor->ProcessTurn(Request);
@@ -274,10 +280,11 @@
 
     bool FWAINMemorySilenceTurnTest::RunTest(const FString &Parameters)
     {
-        auto Provider = MakeShared<WAINMemoryTests::FCapturingProvider>();
+        auto    Provider = MakeShared<WAINMemoryTests::FCapturingProvider>();
         FString Error;
-        auto Processor = WAINMemoryTests::MakeProcessor(Provider, Error);
-        if (!TestTrue(TEXT("세션 시작"), Processor != nullptr)) return false;
+        auto    Processor = WAINMemoryTests::MakeProcessor(Provider, Error);
+        if (!TestTrue(TEXT("세션 시작"), Processor != nullptr))
+            return false;
 
         auto Request = WAINMemoryTests::MakeRequest();
         Request.InputKind = EWAINInputKind::Silence;

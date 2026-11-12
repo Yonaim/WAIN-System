@@ -30,15 +30,15 @@ class WAINSYSTEM_API UWAINRuntimeSubsystem : public UGameInstanceSubsystem
     GENERATED_BODY()
 
   public:
-    bool StartSession(const FWAINStateSnapshot            &InitialWAIN,
-                      TSharedRef<IWAINGameSnapshotAdapter> GameAdapter,
-                      TSharedRef<IWAINProposalProvider>    ProposalProvider,
-                      TSharedRef<IWAINNarrativeEvaluator>  NarrativeEvaluator,
-                      FString                             &OutError,
-                      TSharedPtr<const IWAINPersonaSource> PersonaSource = nullptr,
+    bool StartSession(const FWAINStateSnapshot                  &InitialWAIN,
+                      TSharedRef<IWAINGameSnapshotAdapter>       GameAdapter,
+                      TSharedRef<IWAINProposalProvider>          ProposalProvider,
+                      TSharedRef<IWAINNarrativeEvaluator>        NarrativeEvaluator,
+                      FString                                   &OutError,
+                      TSharedPtr<const IWAINPersonaSource>       PersonaSource = nullptr,
                       TSharedPtr<const IWAINPresentationCatalog> PresentationCatalog = nullptr,
-                      TSharedPtr<const IWAINMemoryReasoner> MemoryReasoner = nullptr,
-                      TSharedPtr<const FWAINWorldStateManager> WorldManager = nullptr);
+                      TSharedPtr<const IWAINMemoryReasoner>      MemoryReasoner = nullptr,
+                      TSharedPtr<const FWAINWorldStateManager>   WorldManager = nullptr);
 
     FWAINInteractionResult ProcessMockTurn(const FWAINInteractionRequest &Request);
 

@@ -11,10 +11,10 @@
 #pragma region 00_Read_Only_Retrieval_Pipeline
 
     TArray<FWAINMemoryRecord> FWAINMemoryRetriever::Retrieve(const FWAINInteractionRequest &Request,
-                                                              const FWAINStateSnapshot &Current) const
+                                                             const FWAINStateSnapshot      &Current) const
     {
         const TArray<FRankedMemory> Ranked = RankCandidates(Request, Current);
-        TArray<FWAINMemoryRecord> Results = SelectTopMemories(Ranked, Current);
+        TArray<FWAINMemoryRecord>   Results = SelectTopMemories(Ranked, Current);
         AppendActivePlan(Request.CharacterId, Current, Results);
         return Results;
     }
@@ -26,9 +26,8 @@
 // ============================================================
 #pragma region 01_Candidate_Ranking_And_Selection
 
-    TArray<FWAINMemoryRetriever::FRankedMemory>
-    FWAINMemoryRetriever::RankCandidates(const FWAINInteractionRequest &Request,
-                                          const FWAINStateSnapshot &Current)
+    TArray<FWAINMemoryRetriever::FRankedMemory> FWAINMemoryRetriever::RankCandidates(const FWAINInteractionRequest &Request,
+                                                                                     const FWAINStateSnapshot      &Current)
     {
         TArray<FRankedMemory> Ranked;
         for (int32 Index = 0; Index < Current.MemoryStream.Num(); ++Index)
@@ -40,22 +39,23 @@
             }
         }
 
-        Ranked.Sort([](const FRankedMemory &Left, const FRankedMemory &Right)
-        {
-            if (Left.Score != Right.Score)
+        Ranked.Sort(
+            [](const FRankedMemory &Left, const FRankedMemory &Right)
             {
-                return Left.Score > Right.Score;
-            }
-            return Left.Index > Right.Index;
-        });
+                if (Left.Score != Right.Score)
+                {
+                    return Left.Score > Right.Score;
+                }
+                return Left.Index > Right.Index;
+            });
         return Ranked;
     }
 
     TArray<FWAINMemoryRecord> FWAINMemoryRetriever::SelectTopMemories(const TArray<FRankedMemory> &Ranked,
-                                                                          const FWAINStateSnapshot &Current)
+                                                                      const FWAINStateSnapshot    &Current)
     {
         TArray<FWAINMemoryRecord> Results;
-        const int32 Count = FMath::Min(Ranked.Num(), 6);
+        const int32               Count = FMath::Min(Ranked.Num(), 6);
         Results.Reserve(Count);
         for (int32 Index = 0; Index < Count; ++Index)
         {
@@ -71,12 +71,13 @@
 // ============================================================
 #pragma region 02_Active_Plan_Context
 
-    void FWAINMemoryRetriever::AppendActivePlan(const FName CharacterId,
-                                                 const FWAINStateSnapshot &Current,
-                                                 TArray<FWAINMemoryRecord> &OutResults)
+    void FWAINMemoryRetriever::AppendActivePlan(const FName                CharacterId,
+                                                const FWAINStateSnapshot  &Current,
+                                                TArray<FWAINMemoryRecord> &OutResults)
     {
         const FGuid *ActiveId = Current.ActivePlanIds.Find(CharacterId);
-        if (!ActiveId) return;
+        if (!ActiveId)
+            return;
 
         for (const FWAINMemoryRecord &Memory : Current.MemoryStream)
         {
@@ -96,8 +97,8 @@
 #pragma region 03_Temporary_Lexical_Scoring
 
     float FWAINMemoryRetriever::CalculateScore(const FWAINInteractionRequest &Request,
-                                                const FWAINMemoryRecord &Memory,
-                                                const int32 CurrentTurn)
+                                               const FWAINMemoryRecord       &Memory,
+                                               const int32                    CurrentTurn)
     {
         const float Relevance = CalculateRelevance(Request.Text, Memory.Content);
         const float Recency = 1.0F / (1.0F + FMath::Max(0, CurrentTurn - Memory.CreatedTurn) / 8.0F);

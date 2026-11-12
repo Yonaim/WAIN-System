@@ -34,16 +34,16 @@ class IWAINGameStateSnapshot;
     /** @brief GameInteger인 경우에만 TargetId를 사용한다. 조건 배열은 논리 AND다. */
     struct FWAINNarrativeCondition
     {
-        EWAINNarrativeFact Source = EWAINNarrativeFact::CharacterTrust;
-        FName TargetId;
+        EWAINNarrativeFact       Source = EWAINNarrativeFact::CharacterTrust;
+        FName                    TargetId;
         EWAINNarrativeComparison Comparison = EWAINNarrativeComparison::AtLeast;
-        int32 Value = 0;
+        int32                    Value = 0;
     };
 
     /** @brief Game Integer의 증가를 감지하면 준비된 State에서 선행 조건을 검사한다. */
     struct FWAINNarrativeHardRule
     {
-        FName GuardedGameTargetId;
+        FName                           GuardedGameTargetId;
         TArray<FWAINNarrativeCondition> Prerequisites;
     };
 
@@ -61,44 +61,44 @@ class IWAINGameStateSnapshot;
 
     struct FWAINNarrativeChapter
     {
-        FName Id;
-        FString Goal;
-        TArray<FString> SoftConstraints;
+        FName                          Id;
+        FString                        Goal;
+        TArray<FString>                SoftConstraints;
         TArray<FWAINNarrativeHardRule> HardRules;
     };
 
     struct FWAINNarrativeSequence
     {
-        FName Id;
-        FName ChapterId;
-        FString Goal;
-        TArray<FString> SoftConstraints;
+        FName                          Id;
+        FName                          ChapterId;
+        FString                        Goal;
+        TArray<FString>                SoftConstraints;
         TArray<FWAINNarrativeHardRule> HardRules;
     };
 
     struct FWAINBeatTransition
     {
-        FName TargetBeatId;
-        int32 Priority = 0;
+        FName                           TargetBeatId;
+        int32                           Priority = 0;
         TArray<FWAINNarrativeCondition> Conditions;
     };
 
     struct FWAINNarrativeBeat
     {
-        FName Id;
-        FName SequenceId;
-        FString Goal;
-        TArray<FString> SoftConstraints;
-        TArray<FWAINNarrativeHardRule> HardRules;
+        FName                           Id;
+        FName                           SequenceId;
+        FString                         Goal;
+        TArray<FString>                 SoftConstraints;
+        TArray<FWAINNarrativeHardRule>  HardRules;
         TArray<FWAINNarrativeCondition> CompletionConditions;
-        TArray<FWAINBeatTransition> Transitions;
+        TArray<FWAINBeatTransition>     Transitions;
     };
 
     struct FWAINNarrativeGraph
     {
-        TArray<FWAINNarrativeChapter> Chapters;
+        TArray<FWAINNarrativeChapter>  Chapters;
         TArray<FWAINNarrativeSequence> Sequences;
-        TArray<FWAINNarrativeBeat> Beats;
+        TArray<FWAINNarrativeBeat>     Beats;
     };
 
 #pragma endregion
@@ -113,12 +113,12 @@ class IWAINGameStateSnapshot;
     /** @brief 현재 활성 부모 경로의 공개 가능한 Goal/Soft Constraint만 Provider에 전달한다. */
     struct FWAINNarrativeContext
     {
-        FName ChapterId;
-        FName SequenceId;
-        FName BeatId;
-        FString ChapterGoal;
-        FString SequenceGoal;
-        FString BeatGoal;
+        FName           ChapterId;
+        FName           SequenceId;
+        FName           BeatId;
+        FString         ChapterGoal;
+        FString         SequenceGoal;
+        FString         BeatGoal;
         TArray<FString> SoftConstraints;
     };
 

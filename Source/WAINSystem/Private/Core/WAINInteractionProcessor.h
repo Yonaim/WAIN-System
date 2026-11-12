@@ -5,10 +5,10 @@
 
 #pragma once
 
+#include "Character/WAINCharacterContextBuilder.h"
 #include "Core/WAINStateStore.h"
 #include "Core/WAINTransactionCoordinator.h"
 #include "CoreMinimal.h"
-#include "Character/WAINCharacterContextBuilder.h"
 #include "WAINInterfaces.h"
 #include "WAINWorldStateManager.h"
 
@@ -20,13 +20,13 @@ class FWAINInteractionProcessor final
 // ============================================================
 #pragma region 00_Public_Interaction_API
 
-    FWAINInteractionProcessor(TSharedRef<IWAINGameSnapshotAdapter> InGameAdapter,
-                              TSharedRef<IWAINProposalProvider>    InProposalProvider,
-                              TSharedRef<IWAINNarrativeEvaluator>  InNarrativeEvaluator,
-                              TSharedPtr<const IWAINPersonaSource> InPersonaSource = nullptr,
+    FWAINInteractionProcessor(TSharedRef<IWAINGameSnapshotAdapter>       InGameAdapter,
+                              TSharedRef<IWAINProposalProvider>          InProposalProvider,
+                              TSharedRef<IWAINNarrativeEvaluator>        InNarrativeEvaluator,
+                              TSharedPtr<const IWAINPersonaSource>       InPersonaSource = nullptr,
                               TSharedPtr<const IWAINPresentationCatalog> InPresentationCatalog = nullptr,
-                              TSharedPtr<const IWAINMemoryReasoner> InMemoryReasoner = nullptr,
-                              TSharedPtr<const FWAINWorldStateManager> InWorldManager = nullptr);
+                              TSharedPtr<const IWAINMemoryReasoner>      InMemoryReasoner = nullptr,
+                              TSharedPtr<const FWAINWorldStateManager>   InWorldManager = nullptr);
 
     bool StartSession(const FWAINStateSnapshot &InitialWAIN, FString &OutError);
 
@@ -64,14 +64,14 @@ class FWAINInteractionProcessor final
 // ============================================================
 #pragma region 02_Dependencies_And_Session_State
 
-    TSharedRef<IWAINGameSnapshotAdapter> GameAdapter;
-    TSharedRef<IWAINProposalProvider>    ProposalProvider;
-    TSharedRef<IWAINNarrativeEvaluator>  NarrativeEvaluator;
-    TSharedPtr<const IWAINPersonaSource> PersonaSource;
+    TSharedRef<IWAINGameSnapshotAdapter>       GameAdapter;
+    TSharedRef<IWAINProposalProvider>          ProposalProvider;
+    TSharedRef<IWAINNarrativeEvaluator>        NarrativeEvaluator;
+    TSharedPtr<const IWAINPersonaSource>       PersonaSource;
     TSharedPtr<const IWAINPresentationCatalog> PresentationCatalog;
-    TSharedPtr<const IWAINMemoryReasoner> MemoryReasoner;
-    TSharedPtr<const FWAINWorldStateManager> WorldManager;
-    FWAINCharacterContextBuilder ContextBuilder;
+    TSharedPtr<const IWAINMemoryReasoner>      MemoryReasoner;
+    TSharedPtr<const FWAINWorldStateManager>   WorldManager;
+    FWAINCharacterContextBuilder               ContextBuilder;
 
     FWAINStateStore             StateStore;
     FWAINTransactionCoordinator Coordinator;

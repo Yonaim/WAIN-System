@@ -16,7 +16,7 @@
     /** @brief 서사 Goal은 현재 Beat를 기본 단위로 하며, 실제 단계 텍스트는 생성기가 제공한다. */
     struct FWAINPlanDraft
     {
-        FString Summary;
+        FString         Summary;
         TArray<FString> Steps;
     };
 
@@ -38,16 +38,16 @@
         public:
         virtual ~IWAINMemoryReasoner() = default;
 
-        virtual bool GenerateReflection(const FWAINInteractionRequest &Request,
+        virtual bool GenerateReflection(const FWAINInteractionRequest   &Request,
                                         const TArray<FWAINMemoryRecord> &Sources,
-                                        FString &OutInsight,
-                                        FString &OutError) const = 0;
+                                        FString                         &OutInsight,
+                                        FString                         &OutError) const = 0;
 
-        virtual bool GeneratePlan(const FWAINInteractionRequest &Request,
-                                  FName ActiveBeatId,
+        virtual bool GeneratePlan(const FWAINInteractionRequest   &Request,
+                                  FName                            ActiveBeatId,
                                   const TArray<FWAINMemoryRecord> &Sources,
-                                  FWAINPlanDraft &OutPlan,
-                                  FString &OutError) const = 0;
+                                  FWAINPlanDraft                  &OutPlan,
+                                  FString                         &OutError) const = 0;
     };
 
 #pragma endregion

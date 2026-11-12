@@ -11,15 +11,15 @@
 // ============================================================
 #pragma region 00_Session_And_Mock_Turn
 
-    bool UWAINRuntimeSubsystem::StartSession(const FWAINStateSnapshot            &InitialWAIN,
-                                             TSharedRef<IWAINGameSnapshotAdapter> GameAdapter,
-                                             TSharedRef<IWAINProposalProvider>    ProposalProvider,
-                                             TSharedRef<IWAINNarrativeEvaluator>  NarrativeEvaluator,
-                                             FString                             &OutError,
-                                             TSharedPtr<const IWAINPersonaSource> PersonaSource,
+    bool UWAINRuntimeSubsystem::StartSession(const FWAINStateSnapshot                  &InitialWAIN,
+                                             TSharedRef<IWAINGameSnapshotAdapter>       GameAdapter,
+                                             TSharedRef<IWAINProposalProvider>          ProposalProvider,
+                                             TSharedRef<IWAINNarrativeEvaluator>        NarrativeEvaluator,
+                                             FString                                   &OutError,
+                                             TSharedPtr<const IWAINPersonaSource>       PersonaSource,
                                              TSharedPtr<const IWAINPresentationCatalog> PresentationCatalog,
-                                             TSharedPtr<const IWAINMemoryReasoner> MemoryReasoner,
-                                             TSharedPtr<const FWAINWorldStateManager> WorldManager)
+                                             TSharedPtr<const IWAINMemoryReasoner>      MemoryReasoner,
+                                             TSharedPtr<const FWAINWorldStateManager>   WorldManager)
     {
         check(IsInGameThread());
 

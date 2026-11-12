@@ -13,14 +13,14 @@
 
     // Host 정본을 복사하지 않고 공개 가능한 Key-Value만 이번 턴 Context에 제공한다.
 
-    FWAINWorldStateManager::FWAINWorldStateManager(TArray<FWAINWorldFactDefinition> InSchema,
+    FWAINWorldStateManager::FWAINWorldStateManager(TArray<FWAINWorldFactDefinition>       InSchema,
                                                    TSharedPtr<const IWAINWorldFactReader> InReader)
-        : Schema(MoveTemp(InSchema)), Reader(MoveTemp(InReader))
+        : Schema(MoveTemp(InSchema)),
+          Reader(MoveTemp(InReader))
     {
     }
 
-    bool FWAINWorldStateManager::ValidateInitial(const IWAINGameStateSnapshot &Current,
-                                                 FString &OutError) const
+    bool FWAINWorldStateManager::ValidateInitial(const IWAINGameStateSnapshot &Current, FString &OutError) const
     {
         if (!ValidateSchema(OutError))
         {
@@ -39,8 +39,8 @@
     }
 
     bool FWAINWorldStateManager::BuildContext(const IWAINGameStateSnapshot &Current,
-                                              FWAINWorldContext &OutContext,
-                                              FString &OutError) const
+                                              FWAINWorldContext            &OutContext,
+                                              FString                      &OutError) const
     {
         FWAINWorldContext NextContext;
         for (const FWAINWorldFactDefinition &Definition : Schema)
@@ -71,18 +71,18 @@
 
     // 제안이 허용된 Mutation인지 먼저 검사하고, Adapter의 실제 Prepared 결과까지 재확인한다.
 
-    bool FWAINWorldStateManager::ValidateMutations(const IWAINGameStateSnapshot &Current,
+    bool FWAINWorldStateManager::ValidateMutations(const IWAINGameStateSnapshot     &Current,
                                                    const TArray<FWAINStateMutation> &Mutations,
-                                                   FString &OutError) const
+                                                   FString                          &OutError) const
     {
         TMap<FName, int32> Expected;
         return ComputeExpected(Current, Mutations, Expected, OutError);
     }
 
-    bool FWAINWorldStateManager::ValidatePrepared(const IWAINGameStateSnapshot &Current,
-                                                  const IWAINGameStateSnapshot &Prepared,
+    bool FWAINWorldStateManager::ValidatePrepared(const IWAINGameStateSnapshot     &Current,
+                                                  const IWAINGameStateSnapshot     &Prepared,
                                                   const TArray<FWAINStateMutation> &Mutations,
-                                                  FString &OutError) const
+                                                  FString                          &OutError) const
     {
         TMap<FName, int32> Expected;
         if (!ComputeExpected(Current, Mutations, Expected, OutError))
@@ -128,8 +128,7 @@
         TSet<FName> Keys;
         for (const FWAINWorldFactDefinition &Definition : Schema)
         {
-            if (Definition.Key.IsNone() || Keys.Contains(Definition.Key) ||
-                Definition.MinValue > Definition.MaxValue)
+            if (Definition.Key.IsNone() || Keys.Contains(Definition.Key) || Definition.MinValue > Definition.MaxValue)
             {
                 OutError = TEXT("World Fact Schema에 중복·누락된 Key 또는 잘못된 값 범위가 있습니다.");
                 return false;
@@ -139,10 +138,10 @@
         return true;
     }
 
-    bool FWAINWorldStateManager::ReadValidated(const IWAINGameStateSnapshot &Snapshot,
+    bool FWAINWorldStateManager::ReadValidated(const IWAINGameStateSnapshot   &Snapshot,
                                                const FWAINWorldFactDefinition &Definition,
-                                               int32 &OutValue,
-                                               FString &OutError) const
+                                               int32                          &OutValue,
+                                               FString                        &OutError) const
     {
         if (!Reader.IsValid() || !Reader->ReadInteger(Snapshot, Definition.Key, OutValue))
         {
@@ -159,10 +158,7 @@
 
     const FWAINWorldFactDefinition *FWAINWorldStateManager::FindDefinition(const FName Key) const
     {
-        return Schema.FindByPredicate([Key](const FWAINWorldFactDefinition &Definition)
-        {
-            return Definition.Key == Key;
-        });
+        return Schema.FindByPredicate([Key](const FWAINWorldFactDefinition &Definition) { return Definition.Key == Key; });
     }
 
 #pragma endregion
@@ -174,10 +170,10 @@
 
     // 변경을 순서대로 모의 적용하여 경계·권한 위반을 실제 Prepare 전 차단한다.
 
-    bool FWAINWorldStateManager::ComputeExpected(const IWAINGameStateSnapshot &Current,
+    bool FWAINWorldStateManager::ComputeExpected(const IWAINGameStateSnapshot     &Current,
                                                  const TArray<FWAINStateMutation> &Mutations,
-                                                 TMap<FName, int32> &OutExpected,
-                                                 FString &OutError) const
+                                                 TMap<FName, int32>               &OutExpected,
+                                                 FString                          &OutError) const
     {
         OutExpected.Reset();
         for (const FWAINWorldFactDefinition &Definition : Schema)
@@ -193,8 +189,7 @@
         for (const FWAINStateMutation &Mutation : Mutations)
         {
             const FWAINWorldFactDefinition *Definition = FindDefinition(Mutation.TargetId);
-            if (Mutation.Owner != EWAINMutationOwner::Game || !Definition ||
-                !Definition->bWritableByProposal ||
+            if (Mutation.Owner != EWAINMutationOwner::Game || !Definition || !Definition->bWritableByProposal ||
                 (Mutation.Operation != EWAINMutationOperation::AddInteger &&
                  Mutation.Operation != EWAINMutationOperation::SetInteger))
             {

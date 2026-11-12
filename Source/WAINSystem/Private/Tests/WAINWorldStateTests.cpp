@@ -20,8 +20,8 @@
 
     namespace WAINWorldTests
     {
-        FWAINWorldFactDefinition Definition(const FName Key, const int32 Min, const int32 Max,
-                                            const bool bVisible, const bool bWritable)
+        FWAINWorldFactDefinition
+        Definition(const FName Key, const int32 Min, const int32 Max, const bool bVisible, const bool bWritable)
         {
             FWAINWorldFactDefinition Fact;
             Fact.Key = Key;
@@ -63,10 +63,10 @@
         class FProvider final : public IWAINProposalProvider
         {
             public:
-            FWAINResponseProposal Proposal;
-            mutable int32 Calls = 0;
+            FWAINResponseProposal     Proposal;
+            mutable int32             Calls = 0;
             mutable FWAINWorldContext LastWorld;
-            mutable bool bReceivedWorld = false;
+            mutable bool              bReceivedWorld = false;
 
             FProvider()
             {
@@ -74,19 +74,19 @@
             }
 
             virtual bool Generate(const FWAINInteractionRequest &Request,
-                                  const FWAINSessionRoot &Current,
-                                  FWAINResponseProposal &OutProposal,
-                                  FString &OutError) const override
+                                  const FWAINSessionRoot        &Current,
+                                  FWAINResponseProposal         &OutProposal,
+                                  FString                       &OutError) const override
             {
                 OutProposal = Proposal;
                 return true;
             }
 
             virtual bool GenerateWithContext(const FWAINInteractionRequest &Request,
-                                             const FWAINSessionRoot &Current,
-                                             const FWAINCharacterContext &Context,
-                                             FWAINResponseProposal &OutProposal,
-                                             FString &OutError) const override
+                                             const FWAINSessionRoot        &Current,
+                                             const FWAINCharacterContext   &Context,
+                                             FWAINResponseProposal         &OutProposal,
+                                             FString                       &OutError) const override
             {
                 ++Calls;
                 bReceivedWorld = Context.bHasWorldContext;
@@ -111,12 +111,13 @@
                 return Delegate.CreateInitialSnapshot(OutError);
             }
 
-            virtual TSharedPtr<const IWAINGameStateSnapshot> Prepare(
-                const IWAINGameStateSnapshot &Current, const TArray<FWAINStateMutation> &Changes,
-                FString &OutError) const override
+            virtual TSharedPtr<const IWAINGameStateSnapshot> Prepare(const IWAINGameStateSnapshot     &Current,
+                                                                     const TArray<FWAINStateMutation> &Changes,
+                                                                     FString &OutError) const override
             {
                 const TSharedPtr<const IWAINGameStateSnapshot> Result = Delegate.Prepare(Current, Changes, OutError);
-                if (!Result.IsValid()) return nullptr;
+                if (!Result.IsValid())
+                    return nullptr;
 
                 auto Changed = MakeShared<FWAINMapGameSnapshot>();
                 Changed->Values = static_cast<const FWAINMapGameSnapshot &>(*Result).Values;
@@ -129,8 +130,7 @@
                 return Delegate.Validate(Prepared, OutError);
             }
 
-            virtual bool ReadInteger(const IWAINGameStateSnapshot &Snapshot,
-                                     FName Key, int32 &OutValue) const override
+            virtual bool ReadInteger(const IWAINGameStateSnapshot &Snapshot, FName Key, int32 &OutValue) const override
             {
                 return Delegate.ReadInteger(Snapshot, Key, OutValue);
             }
@@ -155,25 +155,29 @@
             return Request;
         }
 
-        TUniquePtr<FWAINInteractionProcessor> MakeProcessor(
-            const TSharedRef<FProvider> &Provider,
-            FString &OutError,
-            TArray<FWAINWorldFactDefinition> Schema = MakeSchema(),
-            TSharedPtr<IWAINGameSnapshotAdapter> OverrideAdapter = nullptr,
-            TSharedPtr<const IWAINWorldFactReader> OverrideReader = nullptr)
+        TUniquePtr<FWAINInteractionProcessor> MakeProcessor(const TSharedRef<FProvider>         &Provider,
+                                                            FString                             &OutError,
+                                                            TArray<FWAINWorldFactDefinition>     Schema = MakeSchema(),
+                                                            TSharedPtr<IWAINGameSnapshotAdapter> OverrideAdapter = nullptr,
+                                                            TSharedPtr<const IWAINWorldFactReader> OverrideReader = nullptr)
         {
-            TSharedRef<FWAINMapGameAdapter> DefaultAdapter = MakeShared<FWAINMapGameAdapter>(MakeValues());
-            TSharedRef<IWAINGameSnapshotAdapter> Adapter = OverrideAdapter.IsValid()
-                                                               ? OverrideAdapter.ToSharedRef()
-                                                               : StaticCastSharedRef<IWAINGameSnapshotAdapter>(DefaultAdapter);
-            TSharedPtr<const IWAINWorldFactReader> Reader = OverrideReader.IsValid()
-                                                                 ? MoveTemp(OverrideReader)
-                                                                 : StaticCastSharedRef<const IWAINWorldFactReader>(DefaultAdapter);
+            TSharedRef<FWAINMapGameAdapter>      DefaultAdapter = MakeShared<FWAINMapGameAdapter>(MakeValues());
+            TSharedRef<IWAINGameSnapshotAdapter> Adapter =
+                OverrideAdapter.IsValid() ? OverrideAdapter.ToSharedRef()
+                                          : StaticCastSharedRef<IWAINGameSnapshotAdapter>(DefaultAdapter);
+            TSharedPtr<const IWAINWorldFactReader> Reader =
+                OverrideReader.IsValid() ? MoveTemp(OverrideReader)
+                                         : StaticCastSharedRef<const IWAINWorldFactReader>(DefaultAdapter);
             auto Manager = MakeShared<FWAINWorldStateManager>(MoveTemp(Schema), MoveTemp(Reader));
-            auto Processor = MakeUnique<FWAINInteractionProcessor>(
-                Adapter, Provider, MakeShared<FWAINNoOpNarrativeEvaluator>(),
-                nullptr, nullptr, nullptr, Manager);
-            if (!Processor->StartSession(MakeWAIN(), OutError)) return nullptr;
+            auto Processor = MakeUnique<FWAINInteractionProcessor>(Adapter,
+                                                                   Provider,
+                                                                   MakeShared<FWAINNoOpNarrativeEvaluator>(),
+                                                                   nullptr,
+                                                                   nullptr,
+                                                                   nullptr,
+                                                                   Manager);
+            if (!Processor->StartSession(MakeWAIN(), OutError))
+                return nullptr;
             return Processor;
         }
     } // namespace WAINWorldTests
@@ -193,10 +197,11 @@
 
     bool FWAINWorldVisibleFactsTest::RunTest(const FString &Parameters)
     {
-        auto Provider = MakeShared<WAINWorldTests::FProvider>();
+        auto    Provider = MakeShared<WAINWorldTests::FProvider>();
         FString Error;
-        auto Processor = WAINWorldTests::MakeProcessor(Provider, Error);
-        if (!TestTrue(TEXT("세션 시작"), Processor != nullptr)) return false;
+        auto    Processor = WAINWorldTests::MakeProcessor(Provider, Error);
+        if (!TestTrue(TEXT("세션 시작"), Processor != nullptr))
+            return false;
 
         const auto Result = Processor->ProcessTurn(WAINWorldTests::MakeRequest());
         TestTrue(TEXT("대사 Commit 성공"), Result.Succeeded());
@@ -216,11 +221,14 @@
     bool FWAINWorldMutationCommitTest::RunTest(const FString &Parameters)
     {
         auto Provider = MakeShared<WAINWorldTests::FProvider>();
-        Provider->Proposal.StateChanges.Add(WAINWorldTests::Mutation(TEXT("story.step"), EWAINMutationOperation::AddInteger, 1));
-        Provider->Proposal.StateChanges.Add(WAINWorldTests::Mutation(TEXT("story.step"), EWAINMutationOperation::AddInteger, 1));
+        Provider->Proposal.StateChanges.Add(
+            WAINWorldTests::Mutation(TEXT("story.step"), EWAINMutationOperation::AddInteger, 1));
+        Provider->Proposal.StateChanges.Add(
+            WAINWorldTests::Mutation(TEXT("story.step"), EWAINMutationOperation::AddInteger, 1));
         FString Error;
-        auto Processor = WAINWorldTests::MakeProcessor(Provider, Error);
-        if (!TestTrue(TEXT("세션 시작"), Processor != nullptr)) return false;
+        auto    Processor = WAINWorldTests::MakeProcessor(Provider, Error);
+        if (!TestTrue(TEXT("세션 시작"), Processor != nullptr))
+            return false;
 
         const auto Before = Processor->GetSnapshot();
         const auto Result = Processor->ProcessTurn(WAINWorldTests::MakeRequest());
@@ -248,10 +256,12 @@
     bool FWAINWorldReadOnlyRejectionTest::RunTest(const FString &Parameters)
     {
         auto Provider = MakeShared<WAINWorldTests::FProvider>();
-        Provider->Proposal.StateChanges.Add(WAINWorldTests::Mutation(TEXT("story.secret"), EWAINMutationOperation::SetInteger, 0));
+        Provider->Proposal.StateChanges.Add(
+            WAINWorldTests::Mutation(TEXT("story.secret"), EWAINMutationOperation::SetInteger, 0));
         FString Error;
-        auto Processor = WAINWorldTests::MakeProcessor(Provider, Error);
-        if (!TestTrue(TEXT("세션 시작"), Processor != nullptr)) return false;
+        auto    Processor = WAINWorldTests::MakeProcessor(Provider, Error);
+        if (!TestTrue(TEXT("세션 시작"), Processor != nullptr))
+            return false;
 
         const auto Before = Processor->GetSnapshot();
         const auto Result = Processor->ProcessTurn(WAINWorldTests::MakeRequest());
@@ -267,10 +277,12 @@
     bool FWAINWorldBoundsTest::RunTest(const FString &Parameters)
     {
         auto Provider = MakeShared<WAINWorldTests::FProvider>();
-        Provider->Proposal.StateChanges.Add(WAINWorldTests::Mutation(TEXT("inventory.gift"), EWAINMutationOperation::AddInteger, 4));
+        Provider->Proposal.StateChanges.Add(
+            WAINWorldTests::Mutation(TEXT("inventory.gift"), EWAINMutationOperation::AddInteger, 4));
         FString Error;
-        auto Processor = WAINWorldTests::MakeProcessor(Provider, Error);
-        if (!TestTrue(TEXT("세션 시작"), Processor != nullptr)) return false;
+        auto    Processor = WAINWorldTests::MakeProcessor(Provider, Error);
+        if (!TestTrue(TEXT("세션 시작"), Processor != nullptr))
+            return false;
 
         const auto Result = Processor->ProcessTurn(WAINWorldTests::MakeRequest());
         TestTrue(TEXT("범위 이탈 거절"), Result.Error == EWAINInteractionError::InvalidProposal);
@@ -285,10 +297,12 @@
     bool FWAINWorldUnregisteredKeyTest::RunTest(const FString &Parameters)
     {
         auto Provider = MakeShared<WAINWorldTests::FProvider>();
-        Provider->Proposal.StateChanges.Add(WAINWorldTests::Mutation(TEXT("unknown"), EWAINMutationOperation::SetInteger, 2));
+        Provider->Proposal.StateChanges.Add(
+            WAINWorldTests::Mutation(TEXT("unknown"), EWAINMutationOperation::SetInteger, 2));
         FString Error;
-        auto Processor = WAINWorldTests::MakeProcessor(Provider, Error);
-        if (!TestTrue(TEXT("세션 시작"), Processor != nullptr)) return false;
+        auto    Processor = WAINWorldTests::MakeProcessor(Provider, Error);
+        if (!TestTrue(TEXT("세션 시작"), Processor != nullptr))
+            return false;
 
         const auto Result = Processor->ProcessTurn(WAINWorldTests::MakeRequest());
         TestTrue(TEXT("등록되지 않은 Key 거절"), Result.Error == EWAINInteractionError::InvalidProposal);
@@ -305,7 +319,7 @@
         auto Schema = WAINWorldTests::MakeSchema();
         Schema.Add(Schema[0]);
         FString Error;
-        auto Processor = WAINWorldTests::MakeProcessor(MakeShared<WAINWorldTests::FProvider>(), Error, MoveTemp(Schema));
+        auto    Processor = WAINWorldTests::MakeProcessor(MakeShared<WAINWorldTests::FProvider>(), Error, MoveTemp(Schema));
         TestTrue(TEXT("중복 Schema는 세션 시작 실패"), Processor == nullptr);
         TestFalse(TEXT("실패 원인 기재"), Error.IsEmpty());
         return true;
@@ -320,7 +334,7 @@
         auto Schema = WAINWorldTests::MakeSchema();
         Schema[0].MinValue = 1; // 초기 story.step=0
         FString Error;
-        auto Processor = WAINWorldTests::MakeProcessor(MakeShared<WAINWorldTests::FProvider>(), Error, MoveTemp(Schema));
+        auto    Processor = WAINWorldTests::MakeProcessor(MakeShared<WAINWorldTests::FProvider>(), Error, MoveTemp(Schema));
         TestTrue(TEXT("초기 Snapshot이 Schema 범위 밖이면 세션 거절"), Processor == nullptr);
         return true;
     }
@@ -340,15 +354,20 @@
 
     bool FWAINWorldPreparedDriftTest::RunTest(const FString &Parameters)
     {
-        auto Adapter = MakeShared<WAINWorldTests::FDriftingAdapter>();
-        TSharedPtr<IWAINGameSnapshotAdapter> AdapterInterface = Adapter;
+        auto                                   Adapter = MakeShared<WAINWorldTests::FDriftingAdapter>();
+        TSharedPtr<IWAINGameSnapshotAdapter>   AdapterInterface = Adapter;
         TSharedPtr<const IWAINWorldFactReader> Reader = Adapter;
-        auto Provider = MakeShared<WAINWorldTests::FProvider>();
-        Provider->Proposal.StateChanges.Add(WAINWorldTests::Mutation(TEXT("story.step"), EWAINMutationOperation::AddInteger, 1));
+        auto                                   Provider = MakeShared<WAINWorldTests::FProvider>();
+        Provider->Proposal.StateChanges.Add(
+            WAINWorldTests::Mutation(TEXT("story.step"), EWAINMutationOperation::AddInteger, 1));
         FString Error;
-        auto Processor = WAINWorldTests::MakeProcessor(Provider, Error, WAINWorldTests::MakeSchema(),
-                                                        MoveTemp(AdapterInterface), MoveTemp(Reader));
-        if (!TestTrue(TEXT("세션 시작"), Processor != nullptr)) return false;
+        auto    Processor = WAINWorldTests::MakeProcessor(Provider,
+                                                          Error,
+                                                          WAINWorldTests::MakeSchema(),
+                                                          MoveTemp(AdapterInterface),
+                                                          MoveTemp(Reader));
+        if (!TestTrue(TEXT("세션 시작"), Processor != nullptr))
+            return false;
 
         const auto Before = Processor->GetSnapshot();
         const auto Result = Processor->ProcessTurn(WAINWorldTests::MakeRequest());
@@ -364,10 +383,12 @@
     bool FWAINWorldReplayTest::RunTest(const FString &Parameters)
     {
         auto Provider = MakeShared<WAINWorldTests::FProvider>();
-        Provider->Proposal.StateChanges.Add(WAINWorldTests::Mutation(TEXT("story.step"), EWAINMutationOperation::AddInteger, 1));
+        Provider->Proposal.StateChanges.Add(
+            WAINWorldTests::Mutation(TEXT("story.step"), EWAINMutationOperation::AddInteger, 1));
         FString Error;
-        auto Processor = WAINWorldTests::MakeProcessor(Provider, Error);
-        if (!TestTrue(TEXT("세션 시작"), Processor != nullptr)) return false;
+        auto    Processor = WAINWorldTests::MakeProcessor(Provider, Error);
+        if (!TestTrue(TEXT("세션 시작"), Processor != nullptr))
+            return false;
 
         const auto Request = WAINWorldTests::MakeRequest();
         const auto First = Processor->ProcessTurn(Request);

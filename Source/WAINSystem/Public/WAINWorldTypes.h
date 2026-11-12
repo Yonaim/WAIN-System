@@ -21,9 +21,7 @@ class IWAINGameStateSnapshot;
         public:
         virtual ~IWAINWorldFactReader() = default;
 
-        virtual bool ReadInteger(const IWAINGameStateSnapshot &Snapshot,
-                                 FName TargetId,
-                                 int32 &OutValue) const = 0;
+        virtual bool ReadInteger(const IWAINGameStateSnapshot &Snapshot, FName TargetId, int32 &OutValue) const = 0;
     };
 
 #pragma endregion
@@ -40,8 +38,8 @@ class IWAINGameStateSnapshot;
         FName Key;
         int32 MinValue = 0;
         int32 MaxValue = MAX_int32;
-        bool bExposeToAgent = false;
-        bool bWritableByProposal = false;
+        bool  bExposeToAgent = false;
+        bool  bWritableByProposal = false;
     };
 
     struct FWAINWorldFactValue

@@ -14,40 +14,37 @@
 #pragma region 00_World_State_Manager_Contract
 
     /** @brief 읽기 전용 Host Fact Reader와 값 없는 Schema만 보유한다. */
-    class FWAINWorldStateManager final
+    class WAINSYSTEM_API FWAINWorldStateManager final
     {
         public:
-        FWAINWorldStateManager(TArray<FWAINWorldFactDefinition> InSchema,
-                              TSharedPtr<const IWAINWorldFactReader> InReader);
+        FWAINWorldStateManager(TArray<FWAINWorldFactDefinition> InSchema, TSharedPtr<const IWAINWorldFactReader> InReader);
 
         bool ValidateInitial(const IWAINGameStateSnapshot &Current, FString &OutError) const;
 
-        bool BuildContext(const IWAINGameStateSnapshot &Current,
-                          FWAINWorldContext &OutContext,
-                          FString &OutError) const;
+        bool BuildContext(const IWAINGameStateSnapshot &Current, FWAINWorldContext &OutContext, FString &OutError) const;
 
-        bool ValidateMutations(const IWAINGameStateSnapshot &Current,
+        bool ValidateMutations(const IWAINGameStateSnapshot     &Current,
                                const TArray<FWAINStateMutation> &Mutations,
-                               FString &OutError) const;
+                               FString                          &OutError) const;
 
-        bool ValidatePrepared(const IWAINGameStateSnapshot &Current,
-                              const IWAINGameStateSnapshot &Prepared,
+        bool ValidatePrepared(const IWAINGameStateSnapshot     &Current,
+                              const IWAINGameStateSnapshot     &Prepared,
                               const TArray<FWAINStateMutation> &Mutations,
-                              FString &OutError) const;
+                              FString                          &OutError) const;
 
         private:
-        bool ValidateSchema(FString &OutError) const;
-        bool ReadValidated(const IWAINGameStateSnapshot &Snapshot,
-                           const FWAINWorldFactDefinition &Definition,
-                           int32 &OutValue,
-                           FString &OutError) const;
-        bool ComputeExpected(const IWAINGameStateSnapshot &Current,
-                             const TArray<FWAINStateMutation> &Mutations,
-                             TMap<FName, int32> &OutExpected,
-                             FString &OutError) const;
+        bool                            ValidateSchema(FString &OutError) const;
+        bool                            ReadValidated(const IWAINGameStateSnapshot   &Snapshot,
+                                                      const FWAINWorldFactDefinition &Definition,
+                                                      int32                          &OutValue,
+                                                      FString                        &OutError) const;
+        bool                            ComputeExpected(const IWAINGameStateSnapshot     &Current,
+                                                        const TArray<FWAINStateMutation> &Mutations,
+                                                        TMap<FName, int32>               &OutExpected,
+                                                        FString                          &OutError) const;
         const FWAINWorldFactDefinition *FindDefinition(FName Key) const;
 
-        TArray<FWAINWorldFactDefinition> Schema;
+        TArray<FWAINWorldFactDefinition>       Schema;
         TSharedPtr<const IWAINWorldFactReader> Reader;
     };
 

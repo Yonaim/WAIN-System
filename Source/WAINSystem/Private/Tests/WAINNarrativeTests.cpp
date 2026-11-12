@@ -112,7 +112,7 @@
 
         FWAINStateSnapshot MakeState(const int32 Trust = 45)
         {
-            FWAINStateSnapshot State;
+            FWAINStateSnapshot  State;
             FWAINCharacterState Character;
             Character.Trust = Trust;
             State.Characters.Add(TEXT("MANA"), Character);
@@ -154,8 +154,8 @@
         class FContextCapturingProvider final : public IWAINProposalProvider
         {
             public:
-            FWAINResponseProposal Proposal;
-            mutable int32 ContextCalls = 0;
+            FWAINResponseProposal         Proposal;
+            mutable int32                 ContextCalls = 0;
             mutable FWAINNarrativeContext LastNarrative;
 
             FContextCapturingProvider()
@@ -164,19 +164,19 @@
             }
 
             virtual bool Generate(const FWAINInteractionRequest &Request,
-                                  const FWAINSessionRoot &Current,
-                                  FWAINResponseProposal &OutProposal,
-                                  FString &OutError) const override
+                                  const FWAINSessionRoot        &Current,
+                                  FWAINResponseProposal         &OutProposal,
+                                  FString                       &OutError) const override
             {
                 OutProposal = Proposal;
                 return true;
             }
 
             virtual bool GenerateWithContext(const FWAINInteractionRequest &Request,
-                                             const FWAINSessionRoot &Current,
-                                             const FWAINCharacterContext &Context,
-                                             FWAINResponseProposal &OutProposal,
-                                             FString &OutError) const override
+                                             const FWAINSessionRoot        &Current,
+                                             const FWAINCharacterContext   &Context,
+                                             FWAINResponseProposal         &OutProposal,
+                                             FString                       &OutError) const override
             {
                 ++ContextCalls;
                 LastNarrative = Context.Narrative;
@@ -184,14 +184,15 @@
             }
         };
 
-        TUniquePtr<FWAINInteractionProcessor> MakeProcessor(
-            TSharedRef<IWAINProposalProvider> Provider, FWAINNarrativeGraph Graph,
-            FString &OutError, const int32 Trust = 45)
+        TUniquePtr<FWAINInteractionProcessor> MakeProcessor(TSharedRef<IWAINProposalProvider> Provider,
+                                                            FWAINNarrativeGraph               Graph,
+                                                            FString                          &OutError,
+                                                            const int32                       Trust = 45)
         {
             TMap<FName, int32> Values;
             Values.Add(TEXT("story.step"), 0);
             Values.Add(TEXT("story.secret"), 0);
-            auto Adapter = MakeShared<FWAINMapGameAdapter>(MoveTemp(Values));
+            auto                                           Adapter = MakeShared<FWAINMapGameAdapter>(MoveTemp(Values));
             TSharedPtr<const IWAINNarrativeGameFactReader> FactReader = Adapter;
             auto Evaluator = MakeShared<FWAINBeatGraphNarrativeEvaluator>(MoveTemp(Graph), MoveTemp(FactReader));
             auto Processor = MakeUnique<FWAINInteractionProcessor>(Adapter, MoveTemp(Provider), Evaluator);
@@ -218,10 +219,11 @@
 
     bool FWAINNarrativeContextTest::RunTest(const FString &Parameters)
     {
-        auto Provider = MakeShared<WAINNarrativeTests::FContextCapturingProvider>();
+        auto    Provider = MakeShared<WAINNarrativeTests::FContextCapturingProvider>();
         FString Error;
-        auto Processor = WAINNarrativeTests::MakeProcessor(Provider, WAINNarrativeTests::MakeGraph(), Error);
-        if (!TestTrue(TEXT("Graph/세션 검증"), Processor != nullptr)) return false;
+        auto    Processor = WAINNarrativeTests::MakeProcessor(Provider, WAINNarrativeTests::MakeGraph(), Error);
+        if (!TestTrue(TEXT("Graph/세션 검증"), Processor != nullptr))
+            return false;
 
         const auto Result = Processor->ProcessTurn(WAINNarrativeTests::MakeRequest());
         TestTrue(TEXT("상태 변경 없는 대화"), Result.Succeeded());
@@ -243,8 +245,9 @@
         Provider->Proposal.StateChanges.Add(WAINNarrativeTests::GameSet(TEXT("story.step"), 1));
         Provider->Proposal.StateChanges.Add(WAINNarrativeTests::AddTrust(10));
         FString Error;
-        auto Processor = WAINNarrativeTests::MakeProcessor(Provider, WAINNarrativeTests::MakeGraph(), Error);
-        if (!TestTrue(TEXT("세션 시작"), Processor != nullptr)) return false;
+        auto    Processor = WAINNarrativeTests::MakeProcessor(Provider, WAINNarrativeTests::MakeGraph(), Error);
+        if (!TestTrue(TEXT("세션 시작"), Processor != nullptr))
+            return false;
         const auto Before = Processor->GetSnapshot();
 
         const auto Result = Processor->ProcessTurn(WAINNarrativeTests::MakeRequest());
@@ -266,8 +269,9 @@
         auto Provider = MakeShared<WAINNarrativeTests::FContextCapturingProvider>();
         Provider->Proposal.StateChanges.Add(WAINNarrativeTests::AddTrust(10));
         FString Error;
-        auto Processor = WAINNarrativeTests::MakeProcessor(Provider, WAINNarrativeTests::MakeGraph(), Error);
-        if (!TestTrue(TEXT("세션 시작"), Processor != nullptr)) return false;
+        auto    Processor = WAINNarrativeTests::MakeProcessor(Provider, WAINNarrativeTests::MakeGraph(), Error);
+        if (!TestTrue(TEXT("세션 시작"), Processor != nullptr))
+            return false;
 
         const auto Result = Processor->ProcessTurn(WAINNarrativeTests::MakeRequest());
         TestTrue(TEXT("Commit 성공"), Result.Succeeded());
@@ -286,8 +290,9 @@
         Provider->Proposal.StateChanges.Add(WAINNarrativeTests::GameSet(TEXT("story.step"), 1));
         Provider->Proposal.StateChanges.Add(WAINNarrativeTests::AddTrust(5));
         FString Error;
-        auto Processor = WAINNarrativeTests::MakeProcessor(Provider, WAINNarrativeTests::MakeGraph(), Error);
-        if (!TestTrue(TEXT("세션 시작"), Processor != nullptr)) return false;
+        auto    Processor = WAINNarrativeTests::MakeProcessor(Provider, WAINNarrativeTests::MakeGraph(), Error);
+        if (!TestTrue(TEXT("세션 시작"), Processor != nullptr))
+            return false;
 
         const auto First = Processor->ProcessTurn(WAINNarrativeTests::MakeRequest());
         const auto Second = Processor->ProcessTurn(WAINNarrativeTests::MakeRequest());
@@ -318,8 +323,9 @@
         auto Graph = WAINNarrativeTests::MakeGraph();
         Graph.Beats[0].Transitions[0].TargetBeatId = TEXT("UNKNOWN");
         FString Error;
-        auto Processor = WAINNarrativeTests::MakeProcessor(
-            MakeShared<WAINNarrativeTests::FContextCapturingProvider>(), MoveTemp(Graph), Error);
+        auto    Processor = WAINNarrativeTests::MakeProcessor(MakeShared<WAINNarrativeTests::FContextCapturingProvider>(),
+                                                              MoveTemp(Graph),
+                                                              Error);
         TestTrue(TEXT("미존재 Beat 참조는 세션 시작 거절"), Processor == nullptr);
         TestFalse(TEXT("오류 설명 존재"), Error.IsEmpty());
         return true;
@@ -334,8 +340,9 @@
         auto Provider = MakeShared<WAINNarrativeTests::FContextCapturingProvider>();
         Provider->Proposal.StateChanges.Add(WAINNarrativeTests::GameSet(TEXT("story.secret"), 1));
         FString Error;
-        auto Processor = WAINNarrativeTests::MakeProcessor(Provider, WAINNarrativeTests::MakeGraph(), Error);
-        if (!TestTrue(TEXT("세션 시작"), Processor != nullptr)) return false;
+        auto    Processor = WAINNarrativeTests::MakeProcessor(Provider, WAINNarrativeTests::MakeGraph(), Error);
+        if (!TestTrue(TEXT("세션 시작"), Processor != nullptr))
+            return false;
 
         const auto Before = Processor->GetSnapshot();
         const auto Result = Processor->ProcessTurn(WAINNarrativeTests::MakeRequest());
@@ -355,8 +362,9 @@
         Provider->Proposal.StateChanges.Add(WAINNarrativeTests::GameSet(TEXT("story.secret"), 1));
         Provider->Proposal.StateChanges.Add(WAINNarrativeTests::AddTrust(15));
         FString Error;
-        auto Processor = WAINNarrativeTests::MakeProcessor(Provider, WAINNarrativeTests::MakeGraph(), Error);
-        if (!TestTrue(TEXT("세션 시작"), Processor != nullptr)) return false;
+        auto    Processor = WAINNarrativeTests::MakeProcessor(Provider, WAINNarrativeTests::MakeGraph(), Error);
+        if (!TestTrue(TEXT("세션 시작"), Processor != nullptr))
+            return false;
 
         const auto Result = Processor->ProcessTurn(WAINNarrativeTests::MakeRequest());
         TestTrue(TEXT("같은 턴 Prepared Trust로 Rule 통과"), Result.Succeeded());
@@ -376,8 +384,9 @@
         Provider->Proposal.StateChanges.Add(WAINNarrativeTests::GameSet(TEXT("story.step"), 1));
         Provider->Proposal.StateChanges.Add(WAINNarrativeTests::AddTrust(10));
         FString Error;
-        auto Processor = WAINNarrativeTests::MakeProcessor(Provider, MoveTemp(Graph), Error);
-        if (!TestTrue(TEXT("세션 시작"), Processor != nullptr)) return false;
+        auto    Processor = WAINNarrativeTests::MakeProcessor(Provider, MoveTemp(Graph), Error);
+        if (!TestTrue(TEXT("세션 시작"), Processor != nullptr))
+            return false;
 
         const auto Before = Processor->GetSnapshot();
         const auto Result = Processor->ProcessTurn(WAINNarrativeTests::MakeRequest());
@@ -394,10 +403,11 @@
     {
         auto Graph = WAINNarrativeTests::MakeGraph();
         Graph.Beats[0].CompletionConditions[0].TargetId = TEXT("story.unknown");
-        auto Provider = MakeShared<WAINNarrativeTests::FContextCapturingProvider>();
+        auto    Provider = MakeShared<WAINNarrativeTests::FContextCapturingProvider>();
         FString Error;
-        auto Processor = WAINNarrativeTests::MakeProcessor(Provider, MoveTemp(Graph), Error);
-        if (!TestTrue(TEXT("정의는 유효하지만 값 미등록"), Processor != nullptr)) return false;
+        auto    Processor = WAINNarrativeTests::MakeProcessor(Provider, MoveTemp(Graph), Error);
+        if (!TestTrue(TEXT("정의는 유효하지만 값 미등록"), Processor != nullptr))
+            return false;
 
         const auto Result = Processor->ProcessTurn(WAINNarrativeTests::MakeRequest());
         TestTrue(TEXT("미등록 Fact 조회 실패"), Result.Error == EWAINInteractionError::NarrativeEvaluationFailed);
@@ -415,8 +425,9 @@
         Provider->Proposal.StateChanges.Add(WAINNarrativeTests::GameSet(TEXT("story.step"), 1));
         Provider->Proposal.StateChanges.Add(WAINNarrativeTests::AddTrust(10));
         FString Error;
-        auto Processor = WAINNarrativeTests::MakeProcessor(Provider, WAINNarrativeTests::MakeGraph(), Error);
-        if (!TestTrue(TEXT("세션 시작"), Processor != nullptr)) return false;
+        auto    Processor = WAINNarrativeTests::MakeProcessor(Provider, WAINNarrativeTests::MakeGraph(), Error);
+        if (!TestTrue(TEXT("세션 시작"), Processor != nullptr))
+            return false;
 
         const auto Request = WAINNarrativeTests::MakeRequest();
         const auto First = Processor->ProcessTurn(Request);

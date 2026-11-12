@@ -13,7 +13,7 @@ namespace WAINStateValidation
         bool ValidateMemoryStream(const FWAINStateSnapshot &Snapshot, FString &OutError);
         bool ValidateDerivedMemory(const FWAINMemoryRecord &Memory, FString &OutError);
         bool HasValidEmotionValues(const FWAINEmotionState &Emotion);
-    }
+    } // namespace
 
 // ============================================================
 // 00. Snapshot Validation Pipeline
@@ -122,10 +122,12 @@ namespace WAINStateValidation
                     (Memory.Speaker != EWAINMemorySpeaker::Player && Memory.Speaker != EWAINMemorySpeaker::Character &&
                      Memory.Speaker != EWAINMemorySpeaker::System))
                 {
-                    OutError = TEXT("Memory Stream의 ID, Owner, Content, Turn, Importance 또는 Type이 유효하지 않습니다.");
+                    OutError =
+                        TEXT("Memory Stream의 ID, Owner, Content, Turn, Importance 또는 Type이 유효하지 않습니다.");
                     return false;
                 }
-                if (!ValidateDerivedMemory(Memory, OutError)) return false;
+                if (!ValidateDerivedMemory(Memory, OutError))
+                    return false;
                 MemoryOwners.Add(Memory.Id, Memory.CharacterId);
                 MemoryIndices.Add(Memory.Id, Index);
             }
@@ -133,7 +135,7 @@ namespace WAINStateValidation
             for (int32 Index = 0; Index < Snapshot.MemoryStream.Num(); ++Index)
             {
                 const FWAINMemoryRecord &Memory = Snapshot.MemoryStream[Index];
-                TSet<FGuid> SeenSources;
+                TSet<FGuid>              SeenSources;
                 for (const FGuid &SourceId : Memory.SourceMemoryIds)
                 {
                     const FName *Owner = MemoryOwners.Find(SourceId);

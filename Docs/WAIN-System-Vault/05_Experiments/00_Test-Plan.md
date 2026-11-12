@@ -128,3 +128,7 @@ A: LLM Only → B: A+Character Agent → C: B+World State Manager → D: C+Narra
 ## Host Testbed Sprite Tests — 2026-11-13
 
 `WAIN.Testbed.Sprite.*` 6개: Catalog Path/Count, Default Layer Order, Multiple Overlays, Invalid Variant No Fallback, All PNG Dimensions, Placeholder Metadata. 기존 Plugin 68 + Host Integration 7 + Sprite 6 = **81개 Automation 코드 등록**. UE 5.8 컴파일·실행 미검증. 실제 UMG alpha 합성/렌더 화면은 별도 PIE 수동 검증해야 한다.
+
+## 2026-11-13 — UE 5.8 Editor Build Verification
+
+`WAINTestbedEditor Win64 DebugGame` 빌드 성공. Plugin/Host 모듈과 81개 Automation 테스트 소스가 컴파일·링크됐다. Automation 테스트 실행 및 PIE 검증은 수행하지 않았다.

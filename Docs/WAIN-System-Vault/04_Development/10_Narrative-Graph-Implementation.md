@@ -66,4 +66,4 @@ ProcessTurn
 
 전체 회귀 실행 대상은 `WAIN.Transaction.*`, `WAIN.Character.*`, `WAIN.CharacterContext.*`, `WAIN.Presentation.*`, `WAIN.Memory.*`, `WAIN.MemoryReasoning.*`, `WAIN.Narrative.*`다.
 
-**이 환경에서 Unreal Build/Automation은 실행하지 않았다.** 실제 UE 5.8 빌드 오류 또는 정책 변경 발견 시 동일 Revision을 정본으로 간주하지 않고 수정 사항을 문서에 기록한다.
+**2026-11-13 검증:** `WAINTestbedEditor Win64 DebugGame` UE 5.8 빌드 성공. `FWAINBeatGraphNarrativeEvaluator`를 Host 모듈에서 링크할 수 있도록 모듈 export를 표시했다. Automation 테스트는 실행하지 않았다.

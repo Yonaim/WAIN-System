@@ -345,15 +345,15 @@
         Proposal.StateChanges.Add(WAINTests::MakeEmotionDelta(TEXT("emotion.surprise"), 0.6F));
 
         FString Error;
-        auto Processor = WAINTests::MakeProcessor(Proposal, Error);
+        auto    Processor = WAINTests::MakeProcessor(Proposal, Error);
         if (!TestTrue(TEXT("세션 생성"), Processor != nullptr))
         {
             return false;
         }
 
-        const auto Previous = Processor->GetSnapshot();
-        const auto Result = Processor->ProcessTurn(WAINTests::MakeRequest());
-        const auto Current = Processor->GetSnapshot();
+        const auto  Previous = Processor->GetSnapshot();
+        const auto  Result = Processor->ProcessTurn(WAINTests::MakeRequest());
+        const auto  Current = Processor->GetSnapshot();
         const auto &Emotion = Current->WAIN.Characters.FindChecked(TEXT("TEST_CHARACTER")).Emotion;
 
         TestTrue(TEXT("Commit 성공"), Result.Succeeded());
@@ -385,13 +385,13 @@
         Proposal.StateChanges.Add(WAINTests::MakeEmotionDelta(TEXT("emotion.surprise"), 0.25F));
 
         FString Error;
-        auto Processor = WAINTests::MakeProcessor(Proposal, Error);
+        auto    Processor = WAINTests::MakeProcessor(Proposal, Error);
         if (!TestTrue(TEXT("세션 생성"), Processor != nullptr))
         {
             return false;
         }
 
-        const auto Result = Processor->ProcessTurn(WAINTests::MakeRequest());
+        const auto  Result = Processor->ProcessTurn(WAINTests::MakeRequest());
         const auto &Emotion = Processor->GetSnapshot()->WAIN.Characters.FindChecked(TEXT("TEST_CHARACTER")).Emotion;
         TestTrue(TEXT("Commit 성공"), Result.Succeeded());
         TestTrue(TEXT("Joy 상한"), FMath::IsNearlyEqual(Emotion.Joy, 1.0F));
@@ -410,7 +410,7 @@
         Proposal.StateChanges.Add(WAINTests::MakeEmotionDelta(TEXT("emotion.confidence"), 0.25F));
 
         FString Error;
-        auto Processor = WAINTests::MakeProcessor(Proposal, Error);
+        auto    Processor = WAINTests::MakeProcessor(Proposal, Error);
         if (!TestTrue(TEXT("세션 생성"), Processor != nullptr))
         {
             return false;
@@ -432,12 +432,12 @@
     bool FWAINInvalidEmotionOperationTest::RunTest(const FString &Parameters)
     {
         FWAINResponseProposal Proposal = WAINTests::MakeProposal();
-        FWAINStateMutation WrongOperation = WAINTests::MakeEmotionDelta(TEXT("emotion.joy"), 0.5F);
+        FWAINStateMutation    WrongOperation = WAINTests::MakeEmotionDelta(TEXT("emotion.joy"), 0.5F);
         WrongOperation.Operation = EWAINMutationOperation::SetInteger;
         Proposal.StateChanges.Add(WrongOperation);
 
         FString Error;
-        auto Processor = WAINTests::MakeProcessor(Proposal, Error);
+        auto    Processor = WAINTests::MakeProcessor(Proposal, Error);
         if (!TestTrue(TEXT("세션 생성"), Processor != nullptr))
         {
             return false;
@@ -457,11 +457,11 @@
     bool FWAINNonFiniteEmotionDeltaTest::RunTest(const FString &Parameters)
     {
         FWAINResponseProposal Proposal = WAINTests::MakeProposal();
-        Proposal.StateChanges.Add(WAINTests::MakeEmotionDelta(
-            TEXT("emotion.joy"), std::numeric_limits<float>::quiet_NaN()));
+        Proposal.StateChanges.Add(
+            WAINTests::MakeEmotionDelta(TEXT("emotion.joy"), std::numeric_limits<float>::quiet_NaN()));
 
         FString Error;
-        auto Processor = WAINTests::MakeProcessor(Proposal, Error);
+        auto    Processor = WAINTests::MakeProcessor(Proposal, Error);
         if (!TestTrue(TEXT("세션 생성"), Processor != nullptr))
         {
             return false;
@@ -486,7 +486,7 @@
         Proposal.StateChanges.Add(WAINTests::MakeEmotionDelta(TEXT("emotion.anger"), 0.2F));
 
         FString Error;
-        auto Processor = WAINTests::MakeProcessor(Proposal, Error);
+        auto    Processor = WAINTests::MakeProcessor(Proposal, Error);
         if (!TestTrue(TEXT("세션 생성"), Processor != nullptr))
         {
             return false;

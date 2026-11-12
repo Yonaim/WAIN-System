@@ -13,7 +13,7 @@ class FWAINPresentationValidator final
 {
   public:
     static bool ValidateCatalog(const FWAINPresentationOptions &Options, FString &OutError);
-    static bool ValidateSelection(const FWAINResponseProposal &Proposal,
+    static bool ValidateSelection(const FWAINResponseProposal    &Proposal,
                                   const FWAINPresentationOptions *Options,
-                                  FString &OutError);
+                                  FString                        &OutError);
 };

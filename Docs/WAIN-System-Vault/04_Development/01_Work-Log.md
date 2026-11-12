@@ -114,3 +114,9 @@
 - C++: Host Content Loader에서 파츠·Variant DTO 구성, Renderer에서 UMG 이미지 슬롯과 Texture2D 동기 로드, Commit Response 표정 연동.
 - 테스트: `WAIN.Testbed.Sprite.*` 6개 추가, 총 81개 등록. UBT·PIE 미실행.
 - ADR-013 Proposed. 기존 Plugin/Engineering Standards/Obsidian 설정 불변. [Host 구현 문서](../../../../../Docs/02_Implementation/03_Visual-Asset-System.md).
+
+## 2026-11-13 — Cross-Module Runtime Exports and Editor Build
+
+- `FWAINWorldStateManager`와 `FWAINBeatGraphNarrativeEvaluator`를 Host 모듈에서 사용할 수 있도록 `WAINSYSTEM_API` export를 추가했다. 공개 함수 서명과 동작 계약은 변경하지 않았다.
+- UE 5.8 `WAINTestbedEditor Win64 DebugGame` 빌드 성공. Plugin/Host C++ 컴파일 및 링크 완료.
+- Pre-build formatter의 44개 C/C++ 파일 결과를 반복 실행 해시로 비교해 내용 변경이 없음을 확인했다. Automation/PIE는 실행하지 않았다.

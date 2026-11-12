@@ -24,9 +24,9 @@
         {
             public:
             virtual bool Generate(const FWAINInteractionRequest &Request,
-                                  const FWAINSessionRoot &Current,
-                                  FWAINResponseProposal &OutProposal,
-                                  FString &OutError) const override
+                                  const FWAINSessionRoot        &Current,
+                                  FWAINResponseProposal         &OutProposal,
+                                  FString                       &OutError) const override
             {
                 OutProposal.Dialogue = TEXT("약속을 기억하고 있어.");
                 return true;
@@ -37,21 +37,21 @@
         {
             public:
             mutable TArray<FWAINCharacterContext> Contexts;
-            bool bInvalidGameMutation = false;
+            bool                                  bInvalidGameMutation = false;
 
             virtual bool Generate(const FWAINInteractionRequest &Request,
-                                  const FWAINSessionRoot &Current,
-                                  FWAINResponseProposal &OutProposal,
-                                  FString &OutError) const override
+                                  const FWAINSessionRoot        &Current,
+                                  FWAINResponseProposal         &OutProposal,
+                                  FString                       &OutError) const override
             {
                 return false;
             }
 
             virtual bool GenerateWithContext(const FWAINInteractionRequest &Request,
-                                             const FWAINSessionRoot &Current,
-                                             const FWAINCharacterContext &Context,
-                                             FWAINResponseProposal &OutProposal,
-                                             FString &OutError) const override
+                                             const FWAINSessionRoot        &Current,
+                                             const FWAINCharacterContext   &Context,
+                                             FWAINResponseProposal         &OutProposal,
+                                             FString                       &OutError) const override
             {
                 Contexts.Add(Context);
                 OutProposal.Dialogue = TEXT("약속을 기억하고 있어.");
@@ -71,18 +71,18 @@
         class FDeterministicReasoner final : public IWAINMemoryReasoner
         {
             public:
-            mutable int32 ReflectionCalls = 0;
-            mutable int32 PlanCalls = 0;
+            mutable int32                             ReflectionCalls = 0;
+            mutable int32                             PlanCalls = 0;
             mutable TArray<TArray<FWAINMemoryRecord>> ReflectionSources;
             mutable TArray<TArray<FWAINMemoryRecord>> PlanSources;
-            bool bInvalidReflection = false;
-            bool bInvalidPlan = false;
-            bool bFailReflection = false;
+            bool                                      bInvalidReflection = false;
+            bool                                      bInvalidPlan = false;
+            bool                                      bFailReflection = false;
 
-            virtual bool GenerateReflection(const FWAINInteractionRequest &Request,
+            virtual bool GenerateReflection(const FWAINInteractionRequest   &Request,
                                             const TArray<FWAINMemoryRecord> &Sources,
-                                            FString &OutInsight,
-                                            FString &OutError) const override
+                                            FString                         &OutInsight,
+                                            FString                         &OutError) const override
             {
                 ++ReflectionCalls;
                 ReflectionSources.Add(Sources);
@@ -95,16 +95,17 @@
                 return true;
             }
 
-            virtual bool GeneratePlan(const FWAINInteractionRequest &Request,
-                                      const FName ActiveBeatId,
+            virtual bool GeneratePlan(const FWAINInteractionRequest   &Request,
+                                      const FName                      ActiveBeatId,
                                       const TArray<FWAINMemoryRecord> &Sources,
-                                      FWAINPlanDraft &OutPlan,
-                                      FString &OutError) const override
+                                      FWAINPlanDraft                  &OutPlan,
+                                      FString                         &OutError) const override
             {
                 ++PlanCalls;
                 PlanSources.Add(Sources);
                 OutPlan.Summary = TEXT("이번 장면의 약속을 확인한다.");
-                OutPlan.Steps = bInvalidPlan ? TArray<FString>() : TArray<FString>{TEXT("대화 이어가기"), TEXT("다음 단서 확인")};
+                OutPlan.Steps =
+                    bInvalidPlan ? TArray<FString>() : TArray<FString>{TEXT("대화 이어가기"), TEXT("다음 단서 확인")};
                 return true;
             }
         };
@@ -113,10 +114,10 @@
         {
             public:
             virtual bool Evaluate(const FWAINInteractionRequest &Request,
-                                  const FWAINSessionRoot &Current,
-                                  FWAINStateSnapshot &PreparedWAIN,
-                                  const IWAINGameStateSnapshot &PreparedGame,
-                                  FString &OutError) const override
+                                  const FWAINSessionRoot        &Current,
+                                  FWAINStateSnapshot            &PreparedWAIN,
+                                  const IWAINGameStateSnapshot  &PreparedGame,
+                                  FString                       &OutError) const override
             {
                 if (Current.WAIN.TurnCount == 1)
                 {
@@ -135,8 +136,7 @@
             return State;
         }
 
-        FWAINInteractionRequest MakeRequest(const FName CharacterId = TEXT("MANA"),
-                                            const FName SceneId = TEXT("CLASSROOM"))
+        FWAINInteractionRequest MakeRequest(const FName CharacterId = TEXT("MANA"), const FName SceneId = TEXT("CLASSROOM"))
         {
             FWAINInteractionRequest Request;
             Request.TurnId = FGuid::NewGuid();
@@ -152,23 +152,29 @@
             int32 Count = 0;
             for (const FWAINMemoryRecord &Memory : State.MemoryStream)
             {
-                if (Memory.Type == Type) ++Count;
+                if (Memory.Type == Type)
+                    ++Count;
             }
             return Count;
         }
 
-        TUniquePtr<FWAINInteractionProcessor> MakeProcessor(
-            TSharedRef<IWAINProposalProvider> ProposalProvider,
-            TSharedPtr<const IWAINMemoryReasoner> Reasoner,
-            FString &OutError,
-            TSharedRef<IWAINNarrativeEvaluator> Evaluator = MakeShared<FWAINNoOpNarrativeEvaluator>())
+        TUniquePtr<FWAINInteractionProcessor>
+        MakeProcessor(TSharedRef<IWAINProposalProvider>     ProposalProvider,
+                      TSharedPtr<const IWAINMemoryReasoner> Reasoner,
+                      FString                              &OutError,
+                      TSharedRef<IWAINNarrativeEvaluator>   Evaluator = MakeShared<FWAINNoOpNarrativeEvaluator>())
         {
             TMap<FName, int32> Inventory;
             Inventory.Add(TEXT("inventory.gift"), 2);
             auto Adapter = MakeShared<FWAINMapGameAdapter>(MoveTemp(Inventory));
-            auto Processor = MakeUnique<FWAINInteractionProcessor>(
-                Adapter, MoveTemp(ProposalProvider), MoveTemp(Evaluator), nullptr, nullptr, MoveTemp(Reasoner));
-            if (!Processor->StartSession(MakeState(), OutError)) return nullptr;
+            auto Processor = MakeUnique<FWAINInteractionProcessor>(Adapter,
+                                                                   MoveTemp(ProposalProvider),
+                                                                   MoveTemp(Evaluator),
+                                                                   nullptr,
+                                                                   nullptr,
+                                                                   MoveTemp(Reasoner));
+            if (!Processor->StartSession(MakeState(), OutError))
+                return nullptr;
             return Processor;
         }
     } // namespace WAINMemoryReasoningTests
@@ -188,11 +194,13 @@
 
     bool FWAINReasoningPlanCreatedTest::RunTest(const FString &Parameters)
     {
-        auto Reasoner = MakeShared<WAINMemoryReasoningTests::FDeterministicReasoner>();
+        auto    Reasoner = MakeShared<WAINMemoryReasoningTests::FDeterministicReasoner>();
         FString Error;
-        auto Processor = WAINMemoryReasoningTests::MakeProcessor(
-            MakeShared<WAINMemoryReasoningTests::FProposalProvider>(), Reasoner, Error);
-        if (!TestTrue(TEXT("세션 시작"), Processor != nullptr)) return false;
+        auto Processor = WAINMemoryReasoningTests::MakeProcessor(MakeShared<WAINMemoryReasoningTests::FProposalProvider>(),
+                                                                 Reasoner,
+                                                                 Error);
+        if (!TestTrue(TEXT("세션 시작"), Processor != nullptr))
+            return false;
 
         const auto Previous = Processor->GetSnapshot();
         const auto Result = Processor->ProcessTurn(WAINMemoryReasoningTests::MakeRequest());
@@ -203,7 +211,8 @@
         TestEqual(TEXT("Plan 생성 한 번"), Reasoner->PlanCalls, 1);
         TestEqual(TEXT("이전 Snapshot 불변"), Previous->WAIN.MemoryStream.Num(), 0);
         const FGuid *ActiveId = Current->WAIN.ActivePlanIds.Find(TEXT("MANA"));
-        if (!TestNotNull(TEXT("활성 Plan ID"), ActiveId)) return false;
+        if (!TestNotNull(TEXT("활성 Plan ID"), ActiveId))
+            return false;
         const auto &Plan = Current->WAIN.MemoryStream.Last();
         TestTrue(TEXT("Plan ID 연결"), Plan.Id == *ActiveId);
         TestEqual(TEXT("Plan Step"), Plan.PlanSteps.Num(), 2);
@@ -217,11 +226,13 @@
 
     bool FWAINReasoningReflectionTriggerTest::RunTest(const FString &Parameters)
     {
-        auto Reasoner = MakeShared<WAINMemoryReasoningTests::FDeterministicReasoner>();
+        auto    Reasoner = MakeShared<WAINMemoryReasoningTests::FDeterministicReasoner>();
         FString Error;
-        auto Processor = WAINMemoryReasoningTests::MakeProcessor(
-            MakeShared<WAINMemoryReasoningTests::FProposalProvider>(), Reasoner, Error);
-        if (!TestTrue(TEXT("세션 시작"), Processor != nullptr)) return false;
+        auto Processor = WAINMemoryReasoningTests::MakeProcessor(MakeShared<WAINMemoryReasoningTests::FProposalProvider>(),
+                                                                 Reasoner,
+                                                                 Error);
+        if (!TestTrue(TEXT("세션 시작"), Processor != nullptr))
+            return false;
 
         Processor->ProcessTurn(WAINMemoryReasoningTests::MakeRequest());
         const auto Result = Processor->ProcessTurn(WAINMemoryReasoningTests::MakeRequest());
@@ -242,17 +253,19 @@
 
     bool FWAINReasoningContextTest::RunTest(const FString &Parameters)
     {
-        auto Reasoner = MakeShared<WAINMemoryReasoningTests::FDeterministicReasoner>();
-        auto Provider = MakeShared<WAINMemoryReasoningTests::FCapturingProposalProvider>();
+        auto    Reasoner = MakeShared<WAINMemoryReasoningTests::FDeterministicReasoner>();
+        auto    Provider = MakeShared<WAINMemoryReasoningTests::FCapturingProposalProvider>();
         FString Error;
-        auto Processor = WAINMemoryReasoningTests::MakeProcessor(Provider, Reasoner, Error);
-        if (!TestTrue(TEXT("세션 시작"), Processor != nullptr)) return false;
+        auto    Processor = WAINMemoryReasoningTests::MakeProcessor(Provider, Reasoner, Error);
+        if (!TestTrue(TEXT("세션 시작"), Processor != nullptr))
+            return false;
 
         Processor->ProcessTurn(WAINMemoryReasoningTests::MakeRequest());
         Processor->ProcessTurn(WAINMemoryReasoningTests::MakeRequest());
         Processor->ProcessTurn(WAINMemoryReasoningTests::MakeRequest());
         TestEqual(TEXT("Context 캡처"), Provider->Contexts.Num(), 3);
-        if (Provider->Contexts.Num() != 3) return false;
+        if (Provider->Contexts.Num() != 3)
+            return false;
 
         bool bHasReflection = false;
         bool bHasPlan = false;
@@ -281,19 +294,20 @@
 
     bool FWAINReasoningSceneReplanTest::RunTest(const FString &Parameters)
     {
-        auto Reasoner = MakeShared<WAINMemoryReasoningTests::FDeterministicReasoner>();
+        auto    Reasoner = MakeShared<WAINMemoryReasoningTests::FDeterministicReasoner>();
         FString Error;
-        auto Processor = WAINMemoryReasoningTests::MakeProcessor(
-            MakeShared<WAINMemoryReasoningTests::FProposalProvider>(), Reasoner, Error);
-        if (!TestTrue(TEXT("세션 시작"), Processor != nullptr)) return false;
+        auto Processor = WAINMemoryReasoningTests::MakeProcessor(MakeShared<WAINMemoryReasoningTests::FProposalProvider>(),
+                                                                 Reasoner,
+                                                                 Error);
+        if (!TestTrue(TEXT("세션 시작"), Processor != nullptr))
+            return false;
 
         Processor->ProcessTurn(WAINMemoryReasoningTests::MakeRequest());
         const auto FirstPlanId = *Processor->GetSnapshot()->WAIN.ActivePlanIds.Find(TEXT("MANA"));
         Processor->ProcessTurn(WAINMemoryReasoningTests::MakeRequest());
         TestEqual(TEXT("같은 Scene은 Plan 재사용"), Reasoner->PlanCalls, 1);
 
-        const auto NewScene = Processor->ProcessTurn(
-            WAINMemoryReasoningTests::MakeRequest(TEXT("MANA"), TEXT("ROOFTOP")));
+        const auto NewScene = Processor->ProcessTurn(WAINMemoryReasoningTests::MakeRequest(TEXT("MANA"), TEXT("ROOFTOP")));
         TestTrue(TEXT("Scene 변경 턴 성공"), NewScene.Succeeded());
         TestEqual(TEXT("새 Scene은 Plan 재생성"), Reasoner->PlanCalls, 2);
         TestTrue(TEXT("활성 Plan ID 변경"),
@@ -307,18 +321,22 @@
 
     bool FWAINReasoningBeatReplanTest::RunTest(const FString &Parameters)
     {
-        auto Reasoner = MakeShared<WAINMemoryReasoningTests::FDeterministicReasoner>();
+        auto    Reasoner = MakeShared<WAINMemoryReasoningTests::FDeterministicReasoner>();
         FString Error;
-        auto Processor = WAINMemoryReasoningTests::MakeProcessor(
-            MakeShared<WAINMemoryReasoningTests::FProposalProvider>(), Reasoner, Error,
-            MakeShared<WAINMemoryReasoningTests::FBeatTransitionEvaluator>());
-        if (!TestTrue(TEXT("세션 시작"), Processor != nullptr)) return false;
+        auto    Processor =
+            WAINMemoryReasoningTests::MakeProcessor(MakeShared<WAINMemoryReasoningTests::FProposalProvider>(),
+                                                    Reasoner,
+                                                    Error,
+                                                    MakeShared<WAINMemoryReasoningTests::FBeatTransitionEvaluator>());
+        if (!TestTrue(TEXT("세션 시작"), Processor != nullptr))
+            return false;
 
         Processor->ProcessTurn(WAINMemoryReasoningTests::MakeRequest());
         const auto Second = Processor->ProcessTurn(WAINMemoryReasoningTests::MakeRequest());
         TestTrue(TEXT("Beat 변경 성공"), Second.Succeeded());
         TestEqual(TEXT("Beat 변경 시 Plan 새로 생성"), Reasoner->PlanCalls, 2);
-        TestEqual(TEXT("새 Plan Beat"), Processor->GetSnapshot()->WAIN.MemoryStream.Last().BeatId,
+        TestEqual(TEXT("새 Plan Beat"),
+                  Processor->GetSnapshot()->WAIN.MemoryStream.Last().BeatId,
                   FName(TEXT("NEXT_BEAT")));
         return true;
     }
@@ -329,11 +347,13 @@
 
     bool FWAINReasoningCharacterIsolationTest::RunTest(const FString &Parameters)
     {
-        auto Reasoner = MakeShared<WAINMemoryReasoningTests::FDeterministicReasoner>();
+        auto    Reasoner = MakeShared<WAINMemoryReasoningTests::FDeterministicReasoner>();
         FString Error;
-        auto Processor = WAINMemoryReasoningTests::MakeProcessor(
-            MakeShared<WAINMemoryReasoningTests::FProposalProvider>(), Reasoner, Error);
-        if (!TestTrue(TEXT("세션 시작"), Processor != nullptr)) return false;
+        auto Processor = WAINMemoryReasoningTests::MakeProcessor(MakeShared<WAINMemoryReasoningTests::FProposalProvider>(),
+                                                                 Reasoner,
+                                                                 Error);
+        if (!TestTrue(TEXT("세션 시작"), Processor != nullptr))
+            return false;
 
         Processor->ProcessTurn(WAINMemoryReasoningTests::MakeRequest(TEXT("MANA")));
         Processor->ProcessTurn(WAINMemoryReasoningTests::MakeRequest(TEXT("HANA")));
@@ -361,9 +381,11 @@
         auto Reasoner = MakeShared<WAINMemoryReasoningTests::FDeterministicReasoner>();
         Reasoner->bInvalidPlan = true;
         FString Error;
-        auto Processor = WAINMemoryReasoningTests::MakeProcessor(
-            MakeShared<WAINMemoryReasoningTests::FProposalProvider>(), Reasoner, Error);
-        if (!TestTrue(TEXT("세션 시작"), Processor != nullptr)) return false;
+        auto Processor = WAINMemoryReasoningTests::MakeProcessor(MakeShared<WAINMemoryReasoningTests::FProposalProvider>(),
+                                                                 Reasoner,
+                                                                 Error);
+        if (!TestTrue(TEXT("세션 시작"), Processor != nullptr))
+            return false;
 
         const auto Before = Processor->GetSnapshot();
         const auto Result = Processor->ProcessTurn(WAINMemoryReasoningTests::MakeRequest());
@@ -379,11 +401,13 @@
 
     bool FWAINReasoningInvalidReflectionNoCommitTest::RunTest(const FString &Parameters)
     {
-        auto Reasoner = MakeShared<WAINMemoryReasoningTests::FDeterministicReasoner>();
+        auto    Reasoner = MakeShared<WAINMemoryReasoningTests::FDeterministicReasoner>();
         FString Error;
-        auto Processor = WAINMemoryReasoningTests::MakeProcessor(
-            MakeShared<WAINMemoryReasoningTests::FProposalProvider>(), Reasoner, Error);
-        if (!TestTrue(TEXT("세션 시작"), Processor != nullptr)) return false;
+        auto Processor = WAINMemoryReasoningTests::MakeProcessor(MakeShared<WAINMemoryReasoningTests::FProposalProvider>(),
+                                                                 Reasoner,
+                                                                 Error);
+        if (!TestTrue(TEXT("세션 시작"), Processor != nullptr))
+            return false;
 
         Processor->ProcessTurn(WAINMemoryReasoningTests::MakeRequest());
         const auto Before = Processor->GetSnapshot();
@@ -405,8 +429,9 @@
         auto Provider = MakeShared<WAINMemoryReasoningTests::FCapturingProposalProvider>();
         Provider->bInvalidGameMutation = true;
         FString Error;
-        auto Processor = WAINMemoryReasoningTests::MakeProcessor(Provider, Reasoner, Error);
-        if (!TestTrue(TEXT("세션 시작"), Processor != nullptr)) return false;
+        auto    Processor = WAINMemoryReasoningTests::MakeProcessor(Provider, Reasoner, Error);
+        if (!TestTrue(TEXT("세션 시작"), Processor != nullptr))
+            return false;
 
         const auto Before = Processor->GetSnapshot();
         const auto Result = Processor->ProcessTurn(WAINMemoryReasoningTests::MakeRequest());
@@ -422,11 +447,13 @@
 
     bool FWAINReasoningReplayTest::RunTest(const FString &Parameters)
     {
-        auto Reasoner = MakeShared<WAINMemoryReasoningTests::FDeterministicReasoner>();
+        auto    Reasoner = MakeShared<WAINMemoryReasoningTests::FDeterministicReasoner>();
         FString Error;
-        auto Processor = WAINMemoryReasoningTests::MakeProcessor(
-            MakeShared<WAINMemoryReasoningTests::FProposalProvider>(), Reasoner, Error);
-        if (!TestTrue(TEXT("세션 시작"), Processor != nullptr)) return false;
+        auto Processor = WAINMemoryReasoningTests::MakeProcessor(MakeShared<WAINMemoryReasoningTests::FProposalProvider>(),
+                                                                 Reasoner,
+                                                                 Error);
+        if (!TestTrue(TEXT("세션 시작"), Processor != nullptr))
+            return false;
 
         const auto Request = WAINMemoryReasoningTests::MakeRequest();
         const auto First = Processor->ProcessTurn(Request);

@@ -11,19 +11,26 @@
 #pragma region 00_Transactional_Observation_Preparation
 
     bool FWAINMemoryWriter::PrepareObservations(const FWAINInteractionRequest &Request,
-                                                const FWAINResponseProposal &Proposal,
-                                                FWAINStateSnapshot &Prepared,
-                                                FString &OutError) const
+                                                const FWAINResponseProposal   &Proposal,
+                                                FWAINStateSnapshot            &Prepared,
+                                                FString                       &OutError) const
     {
-        if (Request.InputKind == EWAINInputKind::Text &&
-            !AppendObservation(Request.CharacterId, EWAINMemorySpeaker::Player, Request.Text,
-                               Prepared.TurnCount, Prepared, OutError))
+        if (Request.InputKind == EWAINInputKind::Text && !AppendObservation(Request.CharacterId,
+                                                                            EWAINMemorySpeaker::Player,
+                                                                            Request.Text,
+                                                                            Prepared.TurnCount,
+                                                                            Prepared,
+                                                                            OutError))
         {
             return false;
         }
 
-        return AppendObservation(Request.CharacterId, EWAINMemorySpeaker::Character, Proposal.Dialogue,
-                                 Prepared.TurnCount, Prepared, OutError);
+        return AppendObservation(Request.CharacterId,
+                                 EWAINMemorySpeaker::Character,
+                                 Proposal.Dialogue,
+                                 Prepared.TurnCount,
+                                 Prepared,
+                                 OutError);
     }
 
 #pragma endregion
@@ -33,12 +40,12 @@
 // ============================================================
 #pragma region 01_Observation_Construction
 
-    bool FWAINMemoryWriter::AppendObservation(const FName CharacterId,
+    bool FWAINMemoryWriter::AppendObservation(const FName              CharacterId,
                                               const EWAINMemorySpeaker Speaker,
-                                              const FString &Content,
-                                              const int32 CreatedTurn,
-                                              FWAINStateSnapshot &Prepared,
-                                              FString &OutError)
+                                              const FString           &Content,
+                                              const int32              CreatedTurn,
+                                              FWAINStateSnapshot      &Prepared,
+                                              FString                 &OutError)
     {
         // MVP는 긴 입력의 잘림과 무제한 Memory 증가를 암묵적으로 허용하지 않는다.
         if (Content.TrimStartAndEnd().IsEmpty() || Content.Len() > 4096 || Prepared.MemoryStream.Num() >= 2000)

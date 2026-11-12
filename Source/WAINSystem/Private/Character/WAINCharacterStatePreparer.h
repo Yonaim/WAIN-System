@@ -16,10 +16,10 @@
 class FWAINCharacterStatePreparer final
 {
   public:
-    bool Apply(const FName CharacterId,
+    bool Apply(const FName                       CharacterId,
                const TArray<FWAINStateMutation> &Mutations,
-               FWAINStateSnapshot &Prepared,
-               FString &OutError) const;
+               FWAINStateSnapshot               &Prepared,
+               FString                          &OutError) const;
 
   private:
     bool ApplyMutation(const FWAINStateMutation &Mutation, FWAINCharacterState &Character, FString &OutError) const;

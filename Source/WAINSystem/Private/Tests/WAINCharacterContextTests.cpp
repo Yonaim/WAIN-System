@@ -22,8 +22,8 @@
         {
             public:
             FWAINCharacterPersona Definition;
-            mutable int32 QueryCount = 0;
-            bool bFailLookup = false;
+            mutable int32         QueryCount = 0;
+            bool                  bFailLookup = false;
 
             virtual bool GetPersona(FName CharacterId, FWAINCharacterPersona &OutPersona, FString &OutError) const override
             {
@@ -45,19 +45,19 @@
             mutable TArray<FWAINCharacterContext> Captured;
 
             virtual bool Generate(const FWAINInteractionRequest &Request,
-                                  const FWAINSessionRoot &Current,
-                                  FWAINResponseProposal &OutProposal,
-                                  FString &OutError) const override
+                                  const FWAINSessionRoot        &Current,
+                                  FWAINResponseProposal         &OutProposal,
+                                  FString                       &OutError) const override
             {
                 OutError = TEXT("이 테스트는 Context-aware 생성 경로를 사용해야 합니다.");
                 return false;
             }
 
             virtual bool GenerateWithContext(const FWAINInteractionRequest &Request,
-                                             const FWAINSessionRoot &Current,
-                                             const FWAINCharacterContext &Context,
-                                             FWAINResponseProposal &OutProposal,
-                                             FString &OutError) const override
+                                             const FWAINSessionRoot        &Current,
+                                             const FWAINCharacterContext   &Context,
+                                             FWAINResponseProposal         &OutProposal,
+                                             FString                       &OutError) const override
             {
                 Captured.Add(Context);
                 OutProposal.Dialogue = TEXT("반가워!");
@@ -85,9 +85,9 @@
             mutable int32 Calls = 0;
 
             virtual bool Generate(const FWAINInteractionRequest &Request,
-                                  const FWAINSessionRoot &Current,
-                                  FWAINResponseProposal &OutProposal,
-                                  FString &OutError) const override
+                                  const FWAINSessionRoot        &Current,
+                                  FWAINResponseProposal         &OutProposal,
+                                  FString                       &OutError) const override
             {
                 ++Calls;
                 OutProposal.Dialogue = TEXT("이전 Provider 호출");
@@ -97,7 +97,7 @@
 
         FWAINStateSnapshot MakeState()
         {
-            FWAINStateSnapshot State;
+            FWAINStateSnapshot  State;
             FWAINCharacterState Character;
             Character.Trust = 40;
             Character.Emotion.Anxiety = 0.6F;
@@ -136,14 +136,14 @@
             return Source;
         }
 
-        TUniquePtr<FWAINInteractionProcessor> MakeProcessor(
-            TSharedRef<IWAINProposalProvider> Provider,
-            TSharedPtr<const IWAINPersonaSource> PersonaSource,
-            FString &OutError)
+        TUniquePtr<FWAINInteractionProcessor> MakeProcessor(TSharedRef<IWAINProposalProvider>    Provider,
+                                                            TSharedPtr<const IWAINPersonaSource> PersonaSource,
+                                                            FString                             &OutError)
         {
-            auto Processor = MakeUnique<FWAINInteractionProcessor>(
-                MakeGameAdapter(), MoveTemp(Provider), MakeShared<FWAINNoOpNarrativeEvaluator>(),
-                MoveTemp(PersonaSource));
+            auto Processor = MakeUnique<FWAINInteractionProcessor>(MakeGameAdapter(),
+                                                                   MoveTemp(Provider),
+                                                                   MakeShared<FWAINNoOpNarrativeEvaluator>(),
+                                                                   MoveTemp(PersonaSource));
             if (!Processor->StartSession(MakeState(), OutError))
             {
                 return nullptr;
@@ -166,10 +166,10 @@
 
     bool FWAINContextUsesCommittedStateTest::RunTest(const FString &Parameters)
     {
-        auto Source = WAINContextTests::MakePersonaSource();
-        auto Provider = MakeShared<WAINContextTests::FContextCapturingProvider>();
+        auto    Source = WAINContextTests::MakePersonaSource();
+        auto    Provider = MakeShared<WAINContextTests::FContextCapturingProvider>();
         FString Error;
-        auto Processor = WAINContextTests::MakeProcessor(Provider, Source, Error);
+        auto    Processor = WAINContextTests::MakeProcessor(Provider, Source, Error);
         if (!TestTrue(TEXT("세션 시작"), Processor != nullptr))
         {
             return false;
@@ -202,10 +202,10 @@
 
     bool FWAINContextRefreshAfterCommitTest::RunTest(const FString &Parameters)
     {
-        auto Source = WAINContextTests::MakePersonaSource();
-        auto Provider = MakeShared<WAINContextTests::FContextCapturingProvider>();
+        auto    Source = WAINContextTests::MakePersonaSource();
+        auto    Provider = MakeShared<WAINContextTests::FContextCapturingProvider>();
         FString Error;
-        auto Processor = WAINContextTests::MakeProcessor(Provider, Source, Error);
+        auto    Processor = WAINContextTests::MakeProcessor(Provider, Source, Error);
         if (!TestTrue(TEXT("세션 시작"), Processor != nullptr))
         {
             return false;
@@ -220,8 +220,7 @@
 
         TestEqual(TEXT("두 번째 턴은 Revision 1 조회"), Provider->Captured[1].StateRevision, uint64(1));
         TestEqual(TEXT("두 번째 턴은 Trust 45 조회"), Provider->Captured[1].State.Trust, 45);
-        TestTrue(TEXT("두 번째 턴은 Joy 0.2 조회"),
-                 FMath::IsNearlyEqual(Provider->Captured[1].State.Emotion.Joy, 0.2F));
+        TestTrue(TEXT("두 번째 턴은 Joy 0.2 조회"), FMath::IsNearlyEqual(Provider->Captured[1].State.Emotion.Joy, 0.2F));
         TestEqual(TEXT("최종 Revision 2"), Processor->GetSnapshot()->Revision, uint64(2));
         return true;
     }
@@ -241,9 +240,9 @@
     {
         auto Source = WAINContextTests::MakePersonaSource();
         Source->bFailLookup = true;
-        auto Provider = MakeShared<WAINContextTests::FContextCapturingProvider>();
+        auto    Provider = MakeShared<WAINContextTests::FContextCapturingProvider>();
         FString Error;
-        auto Processor = WAINContextTests::MakeProcessor(Provider, Source, Error);
+        auto    Processor = WAINContextTests::MakeProcessor(Provider, Source, Error);
         if (!TestTrue(TEXT("세션 시작"), Processor != nullptr))
         {
             return false;
@@ -266,9 +265,9 @@
     {
         auto Source = WAINContextTests::MakePersonaSource();
         Source->Definition.CharacterId = TEXT("OTHER_CHARACTER");
-        auto Provider = MakeShared<WAINContextTests::FContextCapturingProvider>();
+        auto    Provider = MakeShared<WAINContextTests::FContextCapturingProvider>();
         FString Error;
-        auto Processor = WAINContextTests::MakeProcessor(Provider, Source, Error);
+        auto    Processor = WAINContextTests::MakeProcessor(Provider, Source, Error);
         if (!TestTrue(TEXT("세션 시작"), Processor != nullptr))
         {
             return false;
@@ -287,9 +286,9 @@
 
     bool FWAINContextLegacyProviderFallbackTest::RunTest(const FString &Parameters)
     {
-        auto Provider = MakeShared<WAINContextTests::FLegacyProvider>();
+        auto    Provider = MakeShared<WAINContextTests::FLegacyProvider>();
         FString Error;
-        auto Processor = WAINContextTests::MakeProcessor(Provider, nullptr, Error);
+        auto    Processor = WAINContextTests::MakeProcessor(Provider, nullptr, Error);
         if (!TestTrue(TEXT("세션 시작"), Processor != nullptr))
         {
             return false;
@@ -308,10 +307,10 @@
 
     bool FWAINContextLegacyProviderRejectsPersonaTest::RunTest(const FString &Parameters)
     {
-        auto Source = WAINContextTests::MakePersonaSource();
-        auto Provider = MakeShared<WAINContextTests::FLegacyProvider>();
+        auto    Source = WAINContextTests::MakePersonaSource();
+        auto    Provider = MakeShared<WAINContextTests::FLegacyProvider>();
         FString Error;
-        auto Processor = WAINContextTests::MakeProcessor(Provider, Source, Error);
+        auto    Processor = WAINContextTests::MakeProcessor(Provider, Source, Error);
         if (!TestTrue(TEXT("세션 시작"), Processor != nullptr))
         {
             return false;
@@ -330,10 +329,10 @@
 
     bool FWAINContextReplaySkipsAssemblyTest::RunTest(const FString &Parameters)
     {
-        auto Source = WAINContextTests::MakePersonaSource();
-        auto Provider = MakeShared<WAINContextTests::FContextCapturingProvider>();
+        auto    Source = WAINContextTests::MakePersonaSource();
+        auto    Provider = MakeShared<WAINContextTests::FContextCapturingProvider>();
         FString Error;
-        auto Processor = WAINContextTests::MakeProcessor(Provider, Source, Error);
+        auto    Processor = WAINContextTests::MakeProcessor(Provider, Source, Error);
         if (!TestTrue(TEXT("세션 시작"), Processor != nullptr))
         {
             return false;

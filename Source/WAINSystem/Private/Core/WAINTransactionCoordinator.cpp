@@ -4,11 +4,11 @@
  */
 
 #include "Core/WAINTransactionCoordinator.h"
-#include "Core/WAINStateValidation.h"
 #include "Character/WAINCharacterStatePreparer.h"
-#include "Presentation/WAINPresentationValidator.h"
-#include "Memory/WAINMemoryWriter.h"
+#include "Core/WAINStateValidation.h"
 #include "Memory/WAINMemoryReasoningPreparer.h"
+#include "Memory/WAINMemoryWriter.h"
+#include "Presentation/WAINPresentationValidator.h"
 
 // ============================================================
 // 00. Commit Result Helper
@@ -40,8 +40,8 @@
                                                             const IWAINGameSnapshotAdapter &GameAdapter,
                                                             const IWAINNarrativeEvaluator  &NarrativeEvaluator,
                                                             const FWAINPresentationOptions *AvailablePresentations,
-                                                            const IWAINMemoryReasoner *MemoryReasoner,
-                                                            const FWAINWorldStateManager *WorldManager) const
+                                                            const IWAINMemoryReasoner      *MemoryReasoner,
+                                                            const FWAINWorldStateManager   *WorldManager) const
     {
         check(IsInGameThread());
 
@@ -57,7 +57,7 @@
             return WAINTransaction::Fail(EWAINInteractionError::SessionNotStarted, TEXT("확정된 Session Root가 없습니다."));
         }
 
-        FWAINStateSnapshot PreparedWAIN;
+        FWAINStateSnapshot    PreparedWAIN;
         EWAINInteractionError PreparationError = EWAINInteractionError::UnsupportedMutation;
         if (!PrepareWAINState(Request, *Current, Proposal, PreparedWAIN, PreparationError, Error))
         {
@@ -86,8 +86,7 @@
             return WAINTransaction::Fail(EWAINInteractionError::NarrativeEvaluationFailed, Error);
         }
 
-        if (MemoryReasoner &&
-            !FWAINMemoryReasoningPreparer().Prepare(Request, PreparedWAIN, *MemoryReasoner, Error))
+        if (MemoryReasoner && !FWAINMemoryReasoningPreparer().Prepare(Request, PreparedWAIN, *MemoryReasoner, Error))
         {
             return WAINTransaction::Fail(EWAINInteractionError::MemoryReasoningFailed, Error);
         }
@@ -114,9 +113,9 @@
 // ============================================================
 #pragma region 02_Proposal_Validation
 
-    bool FWAINTransactionCoordinator::ValidateProposal(const FWAINResponseProposal &Proposal,
+    bool FWAINTransactionCoordinator::ValidateProposal(const FWAINResponseProposal    &Proposal,
                                                        const FWAINPresentationOptions *AvailablePresentations,
-                                                       FString &OutError) const
+                                                       FString                        &OutError) const
     {
         if (Proposal.Dialogue.TrimStartAndEnd().IsEmpty())
         {

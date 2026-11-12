@@ -42,9 +42,7 @@
 
         virtual bool Validate(const IWAINGameStateSnapshot &Prepared, FString &OutError) const override;
 
-        virtual bool ReadInteger(const IWAINGameStateSnapshot &Snapshot,
-                                 FName TargetId,
-                                 int32 &OutValue) const override;
+        virtual bool ReadInteger(const IWAINGameStateSnapshot &Snapshot, FName TargetId, int32 &OutValue) const override;
 
         private:
         TMap<FName, int32> InitialValues;

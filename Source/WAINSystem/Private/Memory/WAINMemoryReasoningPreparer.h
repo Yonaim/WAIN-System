@@ -12,26 +12,25 @@ class FWAINMemoryReasoningPreparer final
 {
   public:
     bool Prepare(const FWAINInteractionRequest &Request,
-                 FWAINStateSnapshot &Prepared,
-                 const IWAINMemoryReasoner &Reasoner,
-                 FString &OutError) const;
+                 FWAINStateSnapshot            &Prepared,
+                 const IWAINMemoryReasoner     &Reasoner,
+                 FString                       &OutError) const;
 
   private:
     static bool PrepareReflection(const FWAINInteractionRequest &Request,
-                                  FWAINStateSnapshot &Prepared,
-                                  const IWAINMemoryReasoner &Reasoner,
-                                  FString &OutError);
+                                  FWAINStateSnapshot            &Prepared,
+                                  const IWAINMemoryReasoner     &Reasoner,
+                                  FString                       &OutError);
 
     static bool PreparePlan(const FWAINInteractionRequest &Request,
-                            FWAINStateSnapshot &Prepared,
-                            const IWAINMemoryReasoner &Reasoner,
-                            FString &OutError);
+                            FWAINStateSnapshot            &Prepared,
+                            const IWAINMemoryReasoner     &Reasoner,
+                            FString                       &OutError);
 
-    static TArray<FWAINMemoryRecord> CollectUnreflectedObservations(FName CharacterId,
+    static TArray<FWAINMemoryRecord> CollectUnreflectedObservations(FName                     CharacterId,
                                                                     const FWAINStateSnapshot &Prepared);
 
-    static TArray<FWAINMemoryRecord> CollectPlanSources(FName CharacterId,
-                                                        const FWAINStateSnapshot &Prepared);
+    static TArray<FWAINMemoryRecord> CollectPlanSources(FName CharacterId, const FWAINStateSnapshot &Prepared);
 
     static bool RequiresPlan(const FWAINInteractionRequest &Request, const FWAINStateSnapshot &Prepared);
     static bool ValidateDraftContent(const FString &Content, FString &OutError);

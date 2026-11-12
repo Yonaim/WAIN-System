@@ -11,8 +11,7 @@
 class FWAINMemoryRetriever final
 {
   public:
-    TArray<FWAINMemoryRecord> Retrieve(const FWAINInteractionRequest &Request,
-                                       const FWAINStateSnapshot &Current) const;
+    TArray<FWAINMemoryRecord> Retrieve(const FWAINInteractionRequest &Request, const FWAINStateSnapshot &Current) const;
 
   private:
     struct FRankedMemory
@@ -22,17 +21,15 @@ class FWAINMemoryRetriever final
     };
 
     static TArray<FRankedMemory> RankCandidates(const FWAINInteractionRequest &Request,
-                                               const FWAINStateSnapshot &Current);
+                                                const FWAINStateSnapshot      &Current);
 
     static TArray<FWAINMemoryRecord> SelectTopMemories(const TArray<FRankedMemory> &Ranked,
-                                                            const FWAINStateSnapshot &Current);
+                                                       const FWAINStateSnapshot    &Current);
 
-    static void AppendActivePlan(FName CharacterId,
-                                 const FWAINStateSnapshot &Current,
-                                 TArray<FWAINMemoryRecord> &OutResults);
+    static void
+    AppendActivePlan(FName CharacterId, const FWAINStateSnapshot &Current, TArray<FWAINMemoryRecord> &OutResults);
 
     static float CalculateRelevance(const FString &Query, const FString &Content);
-    static float CalculateScore(const FWAINInteractionRequest &Request,
-                                const FWAINMemoryRecord &Memory,
-                                int32 CurrentTurn);
+    static float
+    CalculateScore(const FWAINInteractionRequest &Request, const FWAINMemoryRecord &Memory, int32 CurrentTurn);
 };

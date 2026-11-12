@@ -123,12 +123,12 @@
 
     struct FWAINStateSnapshot
     {
-        TMap<FName, FWAINCharacterState> Characters;
+        TMap<FName, FWAINCharacterState>  Characters;
         TArray<FWAINMemoryRecord>         MemoryStream;
         TMap<FName, FGuid>                ActivePlanIds;
-        FName                            ActiveBeatId;
+        FName                             ActiveBeatId;
         TArray<FWAINBeatTransitionRecord> BeatHistory;
-        int32                            TurnCount = 0;
+        int32                             TurnCount = 0;
     };
 
 #pragma endregion

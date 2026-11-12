@@ -13,14 +13,16 @@
     // Graph 초기 검증과 현재 활성 경로의 읽기 전용 Context를 생성한다.
 
     FWAINBeatGraphNarrativeEvaluator::FWAINBeatGraphNarrativeEvaluator(
-        FWAINNarrativeGraph InGraph, TSharedPtr<const IWAINNarrativeGameFactReader> InGameFacts)
-        : Graph(MoveTemp(InGraph)), GameFacts(MoveTemp(InGameFacts))
+        FWAINNarrativeGraph                            InGraph,
+        TSharedPtr<const IWAINNarrativeGameFactReader> InGameFacts)
+        : Graph(MoveTemp(InGraph)),
+          GameFacts(MoveTemp(InGameFacts))
     {
     }
 
-    bool FWAINBeatGraphNarrativeEvaluator::ValidateInitialState(const FWAINStateSnapshot &InitialWAIN,
-                                                                 const IWAINGameStateSnapshot &InitialGame,
-                                                                 FString &OutError) const
+    bool FWAINBeatGraphNarrativeEvaluator::ValidateInitialState(const FWAINStateSnapshot     &InitialWAIN,
+                                                                const IWAINGameStateSnapshot &InitialGame,
+                                                                FString                      &OutError) const
     {
         if (!ValidateGraph(OutError))
         {
@@ -37,12 +39,12 @@
     }
 
     bool FWAINBeatGraphNarrativeEvaluator::BuildContext(const FWAINSessionRoot &Current,
-                                                        FWAINNarrativeContext &OutContext,
-                                                        FString &OutError) const
+                                                        FWAINNarrativeContext  &OutContext,
+                                                        FString                &OutError) const
     {
-        const FWAINNarrativeBeat *Beat = FindBeat(Current.WAIN.ActiveBeatId);
+        const FWAINNarrativeBeat     *Beat = FindBeat(Current.WAIN.ActiveBeatId);
         const FWAINNarrativeSequence *Sequence = Beat ? FindSequence(Beat->SequenceId) : nullptr;
-        const FWAINNarrativeChapter *Chapter = Sequence ? FindChapter(Sequence->ChapterId) : nullptr;
+        const FWAINNarrativeChapter  *Chapter = Sequence ? FindChapter(Sequence->ChapterId) : nullptr;
         if (!Beat || !Sequence || !Chapter)
         {
             OutError = TEXT("현재 Beat 또는 상위 Narrative 정의를 찾을 수 없습니다.");
@@ -75,10 +77,10 @@
     // Hard Rule → Completion → Transition을 평가하며 확정 State는 수정하지 않는다.
 
     bool FWAINBeatGraphNarrativeEvaluator::Evaluate(const FWAINInteractionRequest &Request,
-                                                    const FWAINSessionRoot &Current,
-                                                    FWAINStateSnapshot &PreparedWAIN,
-                                                    const IWAINGameStateSnapshot &PreparedGame,
-                                                    FString &OutError) const
+                                                    const FWAINSessionRoot        &Current,
+                                                    FWAINStateSnapshot            &PreparedWAIN,
+                                                    const IWAINGameStateSnapshot  &PreparedGame,
+                                                    FString                       &OutError) const
     {
         const FWAINNarrativeBeat *Beat = FindBeat(Current.WAIN.ActiveBeatId);
         if (!Beat)
@@ -99,8 +101,7 @@
         }
 
         bool bCompleted = false;
-        if (!EvaluateConditions(Beat->CompletionConditions, Request, PreparedWAIN, PreparedGame,
-                                bCompleted, OutError))
+        if (!EvaluateConditions(Beat->CompletionConditions, Request, PreparedWAIN, PreparedGame, bCompleted, OutError))
         {
             return false;
         }
@@ -128,20 +129,19 @@
         return true;
     }
 
-    bool FWAINBeatGraphNarrativeEvaluator::SelectNextBeat(const FWAINNarrativeBeat &Beat,
+    bool FWAINBeatGraphNarrativeEvaluator::SelectNextBeat(const FWAINNarrativeBeat      &Beat,
                                                           const FWAINInteractionRequest &Request,
-                                                          const FWAINStateSnapshot &PreparedWAIN,
-                                                          const IWAINGameStateSnapshot &PreparedGame,
-                                                          FName &OutNextBeat,
-                                                          FString &OutError) const
+                                                          const FWAINStateSnapshot      &PreparedWAIN,
+                                                          const IWAINGameStateSnapshot  &PreparedGame,
+                                                          FName                         &OutNextBeat,
+                                                          FString                       &OutError) const
     {
-        bool bHasCandidate = false;
+        bool  bHasCandidate = false;
         int32 BestPriority = MIN_int32;
         for (const FWAINBeatTransition &Transition : Beat.Transitions)
         {
             bool bSatisfied = false;
-            if (!EvaluateConditions(Transition.Conditions, Request, PreparedWAIN, PreparedGame,
-                                    bSatisfied, OutError))
+            if (!EvaluateConditions(Transition.Conditions, Request, PreparedWAIN, PreparedGame, bSatisfied, OutError))
             {
                 return false;
             }
@@ -175,30 +175,28 @@
     // Chapter·Sequence·Beat의 Hard Rule을 누적 적용한다.
 
     bool FWAINBeatGraphNarrativeEvaluator::EnforceHardRules(const FWAINInteractionRequest &Request,
-                                                            const FWAINSessionRoot &Current,
-                                                            const FWAINStateSnapshot &PreparedWAIN,
-                                                            const IWAINGameStateSnapshot &PreparedGame,
-                                                            const FWAINNarrativeBeat &Beat,
-                                                            FString &OutError) const
+                                                            const FWAINSessionRoot        &Current,
+                                                            const FWAINStateSnapshot      &PreparedWAIN,
+                                                            const IWAINGameStateSnapshot  &PreparedGame,
+                                                            const FWAINNarrativeBeat      &Beat,
+                                                            FString                       &OutError) const
     {
         const FWAINNarrativeSequence *Sequence = FindSequence(Beat.SequenceId);
-        const FWAINNarrativeChapter *Chapter = Sequence ? FindChapter(Sequence->ChapterId) : nullptr;
+        const FWAINNarrativeChapter  *Chapter = Sequence ? FindChapter(Sequence->ChapterId) : nullptr;
         if (!Sequence || !Chapter || !Current.Game.IsValid())
         {
             OutError = TEXT("Narrative 부모 관계 또는 기존 Game Snapshot이 없습니다.");
             return false;
         }
 
-        const TArray<FWAINNarrativeHardRule> *RuleSets[] =
-            {&Chapter->HardRules, &Sequence->HardRules, &Beat.HardRules};
+        const TArray<FWAINNarrativeHardRule> *RuleSets[] = {&Chapter->HardRules, &Sequence->HardRules, &Beat.HardRules};
         for (const TArray<FWAINNarrativeHardRule> *Rules : RuleSets)
         {
             for (const FWAINNarrativeHardRule &Rule : *Rules)
             {
                 int32 Previous = 0;
                 int32 Next = 0;
-                if (!GameFacts.IsValid() ||
-                    !GameFacts->ReadInteger(*Current.Game, Rule.GuardedGameTargetId, Previous) ||
+                if (!GameFacts.IsValid() || !GameFacts->ReadInteger(*Current.Game, Rule.GuardedGameTargetId, Previous) ||
                     !GameFacts->ReadInteger(PreparedGame, Rule.GuardedGameTargetId, Next))
                 {
                     OutError = TEXT("Hard Rule 평가에 필요한 Game Fact를 읽지 못했습니다.");
@@ -210,8 +208,7 @@
                 }
 
                 bool bAllowed = false;
-                if (!EvaluateConditions(Rule.Prerequisites, Request, PreparedWAIN, PreparedGame,
-                                        bAllowed, OutError))
+                if (!EvaluateConditions(Rule.Prerequisites, Request, PreparedWAIN, PreparedGame, bAllowed, OutError))
                 {
                     return false;
                 }
@@ -234,13 +231,12 @@
 
     // Game/Character Fact를 읽고 비교 연산을 평가한다.
 
-    bool FWAINBeatGraphNarrativeEvaluator::EvaluateConditions(
-        const TArray<FWAINNarrativeCondition> &Conditions,
-        const FWAINInteractionRequest &Request,
-        const FWAINStateSnapshot &PreparedWAIN,
-        const IWAINGameStateSnapshot &PreparedGame,
-        bool &OutSatisfied,
-        FString &OutError) const
+    bool FWAINBeatGraphNarrativeEvaluator::EvaluateConditions(const TArray<FWAINNarrativeCondition> &Conditions,
+                                                              const FWAINInteractionRequest         &Request,
+                                                              const FWAINStateSnapshot              &PreparedWAIN,
+                                                              const IWAINGameStateSnapshot          &PreparedGame,
+                                                              bool                                  &OutSatisfied,
+                                                              FString                               &OutError) const
     {
         OutSatisfied = true;
         for (const FWAINNarrativeCondition &Condition : Conditions)
@@ -254,12 +250,18 @@
             bool bMatches = false;
             switch (Condition.Comparison)
             {
-                case EWAINNarrativeComparison::Equal:   bMatches = Actual == Condition.Value; break;
-                case EWAINNarrativeComparison::AtLeast: bMatches = Actual >= Condition.Value; break;
-                case EWAINNarrativeComparison::AtMost:  bMatches = Actual <= Condition.Value; break;
+                case EWAINNarrativeComparison::Equal:
+                bMatches = Actual == Condition.Value;
+                break;
+                case EWAINNarrativeComparison::AtLeast:
+                bMatches = Actual >= Condition.Value;
+                break;
+                case EWAINNarrativeComparison::AtMost:
+                bMatches = Actual <= Condition.Value;
+                break;
                 default:
-                    OutError = TEXT("지원하지 않는 Narrative 비교 연산입니다.");
-                    return false;
+                OutError = TEXT("지원하지 않는 Narrative 비교 연산입니다.");
+                return false;
             }
             if (!bMatches)
             {
@@ -271,11 +273,11 @@
     }
 
     bool FWAINBeatGraphNarrativeEvaluator::ReadConditionValue(const FWAINNarrativeCondition &Condition,
-                                                               const FWAINInteractionRequest &Request,
-                                                               const FWAINStateSnapshot &PreparedWAIN,
-                                                               const IWAINGameStateSnapshot &PreparedGame,
-                                                               int32 &OutValue,
-                                                               FString &OutError) const
+                                                              const FWAINInteractionRequest &Request,
+                                                              const FWAINStateSnapshot      &PreparedWAIN,
+                                                              const IWAINGameStateSnapshot  &PreparedGame,
+                                                              int32                         &OutValue,
+                                                              FString                       &OutError) const
     {
         switch (Condition.Source)
         {
@@ -290,16 +292,16 @@
                 break;
             }
             case EWAINNarrativeFact::TurnCount:
-                OutValue = PreparedWAIN.TurnCount;
-                return true;
+            OutValue = PreparedWAIN.TurnCount;
+            return true;
             case EWAINNarrativeFact::GameInteger:
-                if (GameFacts.IsValid() && GameFacts->ReadInteger(PreparedGame, Condition.TargetId, OutValue))
-                {
-                    return true;
-                }
-                break;
+            if (GameFacts.IsValid() && GameFacts->ReadInteger(PreparedGame, Condition.TargetId, OutValue))
+            {
+                return true;
+            }
+            break;
             default:
-                break;
+            break;
         }
 
         OutError = TEXT("Narrative Condition에 필요한 Prepared Fact를 읽지 못했습니다.");
@@ -323,9 +325,7 @@
             return false;
         }
 
-        return ValidateChapters(OutError) &&
-               ValidateSequences(OutError) &&
-               ValidateBeatsAndTransitions(OutError);
+        return ValidateChapters(OutError) && ValidateSequences(OutError) && ValidateBeatsAndTransitions(OutError);
     }
 
     bool FWAINBeatGraphNarrativeEvaluator::ValidateChapters(FString &OutError) const
@@ -333,10 +333,11 @@
         TSet<FName> Ids;
         for (const FWAINNarrativeChapter &Chapter : Graph.Chapters)
         {
-            if (Chapter.Id.IsNone() || Ids.Contains(Chapter.Id) ||
-                Chapter.Goal.TrimStartAndEnd().IsEmpty() || !ValidateHardRules(Chapter.HardRules, OutError))
+            if (Chapter.Id.IsNone() || Ids.Contains(Chapter.Id) || Chapter.Goal.TrimStartAndEnd().IsEmpty() ||
+                !ValidateHardRules(Chapter.HardRules, OutError))
             {
-                if (OutError.IsEmpty()) OutError = TEXT("Chapter 정의가 비었거나 중복되었습니다.");
+                if (OutError.IsEmpty())
+                    OutError = TEXT("Chapter 정의가 비었거나 중복되었습니다.");
                 return false;
             }
             Ids.Add(Chapter.Id);
@@ -349,11 +350,11 @@
         TSet<FName> Ids;
         for (const FWAINNarrativeSequence &Sequence : Graph.Sequences)
         {
-            if (Sequence.Id.IsNone() || Ids.Contains(Sequence.Id) ||
-                !FindChapter(Sequence.ChapterId) || Sequence.Goal.TrimStartAndEnd().IsEmpty() ||
-                !ValidateHardRules(Sequence.HardRules, OutError))
+            if (Sequence.Id.IsNone() || Ids.Contains(Sequence.Id) || !FindChapter(Sequence.ChapterId) ||
+                Sequence.Goal.TrimStartAndEnd().IsEmpty() || !ValidateHardRules(Sequence.HardRules, OutError))
             {
-                if (OutError.IsEmpty()) OutError = TEXT("Sequence의 ID 또는 부모 Chapter가 유효하지 않습니다.");
+                if (OutError.IsEmpty())
+                    OutError = TEXT("Sequence의 ID 또는 부모 Chapter가 유효하지 않습니다.");
                 return false;
             }
             Ids.Add(Sequence.Id);
@@ -367,11 +368,11 @@
         for (const FWAINNarrativeBeat &Beat : Graph.Beats)
         {
             if (Beat.Id.IsNone() || Ids.Contains(Beat.Id) || !FindSequence(Beat.SequenceId) ||
-                Beat.Goal.TrimStartAndEnd().IsEmpty() ||
-                !ValidateHardRules(Beat.HardRules, OutError) ||
+                Beat.Goal.TrimStartAndEnd().IsEmpty() || !ValidateHardRules(Beat.HardRules, OutError) ||
                 !ValidateConditions(Beat.CompletionConditions, OutError))
             {
-                if (OutError.IsEmpty()) OutError = TEXT("Beat의 ID 또는 부모 Sequence가 유효하지 않습니다.");
+                if (OutError.IsEmpty())
+                    OutError = TEXT("Beat의 ID 또는 부모 Sequence가 유효하지 않습니다.");
                 return false;
             }
             Ids.Add(Beat.Id);
@@ -383,10 +384,10 @@
             for (const FWAINBeatTransition &Transition : Beat.Transitions)
             {
                 if (!Ids.Contains(Transition.TargetBeatId) || Transition.TargetBeatId == Beat.Id ||
-                    Targets.Contains(Transition.TargetBeatId) ||
-                    !ValidateConditions(Transition.Conditions, OutError))
+                    Targets.Contains(Transition.TargetBeatId) || !ValidateConditions(Transition.Conditions, OutError))
                 {
-                    if (OutError.IsEmpty()) OutError = TEXT("Beat 전이 대상 또는 조건이 유효하지 않습니다.");
+                    if (OutError.IsEmpty())
+                        OutError = TEXT("Beat 전이 대상 또는 조건이 유효하지 않습니다.");
                     return false;
                 }
                 Targets.Add(Transition.TargetBeatId);
@@ -395,8 +396,8 @@
         return true;
     }
 
-    bool FWAINBeatGraphNarrativeEvaluator::ValidateConditions(
-        const TArray<FWAINNarrativeCondition> &Conditions, FString &OutError) const
+    bool FWAINBeatGraphNarrativeEvaluator::ValidateConditions(const TArray<FWAINNarrativeCondition> &Conditions,
+                                                              FString                               &OutError) const
     {
         for (const FWAINNarrativeCondition &Condition : Conditions)
         {
@@ -415,15 +416,16 @@
         return true;
     }
 
-    bool FWAINBeatGraphNarrativeEvaluator::ValidateHardRules(
-        const TArray<FWAINNarrativeHardRule> &Rules, FString &OutError) const
+    bool FWAINBeatGraphNarrativeEvaluator::ValidateHardRules(const TArray<FWAINNarrativeHardRule> &Rules,
+                                                             FString                              &OutError) const
     {
         for (const FWAINNarrativeHardRule &Rule : Rules)
         {
             if (Rule.GuardedGameTargetId.IsNone() || Rule.Prerequisites.IsEmpty() ||
                 !ValidateConditions(Rule.Prerequisites, OutError))
             {
-                if (OutError.IsEmpty()) OutError = TEXT("Hard Rule에 대상 및 조건이 필요합니다.");
+                if (OutError.IsEmpty())
+                    OutError = TEXT("Hard Rule에 대상 및 조건이 필요합니다.");
                 return false;
             }
         }
@@ -442,25 +444,18 @@
     const FWAINNarrativeChapter *FWAINBeatGraphNarrativeEvaluator::FindChapter(const FName ChapterId) const
     {
         return Graph.Chapters.FindByPredicate([ChapterId](const FWAINNarrativeChapter &Item)
-        {
-            return Item.Id == ChapterId;
-        });
+                                              { return Item.Id == ChapterId; });
     }
 
     const FWAINNarrativeSequence *FWAINBeatGraphNarrativeEvaluator::FindSequence(const FName SequenceId) const
     {
         return Graph.Sequences.FindByPredicate([SequenceId](const FWAINNarrativeSequence &Item)
-        {
-            return Item.Id == SequenceId;
-        });
+                                               { return Item.Id == SequenceId; });
     }
 
     const FWAINNarrativeBeat *FWAINBeatGraphNarrativeEvaluator::FindBeat(const FName BeatId) const
     {
-        return Graph.Beats.FindByPredicate([BeatId](const FWAINNarrativeBeat &Item)
-        {
-            return Item.Id == BeatId;
-        });
+        return Graph.Beats.FindByPredicate([BeatId](const FWAINNarrativeBeat &Item) { return Item.Id == BeatId; });
     }
 
 #pragma endregion

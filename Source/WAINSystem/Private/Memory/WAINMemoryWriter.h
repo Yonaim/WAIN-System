@@ -12,15 +12,15 @@ class FWAINMemoryWriter final
 {
   public:
     bool PrepareObservations(const FWAINInteractionRequest &Request,
-                             const FWAINResponseProposal &Proposal,
-                             FWAINStateSnapshot &Prepared,
-                             FString &OutError) const;
+                             const FWAINResponseProposal   &Proposal,
+                             FWAINStateSnapshot            &Prepared,
+                             FString                       &OutError) const;
 
   private:
-    static bool AppendObservation(FName CharacterId,
-                                  EWAINMemorySpeaker Speaker,
-                                  const FString &Content,
-                                  int32 CreatedTurn,
+    static bool AppendObservation(FName               CharacterId,
+                                  EWAINMemorySpeaker  Speaker,
+                                  const FString      &Content,
+                                  int32               CreatedTurn,
                                   FWAINStateSnapshot &Prepared,
-                                  FString &OutError);
+                                  FString            &OutError);
 };

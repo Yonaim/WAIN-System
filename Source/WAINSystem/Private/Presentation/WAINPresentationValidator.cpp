@@ -42,9 +42,9 @@
 // ============================================================
 #pragma region 01_Proposal_Selection_Validation
 
-    bool FWAINPresentationValidator::ValidateSelection(const FWAINResponseProposal &Proposal,
+    bool FWAINPresentationValidator::ValidateSelection(const FWAINResponseProposal    &Proposal,
                                                        const FWAINPresentationOptions *Options,
-                                                       FString &OutError)
+                                                       FString                        &OutError)
     {
         if (Proposal.ExpressionId.IsNone())
         {

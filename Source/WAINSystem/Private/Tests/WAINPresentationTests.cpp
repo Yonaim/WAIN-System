@@ -20,14 +20,14 @@
         class FStaticCatalog final : public IWAINPresentationCatalog
         {
             public:
-            FWAINPresentationOptions Options;
-            mutable int32 QueryCount = 0;
+            FWAINPresentationOptions       Options;
+            mutable int32                  QueryCount = 0;
             mutable FWAINPresentationQuery LastQuery;
-            bool bFailQuery = false;
+            bool                           bFailQuery = false;
 
             virtual bool QueryAvailable(const FWAINPresentationQuery &Query,
-                                        FWAINPresentationOptions &OutOptions,
-                                        FString &OutError) const override
+                                        FWAINPresentationOptions     &OutOptions,
+                                        FString                      &OutError) const override
             {
                 ++QueryCount;
                 LastQuery = Query;
@@ -45,25 +45,25 @@
         class FSelectingProvider final : public IWAINProposalProvider
         {
             public:
-            FName SelectedExpression;
-            FName SelectedVariant;
-            mutable int32 GenerateCount = 0;
+            FName                                 SelectedExpression;
+            FName                                 SelectedVariant;
+            mutable int32                         GenerateCount = 0;
             mutable TArray<FWAINCharacterContext> Captured;
 
             virtual bool Generate(const FWAINInteractionRequest &Request,
-                                  const FWAINSessionRoot &Current,
-                                  FWAINResponseProposal &OutProposal,
-                                  FString &OutError) const override
+                                  const FWAINSessionRoot        &Current,
+                                  FWAINResponseProposal         &OutProposal,
+                                  FString                       &OutError) const override
             {
                 OutError = TEXT("Context-aware 경로가 필요합니다.");
                 return false;
             }
 
             virtual bool GenerateWithContext(const FWAINInteractionRequest &Request,
-                                             const FWAINSessionRoot &Current,
-                                             const FWAINCharacterContext &Context,
-                                             FWAINResponseProposal &OutProposal,
-                                             FString &OutError) const override
+                                             const FWAINSessionRoot        &Current,
+                                             const FWAINCharacterContext   &Context,
+                                             FWAINResponseProposal         &OutProposal,
+                                             FString                       &OutError) const override
             {
                 ++GenerateCount;
                 Captured.Add(Context);
@@ -87,9 +87,9 @@
             mutable int32 GenerateCount = 0;
 
             virtual bool Generate(const FWAINInteractionRequest &Request,
-                                  const FWAINSessionRoot &Current,
-                                  FWAINResponseProposal &OutProposal,
-                                  FString &OutError) const override
+                                  const FWAINSessionRoot        &Current,
+                                  FWAINResponseProposal         &OutProposal,
+                                  FString                       &OutError) const override
             {
                 ++GenerateCount;
                 OutProposal.Dialogue = TEXT("Legacy");
@@ -99,7 +99,7 @@
 
         TSharedRef<FStaticCatalog> MakeCatalog()
         {
-            auto Catalog = MakeShared<FStaticCatalog>();
+            auto                   Catalog = MakeShared<FStaticCatalog>();
             FWAINPresentationEntry Smile;
             Smile.ExpressionId = TEXT("EXP_MANA_SMILE");
             Smile.VariantId = TEXT("soft");
@@ -110,7 +110,7 @@
 
         FWAINStateSnapshot MakeState()
         {
-            FWAINStateSnapshot State;
+            FWAINStateSnapshot  State;
             FWAINCharacterState Character;
             Character.Trust = 30;
             Character.Emotion.Anxiety = 0.8F;
@@ -130,16 +130,18 @@
             return Request;
         }
 
-        TUniquePtr<FWAINInteractionProcessor> MakeProcessor(
-            TSharedRef<IWAINProposalProvider> Provider,
-            TSharedPtr<const IWAINPresentationCatalog> Catalog,
-            FString &OutError)
+        TUniquePtr<FWAINInteractionProcessor> MakeProcessor(TSharedRef<IWAINProposalProvider>          Provider,
+                                                            TSharedPtr<const IWAINPresentationCatalog> Catalog,
+                                                            FString                                   &OutError)
         {
             TMap<FName, int32> Values;
             Values.Add(TEXT("inventory.gift"), 2);
             auto Game = MakeShared<FWAINMapGameAdapter>(MoveTemp(Values));
-            auto Processor = MakeUnique<FWAINInteractionProcessor>(
-                Game, MoveTemp(Provider), MakeShared<FWAINNoOpNarrativeEvaluator>(), nullptr, MoveTemp(Catalog));
+            auto Processor = MakeUnique<FWAINInteractionProcessor>(Game,
+                                                                   MoveTemp(Provider),
+                                                                   MakeShared<FWAINNoOpNarrativeEvaluator>(),
+                                                                   nullptr,
+                                                                   MoveTemp(Catalog));
             if (!Processor->StartSession(MakeState(), OutError))
             {
                 return nullptr;
@@ -150,8 +152,7 @@
         bool IsUnchanged(const FWAINInteractionProcessor &Processor)
         {
             const auto State = Processor.GetSnapshot();
-            return State.IsValid() && State->Revision == 0 &&
-                   State->WAIN.Characters.FindChecked(TEXT("MANA")).Trust == 30;
+            return State.IsValid() && State->Revision == 0 && State->WAIN.Characters.FindChecked(TEXT("MANA")).Trust == 30;
         }
     } // namespace WAINPresentationTests
 
@@ -173,7 +174,7 @@
         Provider->SelectedExpression = TEXT("EXP_MANA_SMILE");
         Provider->SelectedVariant = TEXT("soft");
         FString Error;
-        auto Processor = WAINPresentationTests::MakeProcessor(Provider, Catalog, Error);
+        auto    Processor = WAINPresentationTests::MakeProcessor(Provider, Catalog, Error);
         if (!TestTrue(TEXT("세션 시작"), Processor != nullptr))
         {
             return false;
@@ -187,7 +188,8 @@
         TestEqual(TEXT("확정 Revision"), Processor->GetSnapshot()->Revision, uint64(1));
         TestEqual(TEXT("확정 Trust"), Processor->GetSnapshot()->WAIN.Characters.FindChecked(TEXT("MANA")).Trust, 35);
         TestTrue(TEXT("높은 불안과 미소 표현 독립"),
-                 FMath::IsNearlyEqual(Processor->GetSnapshot()->WAIN.Characters.FindChecked(TEXT("MANA")).Emotion.Anxiety, 0.8F));
+                 FMath::IsNearlyEqual(Processor->GetSnapshot()->WAIN.Characters.FindChecked(TEXT("MANA")).Emotion.Anxiety,
+                                      0.8F));
         TestEqual(TEXT("이전 Root는 불변"), Before->WAIN.Characters.FindChecked(TEXT("MANA")).Trust, 30);
         TestEqual(TEXT("Catalog 조회 1회"), Catalog->QueryCount, 1);
         TestEqual(TEXT("Context 후보 1개"), Provider->Captured[0].AvailablePresentations.Entries.Num(), 1);
@@ -206,9 +208,9 @@
     {
         auto Catalog = WAINPresentationTests::MakeCatalog();
         Catalog->Options.Entries.Reset();
-        auto Provider = MakeShared<WAINPresentationTests::FSelectingProvider>();
+        auto    Provider = MakeShared<WAINPresentationTests::FSelectingProvider>();
         FString Error;
-        auto Processor = WAINPresentationTests::MakeProcessor(Provider, Catalog, Error);
+        auto    Processor = WAINPresentationTests::MakeProcessor(Provider, Catalog, Error);
         if (!TestTrue(TEXT("세션 시작"), Processor != nullptr))
         {
             return false;
@@ -237,8 +239,9 @@
         Provider->SelectedExpression = TEXT("EXP_UNKNOWN");
         Provider->SelectedVariant = TEXT("soft");
         FString Error;
-        auto Processor = WAINPresentationTests::MakeProcessor(Provider, WAINPresentationTests::MakeCatalog(), Error);
-        if (!TestTrue(TEXT("세션 시작"), Processor != nullptr)) return false;
+        auto    Processor = WAINPresentationTests::MakeProcessor(Provider, WAINPresentationTests::MakeCatalog(), Error);
+        if (!TestTrue(TEXT("세션 시작"), Processor != nullptr))
+            return false;
 
         const auto Result = Processor->ProcessTurn(WAINPresentationTests::MakeRequest());
         TestTrue(TEXT("알 수 없는 ID 거절"), Result.Error == EWAINInteractionError::InvalidProposal);
@@ -256,8 +259,9 @@
         Provider->SelectedExpression = TEXT("EXP_MANA_SMILE");
         Provider->SelectedVariant = TEXT("angry");
         FString Error;
-        auto Processor = WAINPresentationTests::MakeProcessor(Provider, WAINPresentationTests::MakeCatalog(), Error);
-        if (!TestTrue(TEXT("세션 시작"), Processor != nullptr)) return false;
+        auto    Processor = WAINPresentationTests::MakeProcessor(Provider, WAINPresentationTests::MakeCatalog(), Error);
+        if (!TestTrue(TEXT("세션 시작"), Processor != nullptr))
+            return false;
 
         const auto Result = Processor->ProcessTurn(WAINPresentationTests::MakeRequest());
         TestTrue(TEXT("미허용 Variant 거절"), Result.Error == EWAINInteractionError::InvalidProposal);
@@ -275,8 +279,9 @@
         Provider->SelectedExpression = TEXT("EXP_MANA_SMILE");
         Provider->SelectedVariant = TEXT("soft");
         FString Error;
-        auto Processor = WAINPresentationTests::MakeProcessor(Provider, nullptr, Error);
-        if (!TestTrue(TEXT("세션 시작"), Processor != nullptr)) return false;
+        auto    Processor = WAINPresentationTests::MakeProcessor(Provider, nullptr, Error);
+        if (!TestTrue(TEXT("세션 시작"), Processor != nullptr))
+            return false;
 
         const auto Result = Processor->ProcessTurn(WAINPresentationTests::MakeRequest());
         TestTrue(TEXT("검증할 Catalog 없어서 거절"), Result.Error == EWAINInteractionError::InvalidProposal);
@@ -293,8 +298,9 @@
         auto Provider = MakeShared<WAINPresentationTests::FSelectingProvider>();
         Provider->SelectedVariant = TEXT("soft");
         FString Error;
-        auto Processor = WAINPresentationTests::MakeProcessor(Provider, WAINPresentationTests::MakeCatalog(), Error);
-        if (!TestTrue(TEXT("세션 시작"), Processor != nullptr)) return false;
+        auto    Processor = WAINPresentationTests::MakeProcessor(Provider, WAINPresentationTests::MakeCatalog(), Error);
+        if (!TestTrue(TEXT("세션 시작"), Processor != nullptr))
+            return false;
 
         const auto Result = Processor->ProcessTurn(WAINPresentationTests::MakeRequest());
         TestTrue(TEXT("Expression 없는 Variant 거절"), Result.Error == EWAINInteractionError::InvalidProposal);
@@ -310,10 +316,11 @@
     {
         auto Catalog = WAINPresentationTests::MakeCatalog();
         Catalog->Options.Entries[0].Description = TEXT(" ");
-        auto Provider = MakeShared<WAINPresentationTests::FSelectingProvider>();
+        auto    Provider = MakeShared<WAINPresentationTests::FSelectingProvider>();
         FString Error;
-        auto Processor = WAINPresentationTests::MakeProcessor(Provider, Catalog, Error);
-        if (!TestTrue(TEXT("세션 시작"), Processor != nullptr)) return false;
+        auto    Processor = WAINPresentationTests::MakeProcessor(Provider, Catalog, Error);
+        if (!TestTrue(TEXT("세션 시작"), Processor != nullptr))
+            return false;
 
         const auto Result = Processor->ProcessTurn(WAINPresentationTests::MakeRequest());
         TestTrue(TEXT("설명 없는 후보 거절"), Result.Error == EWAINInteractionError::ContextPreparationFailed);
@@ -330,10 +337,11 @@
     {
         auto Catalog = WAINPresentationTests::MakeCatalog();
         Catalog->Options.Entries.Add(Catalog->Options.Entries[0]);
-        auto Provider = MakeShared<WAINPresentationTests::FSelectingProvider>();
+        auto    Provider = MakeShared<WAINPresentationTests::FSelectingProvider>();
         FString Error;
-        auto Processor = WAINPresentationTests::MakeProcessor(Provider, Catalog, Error);
-        if (!TestTrue(TEXT("세션 시작"), Processor != nullptr)) return false;
+        auto    Processor = WAINPresentationTests::MakeProcessor(Provider, Catalog, Error);
+        if (!TestTrue(TEXT("세션 시작"), Processor != nullptr))
+            return false;
 
         const auto Result = Processor->ProcessTurn(WAINPresentationTests::MakeRequest());
         TestTrue(TEXT("중복 Catalog 거절"), Result.Error == EWAINInteractionError::ContextPreparationFailed);
@@ -350,10 +358,11 @@
     {
         auto Catalog = WAINPresentationTests::MakeCatalog();
         Catalog->bFailQuery = true;
-        auto Provider = MakeShared<WAINPresentationTests::FSelectingProvider>();
+        auto    Provider = MakeShared<WAINPresentationTests::FSelectingProvider>();
         FString Error;
-        auto Processor = WAINPresentationTests::MakeProcessor(Provider, Catalog, Error);
-        if (!TestTrue(TEXT("세션 시작"), Processor != nullptr)) return false;
+        auto    Processor = WAINPresentationTests::MakeProcessor(Provider, Catalog, Error);
+        if (!TestTrue(TEXT("세션 시작"), Processor != nullptr))
+            return false;
 
         const auto Result = Processor->ProcessTurn(WAINPresentationTests::MakeRequest());
         TestTrue(TEXT("조회 실패 거절"), Result.Error == EWAINInteractionError::ContextPreparationFailed);
@@ -375,10 +384,11 @@
 
     bool FWAINPresentationLegacyProviderTest::RunTest(const FString &Parameters)
     {
-        auto Provider = MakeShared<WAINPresentationTests::FLegacyProvider>();
+        auto    Provider = MakeShared<WAINPresentationTests::FLegacyProvider>();
         FString Error;
-        auto Processor = WAINPresentationTests::MakeProcessor(Provider, WAINPresentationTests::MakeCatalog(), Error);
-        if (!TestTrue(TEXT("세션 시작"), Processor != nullptr)) return false;
+        auto    Processor = WAINPresentationTests::MakeProcessor(Provider, WAINPresentationTests::MakeCatalog(), Error);
+        if (!TestTrue(TEXT("세션 시작"), Processor != nullptr))
+            return false;
 
         const auto Result = Processor->ProcessTurn(WAINPresentationTests::MakeRequest());
         TestTrue(TEXT("Catalog 무시 Provider 거절"), Result.Error == EWAINInteractionError::ProposalGenerationFailed);
@@ -398,8 +408,9 @@
         Provider->SelectedExpression = TEXT("EXP_MANA_SMILE");
         Provider->SelectedVariant = TEXT("soft");
         FString Error;
-        auto Processor = WAINPresentationTests::MakeProcessor(Provider, Catalog, Error);
-        if (!TestTrue(TEXT("세션 시작"), Processor != nullptr)) return false;
+        auto    Processor = WAINPresentationTests::MakeProcessor(Provider, Catalog, Error);
+        if (!TestTrue(TEXT("세션 시작"), Processor != nullptr))
+            return false;
 
         const auto Request = WAINPresentationTests::MakeRequest();
         const auto First = Processor->ProcessTurn(Request);

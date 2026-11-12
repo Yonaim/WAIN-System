@@ -15,9 +15,9 @@
     /** @brief Context Preparation 시점의 캐릭터·장면 문맥으로 허용된 표정 목록을 요청한다. */
     struct FWAINPresentationQuery
     {
-        FName CharacterId;
-        FName SceneId;
-        FName ActiveBeatId;
+        FName  CharacterId;
+        FName  SceneId;
+        FName  ActiveBeatId;
         uint64 StateRevision = 0;
     };
 
@@ -31,8 +31,8 @@
     /** @brief Expression/Variant의 허용 조합. VariantId가 None이면 기본 표현을 뜻한다. */
     struct FWAINPresentationEntry
     {
-        FName ExpressionId;
-        FName VariantId;
+        FName   ExpressionId;
+        FName   VariantId;
         FString Description;
     };
 
@@ -49,8 +49,8 @@
         virtual ~IWAINPresentationCatalog() = default;
 
         virtual bool QueryAvailable(const FWAINPresentationQuery &Query,
-                                    FWAINPresentationOptions &OutOptions,
-                                    FString &OutError) const = 0;
+                                    FWAINPresentationOptions     &OutOptions,
+                                    FString                      &OutError) const = 0;
     };
 
 #pragma endregion

@@ -61,6 +61,6 @@ ProcessTurn
 
 신규 `WAIN.World.*` 자동화 테스트: VisibleContext, MutationCommit, ReadOnlyReject, BoundsReject, UnregisteredKeyReject, DuplicateSchemaReject, InvalidInitialReject, PreparedDriftReject, ReplayNoDoubleCommit.
 
-**정적 검사만 수행**했고 Unreal Engine 5.8의 컴파일·Automation 실행 통과는 확인하지 못했다. 반드시 World 테스트 9개와 기존 59개를 같이 회귀 실행해야 한다.
+**2026-11-13 검증:** `WAINTestbedEditor Win64 DebugGame` UE 5.8 빌드 성공. `FWAINWorldStateManager`를 Host 모듈에서 링크할 수 있도록 모듈 export를 표시했다. World 테스트 9개와 기존 테스트의 Automation 실행은 별도로 필요하다.
 
 다음 작업은 실제 Testbed의 Game Content Schema/Fact 값 JSON을 로딩하는 Host Adapter, 다중 타입 World Facts, World Context용 LLM 직렬화, 관측/로그, 권한별 정보 공개 규칙 등이다.

@@ -44,13 +44,13 @@
                                    const IWAINGameSnapshotAdapter &GameAdapter,
                                    const IWAINNarrativeEvaluator  &NarrativeEvaluator,
                                    const FWAINPresentationOptions *AvailablePresentations = nullptr,
-                                   const IWAINMemoryReasoner *MemoryReasoner = nullptr,
-                                   const FWAINWorldStateManager *WorldManager = nullptr) const;
+                                   const IWAINMemoryReasoner      *MemoryReasoner = nullptr,
+                                   const FWAINWorldStateManager   *WorldManager = nullptr) const;
 
         private:
-        bool ValidateProposal(const FWAINResponseProposal &Proposal,
+        bool ValidateProposal(const FWAINResponseProposal    &Proposal,
                               const FWAINPresentationOptions *AvailablePresentations,
-                              FString &OutError) const;
+                              FString                        &OutError) const;
 
         TArray<FWAINStateMutation> CollectGameMutations(const FWAINResponseProposal &Proposal) const;
 
