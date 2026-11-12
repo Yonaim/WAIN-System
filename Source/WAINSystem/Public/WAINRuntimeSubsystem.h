@@ -5,16 +5,17 @@
 
 #pragma once
 
+// clang-format off
 #include "CoreMinimal.h"
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "WAINInterfaces.h"
 #include "WAINRuntimeTypes.h"
-
 #include "WAINRuntimeSubsystem.generated.h"
+// clang-format on
 
 class FWAINInteractionProcessor;
 
-DECLARE_MULTICAST_DELEGATE_TwoParams(FOnWAINStateCommitted, const FGuid& /*TurnId*/, uint64 /*Revision*/);
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnWAINStateCommitted, const FGuid & /*TurnId*/, uint64 /*Revision*/);
 
 /**
  * @brief 이번 버전은 Game Thread의 동기 Mock Turn만 지원한다.
@@ -26,19 +27,18 @@ class WAINSYSTEM_API UWAINRuntimeSubsystem : public UGameInstanceSubsystem
 {
     GENERATED_BODY()
 
-public:
-    bool StartSession(
-        const FWAINStateSnapshot& InitialWAIN,
-        TSharedRef<IWAINGameSnapshotAdapter> GameAdapter,
-        TSharedRef<IWAINProposalProvider> ProposalProvider,
-        TSharedRef<IWAINNarrativeEvaluator> NarrativeEvaluator,
-        FString& OutError);
+  public:
+    bool StartSession(const FWAINStateSnapshot            &InitialWAIN,
+                      TSharedRef<IWAINGameSnapshotAdapter> GameAdapter,
+                      TSharedRef<IWAINProposalProvider>    ProposalProvider,
+                      TSharedRef<IWAINNarrativeEvaluator>  NarrativeEvaluator,
+                      FString                             &OutError);
 
-    FWAINInteractionResult ProcessMockTurn(const FWAINInteractionRequest& Request);
+    FWAINInteractionResult ProcessMockTurn(const FWAINInteractionRequest &Request);
 
     TSharedPtr<const FWAINSessionRoot> GetStateSnapshot() const;
 
-    FOnWAINStateCommitted& OnStateCommitted()
+    FOnWAINStateCommitted &OnStateCommitted()
     {
         return StateCommitted;
     }
@@ -47,7 +47,7 @@ public:
 
     virtual void Deinitialize() override;
 
-private:
+  private:
     TSharedPtr<FWAINInteractionProcessor> Processor;
-    FOnWAINStateCommitted StateCommitted;
+    FOnWAINStateCommitted                 StateCommitted;
 };

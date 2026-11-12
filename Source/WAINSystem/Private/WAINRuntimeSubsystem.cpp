@@ -4,7 +4,6 @@
  */
 
 #include "WAINRuntimeSubsystem.h"
-
 #include "Core/WAINInteractionProcessor.h"
 
 // ============================================================
@@ -12,79 +11,79 @@
 // ============================================================
 #pragma region 00_Session_And_Mock_Turn
 
-bool UWAINRuntimeSubsystem::StartSession(
-    const FWAINStateSnapshot& InitialWAIN,
-    TSharedRef<IWAINGameSnapshotAdapter> GameAdapter,
-    TSharedRef<IWAINProposalProvider> ProposalProvider,
-    TSharedRef<IWAINNarrativeEvaluator> NarrativeEvaluator,
-    FString& OutError)
-{
-    check(IsInGameThread());
-
-    if (Processor.IsValid())
+    bool UWAINRuntimeSubsystem::StartSession(const FWAINStateSnapshot            &InitialWAIN,
+                                             TSharedRef<IWAINGameSnapshotAdapter> GameAdapter,
+                                             TSharedRef<IWAINProposalProvider>    ProposalProvider,
+                                             TSharedRef<IWAINNarrativeEvaluator>  NarrativeEvaluator,
+                                             FString                             &OutError)
     {
-        OutError = TEXT("기존 세션을 종료한 뒤 새 세션을 시작해야 합니다.");
-        return false;
+        check(IsInGameThread());
+
+        if (Processor.IsValid())
+        {
+            OutError = TEXT("기존 세션을 종료한 뒤 새 세션을 시작해야 합니다.");
+            return false;
+        }
+
+        TSharedPtr<FWAINInteractionProcessor> NextProcessor =
+            MakeShared<FWAINInteractionProcessor>(MoveTemp(GameAdapter),
+                                                  MoveTemp(ProposalProvider),
+                                                  MoveTemp(NarrativeEvaluator));
+
+        if (!NextProcessor->StartSession(InitialWAIN, OutError))
+        {
+            return false;
+        }
+
+        Processor = MoveTemp(NextProcessor);
+        return true;
     }
 
-    TSharedPtr<FWAINInteractionProcessor> NextProcessor = MakeShared<FWAINInteractionProcessor>(
-        MoveTemp(GameAdapter), MoveTemp(ProposalProvider), MoveTemp(NarrativeEvaluator));
-
-    if (!NextProcessor->StartSession(InitialWAIN, OutError))
+    FWAINInteractionResult UWAINRuntimeSubsystem::ProcessMockTurn(const FWAINInteractionRequest &Request)
     {
-        return false;
-    }
+        check(IsInGameThread());
 
-    Processor = MoveTemp(NextProcessor);
-    return true;
-}
+        if (!Processor)
+        {
+            FWAINInteractionResult Result;
+            Result.TurnId = Request.TurnId;
+            Result.Error = EWAINInteractionError::SessionNotStarted;
+            Result.ErrorMessage = TEXT("WAIN 세션이 시작되지 않았습니다.");
+            return Result;
+        }
 
-FWAINInteractionResult UWAINRuntimeSubsystem::ProcessMockTurn(const FWAINInteractionRequest& Request)
-{
-    check(IsInGameThread());
+        const FWAINInteractionResult Result = Processor->ProcessTurn(Request);
+        if (Result.Succeeded() && !Result.bReplayed)
+        {
+            StateCommitted.Broadcast(Request.TurnId, Result.CommittedRevision);
+        }
 
-    if (!Processor)
-    {
-        FWAINInteractionResult Result;
-        Result.TurnId = Request.TurnId;
-        Result.Error = EWAINInteractionError::SessionNotStarted;
-        Result.ErrorMessage = TEXT("WAIN 세션이 시작되지 않았습니다.");
         return Result;
     }
 
-    const FWAINInteractionResult Result = Processor->ProcessTurn(Request);
-    if (Result.Succeeded() && !Result.bReplayed)
-    {
-        StateCommitted.Broadcast(Request.TurnId, Result.CommittedRevision);
-    }
-
-    return Result;
-}
-
 #pragma endregion
-
 
 // ============================================================
 // 01. Snapshot And Lifecycle
 // ============================================================
 #pragma region 01_Snapshot_And_Lifecycle
 
-TSharedPtr<const FWAINSessionRoot> UWAINRuntimeSubsystem::GetStateSnapshot() const
-{
-    check(IsInGameThread());
-    return Processor ? Processor->GetSnapshot() : nullptr;
-}
+    TSharedPtr<const FWAINSessionRoot> UWAINRuntimeSubsystem::GetStateSnapshot() const
+    {
+        check(IsInGameThread());
+        return Processor ? Processor->GetSnapshot() : nullptr;
+    }
 
-void UWAINRuntimeSubsystem::EndSession()
-{
-    check(IsInGameThread());
-    Processor.Reset();
-}
+    void UWAINRuntimeSubsystem::EndSession()
+    {
+        check(IsInGameThread());
+        Processor.Reset();
+    }
 
-void UWAINRuntimeSubsystem::Deinitialize()
-{
-    EndSession();
-    Super::Deinitialize();
-}
+    void UWAINRuntimeSubsystem::Deinitialize()
+    {
+        EndSession();
+        Super::Deinitialize();
+    }
 
 #pragma endregion

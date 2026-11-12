@@ -28,3 +28,10 @@
 | 4~9: Character Emotion Delta, Catalog, Memory, Narrative Graph, LLM, 평가 | **미구현** |
 
 매 빌드 전 포맷팅 도구는 Plugin `Tools`에 배치되어 있으나 실제 Testbed `Target.cs` hook 연결은 아직 이루어지지 않았다. `README.md`의 예시를 참조해 각 타깃에 추가하고 Live Coding 경로를 별도 검증한다.
+
+## Phase 2 착수 업데이트 (2026-11-10)
+
+- **Phase 1:** 사용자 제공 검증 소스를 Baseline으로 채택. 과거 표의 ‘빌드 미검증’은 당시 문서 이력임.
+- **단계 4 일부:** Character Relationship `Trust`와 6축 Emotion `AddFloat` 적용 로직 및 검증 테스트 코드 작성 완료. Persona·Context Assembly는 미구현, Phase 2 부분 완료.
+- **단계 5 이후:** 기존 로드맵 유지. Game-owned 상태에 일반 목적 float Mutation은 아직 허용하지 않음.
+- **개발 환경 확인 필요:** Phase 2 신규 코드의 Unreal 컴파일 및 `WAIN.Transaction.*`, `WAIN.Character.*` Automation Tests 실행.

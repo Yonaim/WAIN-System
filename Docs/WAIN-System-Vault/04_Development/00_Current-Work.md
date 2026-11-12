@@ -37,3 +37,13 @@
 - **미지원:** 실제 Host Testbed 연동, LLM Async, Memory, Emotion Delta, Presentation 검증, 완전한 Narrative Graph, 독립 Actor 원자 Commit, Save/Load.
 - **검증 상태:** Unreal 5.8 빌드/런타임·Automation Test는 사용자 개발 환경에서 수행해야 함. 정적 검사 여부는 아래 Work Log 및 새 ZIP 검증 기록 참고.
 - 위 문서 상단의 **'현재 미구현' 표는 코드 작성 이전 시점의 이력**이며, 최신 상태는 이 절을 기준으로 한다.
+
+## 2026-11-10 — Phase 1 검증본 인수 및 Phase 2 첫 기능 작성
+
+- **입력 기준:** 사용자 제공 `WAINTestbed-Source(1).zip`을 Phase 1 검증된 소스로 취급한다(사용자 확인, 개별 빌드/테스트 로그는 이 작업에 첨부되지 않음).
+- **작성:** Character 전용 `FWAINCharacterStatePreparer`, `AddFloat`/`FloatValue`, 6축 Emotion Delta/Trust Prepared State 처리, Automation Test 6개 추가.
+- **보존:** Phase 1의 Shared Root Publish·Game Adapter·TurnId 중복 보호 및 기존 Automation Tests 6개.
+- **아직 미지원:** Persona/Context Assembly, Memory, Presentation Catalog, LLM, 실제 Testbed UI 연동. **Phase 2 추가분의 Unreal 5.8 빌드/테스트 미검증.**
+- **다음:** 사용자 Unreal 환경에서 `WAIN.Transaction.*`, `WAIN.Character.*` 전체 테스트 실행 및 Persona/Context 설계 연결.
+
+[Character Delta 구현 문서](05_Character-Delta-Implementation.md)

@@ -5,57 +5,53 @@
 
 #pragma once
 
+#include "Core/WAINStateStore.h"
 #include "CoreMinimal.h"
 #include "WAINInterfaces.h"
-#include "Core/WAINStateStore.h"
 
 // ============================================================
 // 00. Commit Outcome
 // ============================================================
 #pragma region 00_Commit_Outcome
 
-struct FWAINCommitOutcome
-{
-    EWAINInteractionError Error = EWAINInteractionError::None;
-    FString Message;
-    uint64 Revision = 0;
-
-    bool Succeeded() const
+    struct FWAINCommitOutcome
     {
-        return Error == EWAINInteractionError::None;
-    }
-};
+        EWAINInteractionError Error = EWAINInteractionError::None;
+        FString               Message;
+        uint64                Revision = 0;
+
+        bool Succeeded() const
+        {
+            return Error == EWAINInteractionError::None;
+        }
+    };
 
 #pragma endregion
-
 
 // ============================================================
 // 01. Coordinator Interface
 // ============================================================
 #pragma region 01_Coordinator_Interface
 
-class FWAINTransactionCoordinator final
-{
-public:
-    FWAINCommitOutcome Execute(
-        const FWAINInteractionRequest& Request,
-        const FWAINResponseProposal& Proposal,
-        FWAINStateStore& StateStore,
-        const IWAINGameSnapshotAdapter& GameAdapter,
-        const IWAINNarrativeEvaluator& NarrativeEvaluator) const;
+    class FWAINTransactionCoordinator final
+    {
+        public:
+        FWAINCommitOutcome Execute(const FWAINInteractionRequest  &Request,
+                                   const FWAINResponseProposal    &Proposal,
+                                   FWAINStateStore                &StateStore,
+                                   const IWAINGameSnapshotAdapter &GameAdapter,
+                                   const IWAINNarrativeEvaluator  &NarrativeEvaluator) const;
 
-private:
-    bool ValidateProposal(const FWAINResponseProposal& Proposal, FString& OutError) const;
+        private:
+        bool ValidateProposal(const FWAINResponseProposal &Proposal, FString &OutError) const;
 
-    TArray<FWAINStateMutation> CollectGameMutations(const FWAINResponseProposal& Proposal) const;
+        TArray<FWAINStateMutation> CollectGameMutations(const FWAINResponseProposal &Proposal) const;
 
-    bool PrepareWAINState(
-        const FWAINInteractionRequest& Request,
-        const FWAINSessionRoot& Current,
-        const FWAINResponseProposal& Proposal,
-        FWAINStateSnapshot& OutPrepared,
-        FString& OutError) const;
-
-};
+        bool PrepareWAINState(const FWAINInteractionRequest &Request,
+                              const FWAINSessionRoot        &Current,
+                              const FWAINResponseProposal   &Proposal,
+                              FWAINStateSnapshot            &OutPrepared,
+                              FString                       &OutError) const;
+    };
 
 #pragma endregion

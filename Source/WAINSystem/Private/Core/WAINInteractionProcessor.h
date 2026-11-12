@@ -5,33 +5,31 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
-#include "WAINInterfaces.h"
 #include "Core/WAINStateStore.h"
 #include "Core/WAINTransactionCoordinator.h"
+#include "CoreMinimal.h"
+#include "WAINInterfaces.h"
 
 class FWAINInteractionProcessor final
 {
-public:
+  public:
 // ============================================================
 // 00. Public Interaction API
 // ============================================================
 #pragma region 00_Public_Interaction_API
 
-    FWAINInteractionProcessor(
-        TSharedRef<IWAINGameSnapshotAdapter> InGameAdapter,
-        TSharedRef<IWAINProposalProvider> InProposalProvider,
-        TSharedRef<IWAINNarrativeEvaluator> InNarrativeEvaluator);
+    FWAINInteractionProcessor(TSharedRef<IWAINGameSnapshotAdapter> InGameAdapter,
+                              TSharedRef<IWAINProposalProvider>    InProposalProvider,
+                              TSharedRef<IWAINNarrativeEvaluator>  InNarrativeEvaluator);
 
-    bool StartSession(const FWAINStateSnapshot& InitialWAIN, FString& OutError);
+    bool StartSession(const FWAINStateSnapshot &InitialWAIN, FString &OutError);
 
-    FWAINInteractionResult ProcessTurn(const FWAINInteractionRequest& Request);
+    FWAINInteractionResult ProcessTurn(const FWAINInteractionRequest &Request);
 
     TSharedPtr<const FWAINSessionRoot> GetSnapshot() const;
 
-private:
+    private:
 #pragma endregion
-
 
 // ============================================================
 // 01. Turn Execution And Validation
@@ -41,22 +39,19 @@ private:
     struct FRecordedTurn
     {
         FWAINInteractionRequest Request;
-        FWAINInteractionResult Result;
+        FWAINInteractionResult  Result;
     };
 
-    bool ValidateRequest(const FWAINInteractionRequest& Request, FString& OutError) const;
+    bool ValidateRequest(const FWAINInteractionRequest &Request, FString &OutError) const;
 
-    FWAINInteractionResult ExecuteTurn(const FWAINInteractionRequest& Request);
+    FWAINInteractionResult ExecuteTurn(const FWAINInteractionRequest &Request);
 
-    static bool IsSameRequest(const FWAINInteractionRequest& Left, const FWAINInteractionRequest& Right);
+    static bool IsSameRequest(const FWAINInteractionRequest &Left, const FWAINInteractionRequest &Right);
 
-    static FWAINInteractionResult Fail(
-        const FWAINInteractionRequest& Request,
-        EWAINInteractionError Error,
-        const FString& Message);
+    static FWAINInteractionResult
+    Fail(const FWAINInteractionRequest &Request, EWAINInteractionError Error, const FString &Message);
 
 #pragma endregion
-
 
 // ============================================================
 // 02. Dependencies And Session State
@@ -64,14 +59,12 @@ private:
 #pragma region 02_Dependencies_And_Session_State
 
     TSharedRef<IWAINGameSnapshotAdapter> GameAdapter;
-    TSharedRef<IWAINProposalProvider> ProposalProvider;
-    TSharedRef<IWAINNarrativeEvaluator> NarrativeEvaluator;
+    TSharedRef<IWAINProposalProvider>    ProposalProvider;
+    TSharedRef<IWAINNarrativeEvaluator>  NarrativeEvaluator;
 
-    FWAINStateStore StateStore;
+    FWAINStateStore             StateStore;
     FWAINTransactionCoordinator Coordinator;
-    TMap<FGuid, FRecordedTurn> CompletedTurns;
-    bool bProcessing = false;
+    TMap<FGuid, FRecordedTurn>  CompletedTurns;
+    bool                        bProcessing = false;
 #pragma endregion
-
-
 };

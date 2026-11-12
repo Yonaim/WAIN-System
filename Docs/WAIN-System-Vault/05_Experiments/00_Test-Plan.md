@@ -40,3 +40,16 @@ A: LLM Only → B: A+Character Agent → C: B+World State Manager → D: C+Narra
 | `WAIN.Transaction.OutOfRangeTrustKeepsState` | Trust 범위 밖 변경 거절, 양측 State 무변경 | 코드 작성 / **미실행** |
 
 **미포함 테스트:** WAIN Subsystem의 이벤트 방송 정확히 1회, 실제 Host Game Actor/Widget 연동, 세션 종료 후/멀티스레드 Commit, 실제 LLM 오류/Timeout, Save/Load, 비동기 재진입. 연결 단계에서 추가한다.
+
+## Phase 2 Character Automation Tests — 작성, Unreal 실행 전
+
+| Test Name | 검증 목적 | 현재 |
+|---|---|---|
+| `WAIN.Character.EmotionDeltaAndRelationshipCommit` | 6차원 동시 변화 + Trust + Game + Beat 단일 Commit, 이전 Snapshot 불변 | 코드 작성 / 미실행 |
+| `WAIN.Character.EmotionDeltaIsClamped` | 각 Emotion 차원 개별 0~1 Clamp | 코드 작성 / 미실행 |
+| `WAIN.Character.UnknownEmotionTargetKeepsState` | 미등록 Emotion Target은 전체 No Commit | 코드 작성 / 미실행 |
+| `WAIN.Character.IntegerEmotionMutationKeepsState` | Emotion에 잘못된 정수 연산 거절 | 코드 작성 / 미실행 |
+| `WAIN.Character.NonFiniteDeltaKeepsState` | NaN Mutation 거절, Revision 및 Game 값 유지 | 코드 작성 / 미실행 |
+| `WAIN.Character.DuplicateTurnDoesNotReapplyEmotion` | 동일 TurnId 재전송 시 Emotion 중복 반영 방지 | 코드 작성 / 미실행 |
+
+**회귀 검증:** 기존 `WAIN.Transaction.*` 6개도 함께 실행. 완료 수치는 총 12개 테스트 *코드 작성*이며, **Phase 2 테스트 실행 성공을 의미하지 않는다**.

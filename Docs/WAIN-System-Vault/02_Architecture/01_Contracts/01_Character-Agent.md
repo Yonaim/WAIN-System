@@ -1,6 +1,6 @@
 # Character Agent Contract
 
-> 상태: **채택된 설계, Plugin 구현 없음**. [ADR-001](../../03_Decisions/01_ADR-001-State-Ownership.md) · [ADR-002](../../03_Decisions/02_ADR-002-Emotion-Expression.md).
+> 상태: **부분 구현** — Phase 2 첫 단계에서 Trust 및 6축 Emotion Delta의 Prepared Snapshot 적용을 추가했다. Persona·Context Assembly·Memory는 미구현. [ADR-001](../../03_Decisions/01_ADR-001-State-Ownership.md) · [ADR-002](../../03_Decisions/02_ADR-002-Emotion-Expression.md).
 
 ## 책임
 
@@ -25,3 +25,14 @@
 감정 시간 감쇠·스케일 조정, Relationship 연산 규칙, Memory Retrieval 점수/Trigger, 실제 C++ API·Persistence 자료형.
 
 [Memory](02_Memory-Reflection-Planning.md) · [Emotion Boundary](07_Emotion-Expression-Boundary.md)
+
+## Phase 2 — Character State Preparation (2026-11-10)
+
+- `FWAINCharacterStatePreparer::Apply(CharacterId, Mutations, Prepared, Error)`가 **Prepared WAIN Snapshot**의 해당 Character만 수정한다. Committed Root는 변경하지 않는다.
+- `relationship.trust`는 기존 `AddInteger`/`SetInteger`, `[0,100]` 범위 검사를 유지한다.
+- `emotion.joy`, `emotion.sadness`, `emotion.anger`, `emotion.disgust`, `emotion.anxiety`, `emotion.surprise`는 **`AddFloat` 전용**이다. 각 Delta는 유한한 `float`여야 하며, 적용값은 `Clamp(Current + Delta, 0, 1)`로 계산한다.
+- 다른 감정 차원을 비례 조정하거나 합계 1로 정규화하지 않는다. 미등록 Target, 잘못된 Operation, NaN/무한대는 Commit 이전에 거절한다.
+- Character 변경을 준비한 뒤에도 Host Game Prepare·Narrative Evaluation·Final Validation이 끝나지 않으면 어떤 변경도 Publish하지 않는다.
+- 이 단계는 **Agent의 상태 처리 기반**이며 Persona, 실제 LLM Context 생성, 메모리·감정 자연 감쇠는 여전히 구현 범위 밖이다.
+
+[Character Delta Implementation](../../04_Development/05_Character-Delta-Implementation.md) · [ADR-002](../../03_Decisions/02_ADR-002-Emotion-Expression.md)

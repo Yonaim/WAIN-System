@@ -33,3 +33,12 @@
 - 변경 범위는 탐색성 및 문서 보완. 의도적으로 실행 로직, API 및 ADR을 수정하지 않았다.
 - **남은 검증:** 실제 UE 5.8 컴파일/테스트, MSVC 및 에디터의 Region 처리, `clang-format → indent_regions.py` 2회 반복 안전성 검증, UBT PreBuildSteps 연결. 이 항목을 수행했다고 주장하지 않는다.
 - LLM API 키를 포함한 보안 설정은 [LLM Configuration Plan](04_LLM-Configuration-Plan.md)에 별도 정의했으며 Phase 1에서는 사용하지 않는다.
+
+## 2026-11-10 — Phase 2 Character State Delta (Phase 1 검증본 기반)
+
+- 기준 소스: `WAINTestbed-Source(1).zip` (사용자가 Phase 1 검증본이라고 확인).
+- 변경 파일: `WAINRuntimeTypes.h`, `WAINTransactionCoordinator.cpp`, `WAINRuntimeTests.cpp`, 신규 `Character/WAINCharacterStatePreparer.{h,cpp}`.
+- 설계 준수: ADR-001·ADR-002·ADR-003·ADR-004의 기존 결정 유지. 구현 범위 확장이므로 새 ADR은 발행하지 않음.
+- 구현: six-dimensional independent Emotion Delta(유한 float, 0~1 Clamp), Trust 범위 유지, 불량 변경 No Commit, Region 구획 및 Top-Down 처리.
+- 회귀 시험: Phase 1 테스트 6개 보존, Character Automation Tests 6개 추가(코드만 작성).
+- 검증: 업로드 소스와 신규 변경분의 파일·헤더 경로·Region 짝·테스트 등록을 정적으로 확인. Unreal 5.8 Build/Automation 테스트는 **이 환경에서 수행하지 않음**.

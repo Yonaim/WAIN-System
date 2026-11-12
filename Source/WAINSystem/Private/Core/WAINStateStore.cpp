@@ -4,7 +4,6 @@
  */
 
 #include "Core/WAINStateStore.h"
-
 #include "Core/WAINStateValidation.h"
 
 // ============================================================
@@ -12,65 +11,63 @@
 // ============================================================
 #pragma region 00_Session_Initialization
 
-bool FWAINStateStore::Initialize(
-    const FWAINStateSnapshot& InitialWAIN,
-    TSharedPtr<const IWAINGameStateSnapshot> InitialGame,
-    FString& OutError)
-{
-    check(IsInGameThread());
-
-    if (!InitialGame.IsValid() || !WAINStateValidation::Validate(InitialWAIN, OutError))
+    bool FWAINStateStore::Initialize(const FWAINStateSnapshot                &InitialWAIN,
+                                     TSharedPtr<const IWAINGameStateSnapshot> InitialGame,
+                                     FString                                 &OutError)
     {
-        if (OutError.IsEmpty())
+        check(IsInGameThread());
+
+        if (!InitialGame.IsValid() || !WAINStateValidation::Validate(InitialWAIN, OutError))
         {
-            OutError = TEXT("초기 Game Snapshot이 없습니다.");
+            if (OutError.IsEmpty())
+            {
+                OutError = TEXT("초기 Game Snapshot이 없습니다.");
+            }
+            return false;
         }
-        return false;
+
+        FWAINSessionRoot InitialRoot;
+        InitialRoot.Revision = 0;
+        InitialRoot.WAIN = InitialWAIN;
+        InitialRoot.Game = MoveTemp(InitialGame);
+
+        CurrentRoot = MakeShared<FWAINSessionRoot>(MoveTemp(InitialRoot));
+        return true;
     }
 
-    FWAINSessionRoot InitialRoot;
-    InitialRoot.Revision = 0;
-    InitialRoot.WAIN = InitialWAIN;
-    InitialRoot.Game = MoveTemp(InitialGame);
-
-    CurrentRoot = MakeShared<FWAINSessionRoot>(MoveTemp(InitialRoot));
-    return true;
-}
-
 #pragma endregion
-
 
 // ============================================================
 // 01. Snapshot Read And Publication
 // ============================================================
 #pragma region 01_Snapshot_Read_And_Publication
 
-TSharedPtr<const FWAINSessionRoot> FWAINStateStore::Read() const
-{
-    check(IsInGameThread());
-    return CurrentRoot;
-}
-
-bool FWAINStateStore::Publish(
-    const uint64 ExpectedRevision,
-    FWAINStateSnapshot&& PreparedWAIN,
-    TSharedPtr<const IWAINGameStateSnapshot> PreparedGame)
-{
-    check(IsInGameThread());
-
-    if (!CurrentRoot.IsValid() || CurrentRoot->Revision != ExpectedRevision || ExpectedRevision == MAX_uint64 || !PreparedGame.IsValid())
+    TSharedPtr<const FWAINSessionRoot> FWAINStateStore::Read() const
     {
-        return false;
+        check(IsInGameThread());
+        return CurrentRoot;
     }
 
-    FWAINSessionRoot NextRoot;
-    NextRoot.Revision = ExpectedRevision + 1;
-    NextRoot.WAIN = MoveTemp(PreparedWAIN);
-    NextRoot.Game = MoveTemp(PreparedGame);
+    bool FWAINStateStore::Publish(const uint64                             ExpectedRevision,
+                                  FWAINStateSnapshot                     &&PreparedWAIN,
+                                  TSharedPtr<const IWAINGameStateSnapshot> PreparedGame)
+    {
+        check(IsInGameThread());
 
-    // Plugin과 Host의 Snapshot을 가리키는 단일 Root만 공개한다.
-    CurrentRoot = MakeShared<FWAINSessionRoot>(MoveTemp(NextRoot));
-    return true;
-}
+        if (!CurrentRoot.IsValid() || CurrentRoot->Revision != ExpectedRevision || ExpectedRevision == MAX_uint64 ||
+            !PreparedGame.IsValid())
+        {
+            return false;
+        }
+
+        FWAINSessionRoot NextRoot;
+        NextRoot.Revision = ExpectedRevision + 1;
+        NextRoot.WAIN = MoveTemp(PreparedWAIN);
+        NextRoot.Game = MoveTemp(PreparedGame);
+
+        // Plugin과 Host의 Snapshot을 가리키는 단일 Root만 공개한다.
+        CurrentRoot = MakeShared<FWAINSessionRoot>(MoveTemp(NextRoot));
+        return true;
+    }
 
 #pragma endregion

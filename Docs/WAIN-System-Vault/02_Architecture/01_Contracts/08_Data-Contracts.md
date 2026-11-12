@@ -60,3 +60,24 @@ Testbed Content JSON의 기존 `schema_version: 1`은 신규 Schema를 자동 �
 - **API 공개 범위:** C++ 인터페이스와 `UGameInstanceSubsystem`은 초안이며, Public DTO는 Unreal Reflection(`USTRUCT`/`UENUM`)으로 아직 공개하지 않는다. LLM Async/Blueprint API도 확정하지 않았다.
 
 [Source Map](../02_Source/00_Source-Map.md) · [ADR-005](../../03_Decisions/05_ADR-005-Minimal-Game-Adapter.md)
+
+## Phase 2 코드 계약 — Emotion Delta 추가 (2026-11-10)
+
+> 위의 Phase 1 계약은 당시 구현 상태 기록이다. **현재 소스**에는 `EWAINMutationOperation::AddFloat` 및 `FWAINStateMutation::FloatValue`가 추가됐다.
+
+| State TargetId | Owner | Operation | Payload | 적용 규칙 |
+|---|---|---|---|---|
+| `relationship.trust` | `Character` | `AddInteger` / `SetInteger` | `IntegerValue:int32` | `[0,100]` 밖이면 거절 |
+| `emotion.joy` | `Character` | `AddFloat` | `FloatValue:float` | 독립 차원 `[0,1]` Clamp |
+| `emotion.sadness` | `Character` | `AddFloat` | `FloatValue:float` | 동일 |
+| `emotion.anger` | `Character` | `AddFloat` | `FloatValue:float` | 동일 |
+| `emotion.disgust` | `Character` | `AddFloat` | `FloatValue:float` | 동일 |
+| `emotion.anxiety` | `Character` | `AddFloat` | `FloatValue:float` | 동일 |
+| `emotion.surprise` | `Character` | `AddFloat` | `FloatValue:float` | 동일 |
+| 등록된 Game 정수 Key | `Game` | `AddInteger` / `SetInteger` | `IntegerValue:int32` | 기존 최소 Adapter 규칙 유지 |
+
+**미지원:** Game-owned `AddFloat`, Emotion `SetInteger`, 알 수 없는 Target ID 및 `Action/Expression` 제안. 이 DTO는 C++ 전용이고 JSON Parser/LLM 요청·Blueprint Reflection은 아직 연결되지 않았다.
+
+**예:** `FloatValue=+0.4`는 `emotion.joy`에만 추가한다. 동일 턴에 `joy=0.4`, `sadness=0.3`, `anxiety=0.5`가 공존할 수 있으며 합계가 1을 넘어도 유효하다.
+
+**검증 상태:** Phase 1은 사용자 제공 검증본 기준. Phase 2 변경분은 Automation Test 코드만 추가했으며 현재 환경에서 Unreal 빌드·실행은 하지 않았다.

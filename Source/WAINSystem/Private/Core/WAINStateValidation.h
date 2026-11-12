@@ -10,5 +10,5 @@
 
 namespace WAINStateValidation
 {
-bool Validate(const FWAINStateSnapshot& Snapshot, FString& OutError);
+    bool Validate(const FWAINStateSnapshot &Snapshot, FString &OutError);
 }

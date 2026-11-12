@@ -10,20 +10,18 @@
 
 class FWAINStateStore final
 {
-public:
-    bool Initialize(
-        const FWAINStateSnapshot& InitialWAIN,
-        TSharedPtr<const IWAINGameStateSnapshot> InitialGame,
-        FString& OutError);
+  public:
+    bool Initialize(const FWAINStateSnapshot                &InitialWAIN,
+                    TSharedPtr<const IWAINGameStateSnapshot> InitialGame,
+                    FString                                 &OutError);
 
     TSharedPtr<const FWAINSessionRoot> Read() const;
 
-    bool Publish(
-        uint64 ExpectedRevision,
-        FWAINStateSnapshot&& PreparedWAIN,
-        TSharedPtr<const IWAINGameStateSnapshot> PreparedGame);
+    bool Publish(uint64                                   ExpectedRevision,
+                 FWAINStateSnapshot                     &&PreparedWAIN,
+                 TSharedPtr<const IWAINGameStateSnapshot> PreparedGame);
 
-private:
+  private:
     // 단일 Game Thread에서만 읽고 교체한다. 외부로는 const Root만 공개한다.
     TSharedPtr<const FWAINSessionRoot> CurrentRoot;
 };

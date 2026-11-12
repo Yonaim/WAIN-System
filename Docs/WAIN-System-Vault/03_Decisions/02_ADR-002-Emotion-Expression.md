@@ -1,6 +1,6 @@
 # ADR-002 — Continuous Emotion & Host Presentation Catalog
 
-- **상태:** Accepted (설계, 미구현)
+- **상태:** Accepted (Emotion Delta 부분 구현, Host Catalog 미구현)
 - **날짜:** 2026-11-10
 - **관련 요구:** FR-06, FR-10, FR-12, UR-02, UR-05
 
@@ -17,7 +17,7 @@
 ## 결정과 근거
 
 - Emotion 정본은 Character Agent가 소유하는 `joy`, `sadness`, `anger`, `disgust`, `anxiety`, `surprise` **여섯 독립 float(각 0~1)**이다. 합계가 1일 필요는 없다.
-- 변화는 `EmotionDelta` Proposal로 받되 Validation/Preparation에서 범위·규칙 검사 후 Commit한다. 복합 감정의 이름은 Context를 고려한 **해석**이며 별도의 권위 Enum으로 저장하지 않는다.
+- 변화는 `EmotionDelta` Proposal로 받되 Validation/Preparation에서 범위·규칙 검사 후 Commit한다. 초기 구현은 유한 `float`의 `AddFloat` Delta만 허용하고 각 차원을 `Clamp(Current + Delta, 0, 1)`로 제한한다. 감정 합계를 1로 정규화하지 않는다. 복합 감정의 이름은 Context를 고려한 **해석**이며 별도의 권위 Enum으로 저장하지 않는다.
 - Emotion 값과 Expression/Variant는 별개다. 예: Anxiety가 높아도 Soft Smile을 표시할 수 있다.
 - Host가 Expression ID, Variant, 설명, PNG 파츠를 소유한다. Plugin은 Context Preparation에서 `IWAINPresentationCatalog` 개념 계약으로 **현재 허용된 ID/Variant/설명**을 조회해 LLM Context에 전달한다.
 - Proposal의 Expression은 조회한 허용 목록 및 Host 정책으로 검증한다. 없는 ID를 임의의 Neutral로 대체하지 않으며, Host가 명시한 대체 정책만 사용한다.
@@ -29,4 +29,9 @@
 
 ## 재검토 조건 / 대체 ADR 링크
 
-Emotion 범위 및 시간 감쇠 수식, Context 목록 필터링 정책, Host 기본 Expression 선택 정책은 구현·실험에서 별도 결정한다.
+턴당 Delta 크기 제한 및 시간 감쇠 수식, Context 목록 필터링 정책, Host 기본 Expression 선택 정책은 구현·실험에서 별도 결정한다. 각 차원의 `[0,1]` Clamp는 Phase 2 MVP에 확정 적용했다.
+
+## 구현 상태 메모 (2026-11-10)
+
+- `FWAINCharacterStatePreparer`로 6축 Emotion Delta 및 Trust 변경을 Prepared Snapshot에만 적용하는 코드와 테스트를 추가했다. 초기 상태 검증·Snapshot Commit 계약은 기존 ADR-003/004대로 유지한다.
+- Persona·Memory·LLM Context·Host Presentation Catalog 연동은 아직 미구현이며, 이번 신규 코드의 Unreal 빌드·Automation Test 실행 결과는 별도 확인이 필요하다.
