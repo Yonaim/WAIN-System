@@ -57,3 +57,12 @@
 - **검증:** Python 기반 정적 검사 예정. Unreal 5.8 컴파일과 Automation Test 실행은 미검증.
 
 [ADR-007](../03_Decisions/07_ADR-007-Read-Only-Character-Context.md) · [Implementation](06_Character-Context-Implementation.md)
+
+## 2026-11-11 — Phase 2 Host Presentation Catalog / Expression Validation
+
+- **구현:** Host Catalog 읽기 전용 인터페이스, Expression+Variant 허용 목록, Context Preparation 조회/검증, Provider Context 전달, Transaction 사전 검증, 성공 Result에 선택 ID 반환.
+- **보존:** 기존 Snapshot/Transaction/Character/Persona 경계, Catalog 없는 Phase 1 동기 Mock 경로, 미검증 Action 거절.
+- **추가 테스트:** `WAIN.Presentation.*` 11개 코드 작성, 총 30개. 실제 UE 5.8 컴파일 및 테스트 실행은 별도 필요.
+- **미구현:** Host JSON Loader, PNG 연출, 비동기·LLM, Memory·World/Beat 조건식, Catalog Revision 재확인.
+
+[ADR-002](../03_Decisions/02_ADR-002-Emotion-Expression.md) · [구현 문서](07_Presentation-Catalog-Implementation.md)

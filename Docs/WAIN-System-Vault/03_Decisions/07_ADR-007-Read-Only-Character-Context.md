@@ -36,3 +36,7 @@ Host가 정의한 상대적으로 고정된 Persona와 WAIN이 확정 상태로 
 - 중복 TurnId는 Context/Persona를 다시 조회하지 않는다.
 
 > 테스트 코드는 작성했지만 **Unreal Engine 5.8 빌드와 Automation Test 실행은 아직 수행하지 않았다.**
+
+## 이후 확장 상태 (2026-11-11)
+
+ADR-002의 Host Presentation Catalog 계약을 `FWAINCharacterContext`에 추가 구현했다. 위 3번의 'Persona만 포함'과 영향 절의 'Presentation 미구현'은 **2026-11-10 당시 구현 범위**를 설명한다. 현재 Context는 선택적으로 Allowed Expression Options도 포함하며 Current WAIN Snapshot의 불변성 원칙은 그대로 유지한다. [구현 현황](../04_Development/07_Presentation-Catalog-Implementation.md).

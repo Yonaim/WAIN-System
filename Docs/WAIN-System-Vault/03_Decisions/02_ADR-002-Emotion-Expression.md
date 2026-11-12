@@ -1,6 +1,6 @@
 # ADR-002 — Continuous Emotion & Host Presentation Catalog
 
-- **상태:** Accepted (Emotion Delta 부분 구현, Host Catalog 미구현)
+- **상태:** Accepted (Emotion Delta 구현, Host Catalog C++ 계약 및 검증 코드 작성; UE 실행 미검증)
 - **날짜:** 2026-11-10
 - **관련 요구:** FR-06, FR-10, FR-12, UR-02, UR-05
 
@@ -35,3 +35,12 @@
 
 - `FWAINCharacterStatePreparer`로 6축 Emotion Delta 및 Trust 변경을 Prepared Snapshot에만 적용하는 코드와 테스트를 추가했다. 초기 상태 검증·Snapshot Commit 계약은 기존 ADR-003/004대로 유지한다.
 - Persona·Memory·LLM Context·Host Presentation Catalog 연동은 아직 미구현이며, 이번 신규 코드의 Unreal 빌드·Automation Test 실행 결과는 별도 확인이 필요하다.
+
+## 구현 확장 메모 (2026-11-11)
+
+- 기존 결정대로 Host `IWAINPresentationCatalog`가 턴별 허용 `(ExpressionId, VariantId, Description)` 목록을 반환하고, WAIN이 Response Validation에서 **정확한 ID 쌍**을 검사한다. `VariantId=None`은 기본 조합을 뜻한다.
+- 목록이 비어 있거나 표현이 미선택된 경우 임의의 Neutral로 대체하지 않는다. 존재하지 않는 조합은 Commit 전에 거절한다.
+- `FWAINCharacterContext`에 읽기 전용 Allowed Options를 포함하며 현재 Phase 2 동기 턴에서 동일한 조회 결과를 검증에 사용한다. LLM/비동기 턴 도입 전에는 Catalog Revision 재확인 정책을 별도 설계해야 한다.
+- **이번 변경은 구현 범위의 확장이지 ADR-002의 변경이 아니다.** Testbed JSON Loader·PNG Renderer는 수정하지 않았고, UE 빌드·테스트는 아직 검증하지 않았다.
+
+[Presentation 구현 문서](../04_Development/07_Presentation-Catalog-Implementation.md)

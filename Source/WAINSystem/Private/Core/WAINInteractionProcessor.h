@@ -22,7 +22,8 @@ class FWAINInteractionProcessor final
     FWAINInteractionProcessor(TSharedRef<IWAINGameSnapshotAdapter> InGameAdapter,
                               TSharedRef<IWAINProposalProvider>    InProposalProvider,
                               TSharedRef<IWAINNarrativeEvaluator>  InNarrativeEvaluator,
-                              TSharedPtr<const IWAINPersonaSource> InPersonaSource = nullptr);
+                              TSharedPtr<const IWAINPersonaSource> InPersonaSource = nullptr,
+                              TSharedPtr<const IWAINPresentationCatalog> InPresentationCatalog = nullptr);
 
     bool StartSession(const FWAINStateSnapshot &InitialWAIN, FString &OutError);
 
@@ -64,6 +65,7 @@ class FWAINInteractionProcessor final
     TSharedRef<IWAINProposalProvider>    ProposalProvider;
     TSharedRef<IWAINNarrativeEvaluator>  NarrativeEvaluator;
     TSharedPtr<const IWAINPersonaSource> PersonaSource;
+    TSharedPtr<const IWAINPresentationCatalog> PresentationCatalog;
     FWAINCharacterContextBuilder ContextBuilder;
 
     FWAINStateStore             StateStore;

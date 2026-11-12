@@ -6,6 +6,7 @@
 #include "Core/WAINTransactionCoordinator.h"
 #include "Core/WAINStateValidation.h"
 #include "Character/WAINCharacterStatePreparer.h"
+#include "Presentation/WAINPresentationValidator.h"
 
 // ============================================================
 // 00. Commit Result Helper
@@ -35,12 +36,13 @@
                                                             const FWAINResponseProposal    &Proposal,
                                                             FWAINStateStore                &StateStore,
                                                             const IWAINGameSnapshotAdapter &GameAdapter,
-                                                            const IWAINNarrativeEvaluator  &NarrativeEvaluator) const
+                                                            const IWAINNarrativeEvaluator  &NarrativeEvaluator,
+                                                            const FWAINPresentationOptions *AvailablePresentations) const
     {
         check(IsInGameThread());
 
         FString Error;
-        if (!ValidateProposal(Proposal, Error))
+        if (!ValidateProposal(Proposal, AvailablePresentations, Error))
         {
             return WAINTransaction::Fail(EWAINInteractionError::InvalidProposal, Error);
         }
@@ -92,7 +94,9 @@
 // ============================================================
 #pragma region 02_Proposal_Validation
 
-    bool FWAINTransactionCoordinator::ValidateProposal(const FWAINResponseProposal &Proposal, FString &OutError) const
+    bool FWAINTransactionCoordinator::ValidateProposal(const FWAINResponseProposal &Proposal,
+                                                       const FWAINPresentationOptions *AvailablePresentations,
+                                                       FString &OutError) const
     {
         if (Proposal.Dialogue.TrimStartAndEnd().IsEmpty())
         {
@@ -100,10 +104,15 @@
             return false;
         }
 
-        // Presentation Catalog와 Action Schema를 연결하기 전까지 미검증 ID는 거절한다.
-        if (!Proposal.ExpressionId.IsNone() || !Proposal.ExpressionVariantId.IsNone() || !Proposal.ActionId.IsNone())
+        // Action Schema는 아직 구현되지 않았으므로 미검증 Action은 거절한다.
+        if (!Proposal.ActionId.IsNone())
         {
-            OutError = TEXT("Presentation / Action ID 검증은 아직 구현되지 않았습니다.");
+            OutError = TEXT("Action ID 검증은 아직 구현되지 않았습니다.");
+            return false;
+        }
+
+        if (!FWAINPresentationValidator::ValidateSelection(Proposal, AvailablePresentations, OutError))
+        {
             return false;
         }
 

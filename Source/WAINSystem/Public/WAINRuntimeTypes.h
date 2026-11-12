@@ -131,6 +131,8 @@
         FString               ErrorMessage;
         uint64                CommittedRevision = 0;
         FString               Dialogue;
+        FName                 ExpressionId;
+        FName                 ExpressionVariantId;
         bool                  bReplayed = false;
 
         bool Succeeded() const

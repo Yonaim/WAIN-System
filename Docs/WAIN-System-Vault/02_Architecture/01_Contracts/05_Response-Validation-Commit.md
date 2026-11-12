@@ -36,3 +36,9 @@ Validation/Prepare/Revision 충돌은 No Commit. Commit 실패 가능성과 복�
 MVP에서 아직 지원하지 않는 State Target과 Presentation/Action ID는 **검증 완료로 간주하지 않고 거절**한다. 실제 LLM 응답, Hard Constraint Engine 및 Host Presentation Catalog 조회는 후속 단계다.
 
 Commit 성공 뒤 `UWAINRuntimeSubsystem`이 `OnStateCommitted(TurnId, Revision)`를 방송한다. **같은 TurnId의 재전송에서는 중복 방송하지 않는다.** Testbed UI 알림/표시 재시도는 아직 구현되지 않았다.
+
+## Phase 2 Presentation 검증 확장 (2026-11-11)
+
+기존 문서의 'Presentation ID는 거절'은 Phase 1 당시의 상태다. 현재는 Host Catalog가 제공한 `(ExpressionId, VariantId)` 조합이 정확히 일치하는 경우에 한해 Presentation을 허용한다. Catalog 조회 실패·불완전한 후보 목록은 Context Preparation에서 실패하고, 미등록 ID·Variant는 Transaction의 첫 Validation에서 거절하여 **WAIN/Game Prepared State를 만들기 전에** No Commit한다. Action ID와 완전한 Narrative Hard Constraint 엔진은 아직 미지원이다.
+
+[Presentation 구현](../../04_Development/07_Presentation-Catalog-Implementation.md)

@@ -52,3 +52,13 @@
 - 불변 범위: WAIN Transaction Coordinator/State Store/Character Mutation, Host Testbed 소스·JSON, Obsidian 설정 전부 변경하지 않음.
 - 미검증: Unreal Engine 5.8 Build, 실제 테스트 실행, JSON Loader/Prompt/LLM 연동.
 
+## 2026-11-11 — Phase 2 Presentation Catalog 조회 및 Expression 검증
+
+- 입력: 직전 `WAINSystem-Phase2-Persona-Context-Plugin-and-Vault.zip`의 Plugin 전체 소스를 기준으로 변경.
+- 코드: Host Catalog Public DTO/Interface 및 Private Validator를 추가하고 Character Context Builder → Proposal Provider → Transaction Coordinator → Interaction Result 흐름에 연결.
+- ADR: [ADR-002](../03_Decisions/02_ADR-002-Emotion-Expression.md)의 구현 상태만 갱신. 원래 승인된 Emotion/Expression 소유권은 변경하지 않음. [ADR-007](../03_Decisions/07_ADR-007-Read-Only-Character-Context.md)에는 Context 확장 이력 추가.
+- 테스트: `WAIN.Presentation.*` 11개 신규 등록 코드 작성, 기존 19개 테스트 소스 유지.
+- **검증 범위:** Python 기반 구조·참조·JSON·Markdown 링크·Region 짝 검사. UnrealBuildTool/UE 5.8 실제 C++ 컴파일·테스트·Live Coding은 실행하지 않음.
+- 변경하지 않음: Host Testbed UI·JSON·PNG, Unreal Build Hook, Obsidian 테마/플러그인 설정.
+
+[Implementation](07_Presentation-Catalog-Implementation.md)

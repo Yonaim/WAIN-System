@@ -68,3 +68,20 @@ A: LLM Only → B: A+Character Agent → C: B+World State Manager → D: C+Narra
 
 현재 등록된 Unreal Automation Test 코드는 **기존 12 + 신규 7 = 총 19개**다. `WAIN.Transaction.*`, `WAIN.Character.*`, `WAIN.CharacterContext.*`를 함께 실행하고 결과 로그를 기록한다.
 
+## Phase 2 Presentation Automation Tests — 작성, UE 실행 전 (2026-11-11)
+
+| Test Name | 검증 목적 |
+|---|---|
+| `WAIN.Presentation.AllowedExpression` | 허용된 ID·Variant가 Proposal을 통과하고 Result에 포함, 기존 Snapshot 불변 |
+| `WAIN.Presentation.NoExpressionAllowed` | 빈 Catalog에서 Expression을 자동 대체하지 않고 대사만 성공 |
+| `WAIN.Presentation.UnknownExpressionNoCommit` | 미등록 Expression에서 No Commit |
+| `WAIN.Presentation.UnknownVariantNoCommit` | 허용되지 않은 Variant에서 No Commit |
+| `WAIN.Presentation.MissingCatalogNoCommit` | Catalog 미주입 상태의 표현 ID 거절 |
+| `WAIN.Presentation.VariantWithoutExpressionNoCommit` | Expression 없는 Variant 제안 거절 |
+| `WAIN.Presentation.InvalidCatalogEntryNoCommit` | 설명 없는 Host 후보 거절 |
+| `WAIN.Presentation.DuplicateEntriesNoCommit` | 중복 `(ExpressionId,VariantId)` 후보 거절, Provider 미호출 |
+| `WAIN.Presentation.LookupFailureNoCommit` | Host 조회 실패 시 Provider 미호출·No Commit |
+| `WAIN.Presentation.LegacyProviderRejectsCatalog` | Catalog를 무시할 수 있는 Legacy Provider를 실패 처리 |
+| `WAIN.Presentation.ReplaySkipsCatalog` | 동일 TurnId 재처리 시 조회·생성·Commit 중복 방지 |
+
+총 등록 코드: **기존 19개 + 신규 11개 = 30개**. 테스트 코드는 작성됐지만 UE 컴파일·실행 통과는 주장하지 않는다. 회귀: `WAIN.Transaction.*`, `WAIN.Character.*`, `WAIN.CharacterContext.*`, `WAIN.Presentation.*`.

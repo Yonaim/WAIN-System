@@ -11,3 +11,9 @@
 ## 참고
 
 공통 템플릿 자체의 변경 사항과 버전 이력은 [Engineering Standards](00_Engineering-Standards/00_Core/00_Code-Style.md) 및 최신 공통 볼트의 CHANGELOG에서 관리한다. 이 문서는 WAIN에 적용한 변경을 기록한다.
+
+## 2026-11-11 — Phase 2 Presentation Catalog Implementation
+
+- Host Presentation Catalog Public API 및 검증 코드를 도입하고, Character Context → Transaction 검증 → Result 반환 경로에 연결했다.
+- ADR-002/ADR-007 구현 상태를 갱신하고, Source Map·Contracts·Test Plan·Work Log에 실제 지원·미지원 범위를 명시했다.
+- WAIN `00_Engineering-Standards`, Obsidian 설정, Host Testbed 콘텐츠는 변경하지 않았다. UE 5.8 빌드/테스트 실행 미검증.

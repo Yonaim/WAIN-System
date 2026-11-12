@@ -7,6 +7,7 @@
 
 #include "CoreMinimal.h"
 #include "WAINRuntimeTypes.h"
+#include "WAINPresentationCatalog.h"
 
 // ============================================================
 // 00. Persona Definition
@@ -40,7 +41,7 @@
 // ============================================================
 #pragma region 01_Read_Only_Character_Context
 
-    /** @brief 제안 생성에 사용할 현재 턴의 읽기 전용 Character 문맥. 메모리/World/Catalog는 이후 단계에 추가한다. */
+    /** @brief 제안 생성에 사용할 현재 턴의 읽기 전용 Character 문맥. Memory·World 문맥은 추후 추가한다. Presentation 후보는 Host에서 조회한다. */
     struct FWAINCharacterContext
     {
         FName CharacterId;
@@ -51,6 +52,8 @@
         FWAINCharacterState State;
         bool bHasPersona = false;
         FWAINCharacterPersona Persona;
+        bool bHasPresentationCatalog = false;
+        FWAINPresentationOptions AvailablePresentations;
     };
 
 #pragma endregion

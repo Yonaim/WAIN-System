@@ -15,6 +15,7 @@ class FWAINCharacterContextBuilder final
     bool Build(const FWAINInteractionRequest &Request,
                const FWAINSessionRoot &Current,
                const IWAINPersonaSource *PersonaSource,
+               const IWAINPresentationCatalog *PresentationCatalog,
                FWAINCharacterContext &OutContext,
                FString &OutError) const;
 
@@ -23,6 +24,11 @@ class FWAINCharacterContextBuilder final
                      const IWAINPersonaSource *PersonaSource,
                      FWAINCharacterContext &Context,
                      FString &OutError) const;
+
+    bool LoadPresentations(const FWAINPresentationQuery &Query,
+                           const IWAINPresentationCatalog *PresentationCatalog,
+                           FWAINCharacterContext &Context,
+                           FString &OutError) const;
 
     static bool ValidatePersona(const FWAINCharacterPersona &Persona, FName ExpectedCharacterId, FString &OutError);
 };

@@ -1,6 +1,6 @@
 # Emotion State & Host Presentation Contract
 
-> 상태: **설계 채택 / Plugin 및 JSON 마이그레이션 미구현.** [ADR-002](../../03_Decisions/02_ADR-002-Emotion-Expression.md).
+> 상태: **Plugin의 C++ Host Catalog 조회/검증 코드 작성 / 실제 Testbed JSON Loader 및 Content 마이그레이션 미구현.** [ADR-002](../../03_Decisions/02_ADR-002-Emotion-Expression.md).
 
 ## State와 Presentation 경계
 
@@ -11,7 +11,7 @@
 | Expression | 허용 목록 조회, 의미 ID/Variant Proposal 및 Validation | Catalog/Variant/PNG 경로 정의 및 실제 렌더링 |
 | Physical Assets | PNG 파일·레이어 합성 구현을 알지 못함 | `Content/Drawing/` 및 Presentation JSON 소유 |
 
-## Host Interface — 개념 API (미구현)
+## Host Interface — 개념 계약과 Phase 2 C++ 구현
 
 - `QueryAvailablePresentation(CharacterId, SceneId, PoseId, Context) -> AllowedExpressionOptions`.
 - 각 Option은 `expression_id`, 허용 `variant_id`, 자연어 설명 및 필요한 제한 조건 제공.
@@ -26,3 +26,12 @@
 - 추가 예정 파츠는 파일이 실제로 있을 때만 활성 Variant에서 참조한다. 기존 Host JSON 및 PNG는 **이번 문서 작업에서 수정하지 않았다.**
 
 [Emotion Flow](../00_Flows/01_Emotion-Expression-Flow.md) · [Data Contracts](08_Data-Contracts.md)
+
+## Phase 2 C++ 실제 지원 범위 (2026-11-11)
+
+- `IWAINPresentationCatalog::QueryAvailable(FWAINPresentationQuery, OutOptions, OutError)`는 Character/Scene/ActiveBeat/Revision을 입력받는다. 초기 버전에서는 Pose 필터 및 Host 파일 존재 검사가 인터페이스 자체에 포함되지 않는다.
+- `FWAINPresentationEntry`는 정확한 Expression/Variant 조합과 자연어 Description을 포함한다. Catalog 구조·중복 검사 후 Context로 복사하고, 동일 후보 목록으로 Proposal을 검증한다.
+- `FWAINInteractionResult`에 허용된 Expression/Variant 선택을 반환한다. 실제 Host PNG 합성은 미구현이다.
+- 미등록 ID, 잘못된 Variant, 조회 실패는 Commit 이전에 거절한다. Context-aware Provider가 아닌 기존 Mock은 Catalog 주입 시 실패한다.
+
+[Presentation 구현 문서](../../04_Development/07_Presentation-Catalog-Implementation.md)

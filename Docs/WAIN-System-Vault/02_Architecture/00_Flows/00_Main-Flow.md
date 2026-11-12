@@ -51,3 +51,9 @@ flowchart TD
 `Context Preparation` 중 **Character 부분만** 구현되었다. 현재 `ProcessTurn`은 확정된 Root에서 Character State를 복사하고, 선택적으로 Host Persona Source를 조회·검증한 후 `GenerateWithContext`를 호출한다. 이전 절의 `Context Preparation 미구현` 표시는 Phase 1 당시 이력이다. 아직 Memory·World·Narrative Constraint·Presentation Catalog를 합친 완전한 Context는 아니며, 실제 LLM 호출 및 UI도 미지원이다.
 
 [Context 구현 문서](../../04_Development/06_Character-Context-Implementation.md)
+
+## Phase 2 Presentation 실제 구현 경로 (2026-11-11)
+
+기존 흐름의 Character Context Builder가 Context Preparation 중 Host Catalog를 **한 번 조회·검증**하여 허용 ID/Variant/설명 목록을 Provider로 전달한다. Provider가 선택한 조합은 Transaction의 Response Validation 단계에서 동일한 목록과 대조하며, 성공한 경우에만 Prepared Snapshot과 Publish를 진행한다. Commit된 Expression/Variant는 `FWAINInteractionResult`에 포함된다. **실제 화면 표시·PNG 렌더링은 이번 Plugin 구현 범위가 아니다.**
+
+[구현 상세](../../04_Development/07_Presentation-Catalog-Implementation.md)

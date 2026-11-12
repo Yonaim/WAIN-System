@@ -13,11 +13,13 @@
     FWAINInteractionProcessor::FWAINInteractionProcessor(TSharedRef<IWAINGameSnapshotAdapter> InGameAdapter,
                                                          TSharedRef<IWAINProposalProvider>    InProposalProvider,
                                                          TSharedRef<IWAINNarrativeEvaluator>  InNarrativeEvaluator,
-                                                         TSharedPtr<const IWAINPersonaSource> InPersonaSource)
+                                                         TSharedPtr<const IWAINPersonaSource> InPersonaSource,
+                                                         TSharedPtr<const IWAINPresentationCatalog> InPresentationCatalog)
         : GameAdapter(MoveTemp(InGameAdapter)),
           ProposalProvider(MoveTemp(InProposalProvider)),
           NarrativeEvaluator(MoveTemp(InNarrativeEvaluator)),
-          PersonaSource(MoveTemp(InPersonaSource))
+          PersonaSource(MoveTemp(InPersonaSource)),
+          PresentationCatalog(MoveTemp(InPresentationCatalog))
     {
     }
 
@@ -101,7 +103,7 @@
 
         FWAINCharacterContext Context;
         FString Error;
-        if (!ContextBuilder.Build(Request, *Current, PersonaSource.Get(), Context, Error))
+        if (!ContextBuilder.Build(Request, *Current, PersonaSource.Get(), PresentationCatalog.Get(), Context, Error))
         {
             return Fail(Request, EWAINInteractionError::ContextPreparationFailed, Error);
         }
@@ -113,7 +115,8 @@
         }
 
         const FWAINCommitOutcome Commit =
-            Coordinator.Execute(Request, Proposal, StateStore, *GameAdapter, *NarrativeEvaluator);
+            Coordinator.Execute(Request, Proposal, StateStore, *GameAdapter, *NarrativeEvaluator,
+                                Context.bHasPresentationCatalog ? &Context.AvailablePresentations : nullptr);
         if (!Commit.Succeeded())
         {
             return Fail(Request, Commit.Error, Commit.Message);
@@ -123,6 +126,8 @@
         Result.TurnId = Request.TurnId;
         Result.CommittedRevision = Commit.Revision;
         Result.Dialogue = Proposal.Dialogue;
+        Result.ExpressionId = Proposal.ExpressionId;
+        Result.ExpressionVariantId = Proposal.ExpressionVariantId;
         return Result;
     }
 

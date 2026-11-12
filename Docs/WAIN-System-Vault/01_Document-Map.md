@@ -31,3 +31,8 @@
 
 - 범용 규칙 변경은 [Common Engineering Standards](00_Engineering-Standards/00_Core/00_Code-Style.md)를 최신 원본과 동기화하고, 프로젝트별 추가 규칙은 [Implementation Principles](04_Development/03_Implementation-Principles.md)에 기록한다.
 - `copilot/skills`와 `.obsidian`은 도구의 사용 편의를 위한 **복제 설정**이며 WAIN Runtime의 구현 계약이 아니다.
+
+## 2026-11-11 추가 구현 문서
+
+- `Host Presentation Catalog / Expression Validation` 관련 코드는 [ADR-002](03_Decisions/02_ADR-002-Emotion-Expression.md), [Emotion/Expression Boundary](02_Architecture/01_Contracts/07_Emotion-Expression-Boundary.md), [Presentation 구현 상세](04_Development/07_Presentation-Catalog-Implementation.md)를 함께 확인한다.
+- 새 구현의 상태는 [Current Work](04_Development/00_Current-Work.md)와 [Test Plan](05_Experiments/00_Test-Plan.md)에서 관리한다.

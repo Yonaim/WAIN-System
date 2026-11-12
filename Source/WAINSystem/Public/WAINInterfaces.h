@@ -90,9 +90,9 @@
                                          FString &OutError) const
         {
             // Persona가 제공됐는데 무시한 채 대화를 생성하지 않도록 명시적으로 실패시킨다.
-            if (Context.bHasPersona)
+            if (Context.bHasPersona || Context.bHasPresentationCatalog)
             {
-                OutError = TEXT("Persona를 사용하는 Provider는 GenerateWithContext를 구현해야 합니다.");
+                OutError = TEXT("Persona 또는 Presentation Catalog를 사용하는 Provider는 GenerateWithContext를 구현해야 합니다.");
                 return false;
             }
 

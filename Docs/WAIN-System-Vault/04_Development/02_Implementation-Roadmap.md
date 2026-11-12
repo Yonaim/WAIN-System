@@ -42,3 +42,9 @@
 - 단계 5 Presentation Catalog, 단계 6 Memory, 단계 7 Narrative, 단계 8 LLM/Prompt는 아직 구현하지 않았다.
 - 초기 Context는 현재 확정 State 기반이며, Game-owned World State 및 장기 Memory는 포함하지 않는다.
 
+## 2026-11-11 Phase 2 Presentation 진행 상태
+
+- **단계 5 (Presentation):** Host Catalog 조회 및 Expression·Variant 검증의 C++ 최소 구현과 11개 Automation Test 코드를 작성했다(UE 실행 미검증).
+- 아직 연결되지 않은 실제 게임 콘텐츠: `ManaExpressions.json` 로더, Pose·Stage/PNG Variant 선택, Host Widget 렌더러.
+- **다음 단계 후보:** Host Game의 World State 조회 계약 또는 Memory Stream 최소 구현. LLM 연결은 Context의 기본 입력 출처를 충분히 확보한 뒤 진행.
+- 이전 Roadmap 표에서 Catalog를 미구현으로 표시한 것은 작성 당시의 이력이며 현재 현황은 본 절을 따른다.

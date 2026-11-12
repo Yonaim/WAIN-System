@@ -40,10 +40,13 @@
                                    const FWAINResponseProposal    &Proposal,
                                    FWAINStateStore                &StateStore,
                                    const IWAINGameSnapshotAdapter &GameAdapter,
-                                   const IWAINNarrativeEvaluator  &NarrativeEvaluator) const;
+                                   const IWAINNarrativeEvaluator  &NarrativeEvaluator,
+                                   const FWAINPresentationOptions *AvailablePresentations = nullptr) const;
 
         private:
-        bool ValidateProposal(const FWAINResponseProposal &Proposal, FString &OutError) const;
+        bool ValidateProposal(const FWAINResponseProposal &Proposal,
+                              const FWAINPresentationOptions *AvailablePresentations,
+                              FString &OutError) const;
 
         TArray<FWAINStateMutation> CollectGameMutations(const FWAINResponseProposal &Proposal) const;
 

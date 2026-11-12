@@ -59,3 +59,19 @@
 - 테스트 `Private/Tests/WAINCharacterContextTests.cpp` 7개를 추가했다. 기존 12개를 유지해 **19개 테스트 코드를 작성**했다(UE 실행 미검증).
 
 [ADR-007](../../03_Decisions/07_ADR-007-Read-Only-Character-Context.md) · [Details](../../04_Development/06_Character-Context-Implementation.md)
+
+## 50. Phase 2 Host Presentation Catalog 구현 (2026-11-11)
+
+| 경로 (Source/WAINSystem 기준) | 책임 |
+|---|---|
+| `Public/WAINPresentationCatalog.h` | Host 후보 조회 Interface 및 턴별 Query/Options/Entry DTO |
+| `Private/Presentation/WAINPresentationValidator.{h,cpp}` | Host 목록 구조 검증과 Expression+Variant ID 매칭 |
+| `Public/WAINCharacterContext.h` | 허용 후보를 포함한 읽기 전용 Character Context |
+| `Private/Character/WAINCharacterContextBuilder.cpp` | Host Catalog 조회·검증·Context 구성 |
+| `Private/Core/WAINInteractionProcessor.cpp` | 후보를 Provider와 Transaction에 전달하고 결과 ID 반환 |
+| `Private/Core/WAINTransactionCoordinator.cpp` | Proposal Validation에서 선택 ID 조합 검사 후 기존 Prepare/Commit 진행 |
+| `Private/Tests/WAINPresentationTests.cpp` | 11개 신규 Automation Tests, 총 30개 테스트 코드 등록 |
+
+실제 LLM, Testbed Catalog JSON Loader/PNG Renderer, 비동기 Revision 재검증은 미구현. 전체 Unreal 빌드·신규 테스트 실행은 이 환경에서 미검증. 기존 파일들의 Phase 1 설명은 해당 당시의 이력으로 보존한다.
+
+[Implementation](../../04_Development/07_Presentation-Catalog-Implementation.md)

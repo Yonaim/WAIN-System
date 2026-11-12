@@ -4,6 +4,7 @@
  */
 
 #include "Character/WAINCharacterContextBuilder.h"
+#include "Presentation/WAINPresentationValidator.h"
 
 // ============================================================
 // 00. Context Assembly
@@ -13,6 +14,7 @@
     bool FWAINCharacterContextBuilder::Build(const FWAINInteractionRequest &Request,
                                              const FWAINSessionRoot &Current,
                                              const IWAINPersonaSource *PersonaSource,
+                                             const IWAINPresentationCatalog *PresentationCatalog,
                                              FWAINCharacterContext &OutContext,
                                              FString &OutError) const
     {
@@ -32,6 +34,16 @@
         NextContext.State = *Character;
 
         if (!LoadPersona(Request.CharacterId, PersonaSource, NextContext, OutError))
+        {
+            return false;
+        }
+
+        FWAINPresentationQuery PresentationQuery;
+        PresentationQuery.CharacterId = Request.CharacterId;
+        PresentationQuery.SceneId = Request.SceneId;
+        PresentationQuery.ActiveBeatId = Current.WAIN.ActiveBeatId;
+        PresentationQuery.StateRevision = Current.Revision;
+        if (!LoadPresentations(PresentationQuery, PresentationCatalog, NextContext, OutError))
         {
             return false;
         }
@@ -106,6 +118,43 @@
             }
         }
 
+        return true;
+    }
+
+#pragma endregion
+
+// ============================================================
+// 02. Host Presentation Catalog Lookup
+// ============================================================
+#pragma region 02_Host_Presentation_Catalog_Lookup
+
+    bool FWAINCharacterContextBuilder::LoadPresentations(const FWAINPresentationQuery &Query,
+                                                         const IWAINPresentationCatalog *PresentationCatalog,
+                                                         FWAINCharacterContext &Context,
+                                                         FString &OutError) const
+    {
+        if (!PresentationCatalog)
+        {
+            return true; // 기존 Mock 텍스트 전용 경로를 유지한다.
+        }
+
+        FWAINPresentationOptions Options;
+        if (!PresentationCatalog->QueryAvailable(Query, Options, OutError))
+        {
+            if (OutError.IsEmpty())
+            {
+                OutError = TEXT("Host Presentation Catalog를 조회하지 못했습니다.");
+            }
+            return false;
+        }
+
+        if (!FWAINPresentationValidator::ValidateCatalog(Options, OutError))
+        {
+            return false;
+        }
+
+        Context.AvailablePresentations = MoveTemp(Options);
+        Context.bHasPresentationCatalog = true;
         return true;
     }
 

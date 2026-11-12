@@ -16,7 +16,8 @@
                                              TSharedRef<IWAINProposalProvider>    ProposalProvider,
                                              TSharedRef<IWAINNarrativeEvaluator>  NarrativeEvaluator,
                                              FString                             &OutError,
-                                             TSharedPtr<const IWAINPersonaSource> PersonaSource)
+                                             TSharedPtr<const IWAINPersonaSource> PersonaSource,
+                                             TSharedPtr<const IWAINPresentationCatalog> PresentationCatalog)
     {
         check(IsInGameThread());
 
@@ -30,7 +31,8 @@
             MakeShared<FWAINInteractionProcessor>(MoveTemp(GameAdapter),
                                                   MoveTemp(ProposalProvider),
                                                   MoveTemp(NarrativeEvaluator),
-                                                  MoveTemp(PersonaSource));
+                                                  MoveTemp(PersonaSource),
+                                                  MoveTemp(PresentationCatalog));
 
         if (!NextProcessor->StartSession(InitialWAIN, OutError))
         {

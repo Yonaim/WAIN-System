@@ -91,3 +91,13 @@ Testbed Content JSON의 기존 `schema_version: 1`은 신규 Schema를 자동 �
 - **지원하지 않음:** Persona JSON Parser, Prompt Template, Character Memory/World/Presentation Context, LLM, 비동기 처리. Host의 게임별 `ManaPersona.json` 구조는 Plugin에 고정하지 않았다.
 
 [ADR-007](../../03_Decisions/07_ADR-007-Read-Only-Character-Context.md) · [Implementation](../../04_Development/06_Character-Context-Implementation.md)
+
+## Phase 2 Presentation 계약 업데이트 (2026-11-11)
+
+위 'Phase 1 소스와의 대응'에 적힌 `Expression ID 거절`, `Catalog Query 미구현`은 **Phase 1 당시의 상태**다. 현재 코드에는 `WAINPresentationCatalog.h`의 `FWAINPresentationQuery`, `FWAINPresentationEntry`, `FWAINPresentationOptions`, `IWAINPresentationCatalog`가 추가됐다. `FWAINCharacterContext`는 Host의 허용 후보를 읽기 전용으로 포함하고, `FWAINTransactionCoordinator`는 `(ExpressionId, ExpressionVariantId)`의 정확한 조합을 Commit 전 검증한다.
+
+- 허용 ID 쌍이 일치하면 `FWAINInteractionResult`에 전달; PNG/렌더링은 Host 책임.
+- Catalog가 없으면 무표정 Proposal은 허용, 선택 ID가 있으면 거절. 중복·불완전 Catalog는 ContextPreparationFailed.
+- 기존 예시 JSON은 **구현된 Parser가 아니다**. 실제 Host Catalog Loader·LLM Structured Output Parser·Action/Event 규칙은 후속 구현이다.
+
+[구현 상세](../../04_Development/07_Presentation-Catalog-Implementation.md)
