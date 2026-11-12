@@ -25,3 +25,11 @@
 - **문서 갱신:** Source Map, Data/Transaction Contracts, Main Flow, Current Work/Roadmap, Test Plan/Validation, Work Log. ADR-001~006의 결정은 변경하지 않음.
 - **안전 경계:** Host/게임 고유 JSON과 Testbed Widget 변경 없음. 미지원 Action·Presentation/State Mutation 거절, 테스트 Adapter는 비공개 Mock 전용.
 - **검증:** Python 스크립트 구문 검사, C++ 헤더 경로·기초 브레이스 검사, 24개 JSON 파싱, Markdown 253개 상대 링크 무결성을 확인함. `clang-format` 부재로 포맷 검사는 완료하지 못함. **Unreal 엔진 5.8, UBT, C++ 컴파일, Automation Tests, Live Coding는 미실행.** 실제 포맷터 실행 성공 여부는 산출물 검증 기록 참고.
+
+## 2026-11-10 — Phase 1 코드 Region 구성 보완
+
+- `00_Engineering-Standards/00_Core/01_Local-Numbering-and-Navigation.md`를 근거로 여러 책임을 포함한 C++ 소스에 **3줄 구분 주석 + 지역 번호가 있는 `#pragma region`**을 추가했다.
+- 주로 Interaction Processor, Transaction Coordinator, 공통 데이터 타입·인터페이스, Mock Adapter, Automation Tests의 기능 구획을 만들었다. 작은 단일 책임 파일에는 무의미한 Region을 강제하지 않았다.
+- 변경 범위는 탐색성 및 문서 보완. 의도적으로 실행 로직, API 및 ADR을 수정하지 않았다.
+- **남은 검증:** 실제 UE 5.8 컴파일/테스트, MSVC 및 에디터의 Region 처리, `clang-format → indent_regions.py` 2회 반복 안전성 검증, UBT PreBuildSteps 연결. 이 항목을 수행했다고 주장하지 않는다.
+- LLM API 키를 포함한 보안 설정은 [LLM Configuration Plan](04_LLM-Configuration-Plan.md)에 별도 정의했으며 Phase 1에서는 사용하지 않는다.

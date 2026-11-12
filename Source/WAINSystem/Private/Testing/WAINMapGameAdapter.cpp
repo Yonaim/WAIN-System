@@ -5,11 +5,24 @@
 
 #include "Testing/WAINMapGameAdapter.h"
 
+// ============================================================
+// 00. Snapshot Identity
+// ============================================================
+#pragma region 00_Snapshot_Identity
+
 FName FWAINMapGameSnapshot::GetKind() const
 {
     static const FName Kind(TEXT("WAIN.MapGameSnapshot"));
     return Kind;
 }
+
+#pragma endregion
+
+
+// ============================================================
+// 01. Snapshot Preparation
+// ============================================================
+#pragma region 01_Snapshot_Preparation
 
 FWAINMapGameAdapter::FWAINMapGameAdapter(TMap<FName, int32> InInitialValues)
     : InitialValues(MoveTemp(InInitialValues))
@@ -70,6 +83,14 @@ TSharedPtr<const IWAINGameStateSnapshot> FWAINMapGameAdapter::Prepare(
     return Prepared;
 }
 
+#pragma endregion
+
+
+// ============================================================
+// 02. Prepared State Validation
+// ============================================================
+#pragma region 02_Prepared_State_Validation
+
 bool FWAINMapGameAdapter::Validate(const IWAINGameStateSnapshot& Prepared, FString& OutError) const
 {
     if (Prepared.GetKind() != FWAINMapGameSnapshot().GetKind())
@@ -90,3 +111,5 @@ bool FWAINMapGameAdapter::Validate(const IWAINGameStateSnapshot& Prepared, FStri
 
     return true;
 }
+
+#pragma endregion

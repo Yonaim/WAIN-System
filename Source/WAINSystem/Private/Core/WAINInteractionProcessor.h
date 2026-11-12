@@ -13,6 +13,11 @@
 class FWAINInteractionProcessor final
 {
 public:
+// ============================================================
+// 00. Public Interaction API
+// ============================================================
+#pragma region 00_Public_Interaction_API
+
     FWAINInteractionProcessor(
         TSharedRef<IWAINGameSnapshotAdapter> InGameAdapter,
         TSharedRef<IWAINProposalProvider> InProposalProvider,
@@ -25,6 +30,14 @@ public:
     TSharedPtr<const FWAINSessionRoot> GetSnapshot() const;
 
 private:
+#pragma endregion
+
+
+// ============================================================
+// 01. Turn Execution And Validation
+// ============================================================
+#pragma region 01_Turn_Execution_And_Validation
+
     struct FRecordedTurn
     {
         FWAINInteractionRequest Request;
@@ -42,6 +55,14 @@ private:
         EWAINInteractionError Error,
         const FString& Message);
 
+#pragma endregion
+
+
+// ============================================================
+// 02. Dependencies And Session State
+// ============================================================
+#pragma region 02_Dependencies_And_Session_State
+
     TSharedRef<IWAINGameSnapshotAdapter> GameAdapter;
     TSharedRef<IWAINProposalProvider> ProposalProvider;
     TSharedRef<IWAINNarrativeEvaluator> NarrativeEvaluator;
@@ -50,4 +71,7 @@ private:
     FWAINTransactionCoordinator Coordinator;
     TMap<FGuid, FRecordedTurn> CompletedTurns;
     bool bProcessing = false;
+#pragma endregion
+
+
 };

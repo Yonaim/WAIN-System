@@ -7,6 +7,11 @@
 
 #include "Core/WAINInteractionProcessor.h"
 
+// ============================================================
+// 00. Session And Mock Turn
+// ============================================================
+#pragma region 00_Session_And_Mock_Turn
+
 bool UWAINRuntimeSubsystem::StartSession(
     const FWAINStateSnapshot& InitialWAIN,
     TSharedRef<IWAINGameSnapshotAdapter> GameAdapter,
@@ -56,6 +61,14 @@ FWAINInteractionResult UWAINRuntimeSubsystem::ProcessMockTurn(const FWAINInterac
     return Result;
 }
 
+#pragma endregion
+
+
+// ============================================================
+// 01. Snapshot And Lifecycle
+// ============================================================
+#pragma region 01_Snapshot_And_Lifecycle
+
 TSharedPtr<const FWAINSessionRoot> UWAINRuntimeSubsystem::GetStateSnapshot() const
 {
     check(IsInGameThread());
@@ -73,3 +86,5 @@ void UWAINRuntimeSubsystem::Deinitialize()
     EndSession();
     Super::Deinitialize();
 }
+
+#pragma endregion

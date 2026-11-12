@@ -11,6 +11,11 @@
 
 #include "Misc/AutomationTest.h"
 
+// ============================================================
+// 00. Test Fixtures
+// ============================================================
+#pragma region 00_Test_Fixtures
+
 namespace WAINTests
 {
 class FFixedProposalProvider final : public IWAINProposalProvider
@@ -136,6 +141,14 @@ int32 GetGiftCount(const TSharedPtr<const FWAINSessionRoot>& Root)
 }
 } // namespace WAINTests
 
+#pragma endregion
+
+
+// ============================================================
+// 01. Commit And Prepare Failure Tests
+// ============================================================
+#pragma region 01_Commit_And_Prepare_Failure_Tests
+
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(
     FWAINCommitSuccessTest,
     "WAIN.Transaction.AtomicCommit",
@@ -192,6 +205,14 @@ bool FWAINPrepareFailureTest::RunTest(const FString& Parameters)
     return true;
 }
 
+#pragma endregion
+
+
+// ============================================================
+// 02. Idempotency And Proposal Tests
+// ============================================================
+#pragma region 02_Idempotency_And_Proposal_Tests
+
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(
     FWAINDuplicateTurnTest,
     "WAIN.Transaction.DuplicateTurnIsIdempotent",
@@ -245,6 +266,14 @@ bool FWAINInvalidProposalTest::RunTest(const FString& Parameters)
     return true;
 }
 
+#pragma endregion
+
+
+// ============================================================
+// 03. Revision And Boundary Tests
+// ============================================================
+#pragma region 03_Revision_And_Boundary_Tests
+
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(
     FWAINRevisionConflictTest,
     "WAIN.Transaction.StaleRevisionCannotPublish",
@@ -293,5 +322,7 @@ bool FWAINTrustLimitTest::RunTest(const FString& Parameters)
     TestEqual(TEXT("Game 무변경"), WAINTests::GetGiftCount(Processor->GetSnapshot()), 2);
     return true;
 }
+
+#pragma endregion
 
 #endif // WITH_DEV_AUTOMATION_TESTS

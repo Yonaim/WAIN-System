@@ -9,6 +9,11 @@
 #include "Templates/SharedPointer.h"
 #include "WAINRuntimeTypes.h"
 
+// ============================================================
+// 00. Session Root And Game Snapshot
+// ============================================================
+#pragma region 00_Session_Root_And_Game_Snapshot
+
 /**
  * @brief Host Game이 소유하는 불변 상태 Snapshot의 타입 소거 인터페이스.
  *
@@ -29,6 +34,14 @@ struct FWAINSessionRoot
     FWAINStateSnapshot WAIN;
     TSharedPtr<const IWAINGameStateSnapshot> Game;
 };
+
+#pragma endregion
+
+
+// ============================================================
+// 01. Host Game Adapter Contract
+// ============================================================
+#pragma region 01_Host_Game_Adapter_Contract
 
 /**
  * @brief Host-owned Snapshot의 준비 단계만 제공하는 최소 Adapter.
@@ -52,6 +65,14 @@ public:
     virtual bool Validate(const IWAINGameStateSnapshot& Prepared, FString& OutError) const = 0;
 };
 
+#pragma endregion
+
+
+// ============================================================
+// 02. Proposal Provider Contract
+// ============================================================
+#pragma region 02_Proposal_Provider_Contract
+
 /** @brief 실제 LLM 이전에는 결정론적 Mock Provider를 주입한다. */
 class IWAINProposalProvider
 {
@@ -64,6 +85,14 @@ public:
         FWAINResponseProposal& OutProposal,
         FString& OutError) const = 0;
 };
+
+#pragma endregion
+
+
+// ============================================================
+// 03. Narrative Evaluation Contract
+// ============================================================
+#pragma region 03_Narrative_Evaluation_Contract
 
 /** @brief Current와 준비된 상태를 비교한 뒤 다음 Beat만 결정한다. */
 class IWAINNarrativeEvaluator
@@ -93,3 +122,5 @@ public:
         return true;
     }
 };
+
+#pragma endregion

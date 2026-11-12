@@ -7,6 +7,11 @@
 
 #include "CoreMinimal.h"
 
+// ============================================================
+// 00. Interaction Enums
+// ============================================================
+#pragma region 00_Interaction_Enums
+
 /** @brief 사용자 입력 형태. Silence는 빈 Text와 구별되는 명시적인 턴이다. */
 enum class EWAINInputKind : uint8
 {
@@ -44,6 +49,14 @@ enum class EWAINInteractionError : uint8
     RevisionConflict
 };
 
+#pragma endregion
+
+
+// ============================================================
+// 01. Request And Proposal
+// ============================================================
+#pragma region 01_Request_And_Proposal
+
 struct FWAINInteractionRequest
 {
     FGuid TurnId;
@@ -71,6 +84,14 @@ struct FWAINResponseProposal
     TArray<FWAINStateMutation> StateChanges;
 };
 
+#pragma endregion
+
+
+// ============================================================
+// 02. WAIN State Snapshots
+// ============================================================
+#pragma region 02_WAIN_State_Snapshots
+
 /** @brief 감정 차원은 서로 독립적이며 각각 [0,1] 범위다. */
 struct FWAINEmotionState
 {
@@ -95,6 +116,14 @@ struct FWAINStateSnapshot
     int32 TurnCount = 0;
 };
 
+#pragma endregion
+
+
+// ============================================================
+// 03. Interaction Result
+// ============================================================
+#pragma region 03_Interaction_Result
+
 struct FWAINInteractionResult
 {
     FGuid TurnId;
@@ -109,3 +138,5 @@ struct FWAINInteractionResult
         return Error == EWAINInteractionError::None;
     }
 };
+
+#pragma endregion

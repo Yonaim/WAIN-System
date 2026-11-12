@@ -7,6 +7,11 @@
 
 #include "Core/WAINStateValidation.h"
 
+// ============================================================
+// 00. Commit Result Helper
+// ============================================================
+#pragma region 00_Commit_Result_Helper
+
 namespace WAINTransaction
 {
 FWAINCommitOutcome Fail(const EWAINInteractionError Error, const FString& Message)
@@ -18,6 +23,14 @@ FWAINCommitOutcome Fail(const EWAINInteractionError Error, const FString& Messag
 }
 
 } // namespace WAINTransaction
+
+#pragma endregion
+
+
+// ============================================================
+// 01. Transaction Pipeline
+// ============================================================
+#pragma region 01_Transaction_Pipeline
 
 FWAINCommitOutcome FWAINTransactionCoordinator::Execute(
     const FWAINInteractionRequest& Request,
@@ -74,6 +87,14 @@ FWAINCommitOutcome FWAINTransactionCoordinator::Execute(
     return Outcome;
 }
 
+#pragma endregion
+
+
+// ============================================================
+// 02. Proposal Validation
+// ============================================================
+#pragma region 02_Proposal_Validation
+
 bool FWAINTransactionCoordinator::ValidateProposal(const FWAINResponseProposal& Proposal, FString& OutError) const
 {
     if (Proposal.Dialogue.TrimStartAndEnd().IsEmpty())
@@ -107,6 +128,14 @@ bool FWAINTransactionCoordinator::ValidateProposal(const FWAINResponseProposal& 
 
     return true;
 }
+
+#pragma endregion
+
+
+// ============================================================
+// 03. Mutation Preparation
+// ============================================================
+#pragma region 03_Mutation_Preparation
 
 TArray<FWAINStateMutation> FWAINTransactionCoordinator::CollectGameMutations(
     const FWAINResponseProposal& Proposal) const
@@ -173,3 +202,4 @@ bool FWAINTransactionCoordinator::PrepareWAINState(
     return true;
 }
 
+#pragma endregion

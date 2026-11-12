@@ -61,3 +61,8 @@ In macOS/Linux use `python3` and `/` path separators. **These Target.cs files ar
 - Implemented source map and test cases: `Docs/WAIN-System-Vault/02_Architecture/02_Source/00_Source-Map.md`
 
 Unreal-specific Host code and character assets remain outside the reusable plugin.
+
+
+## Phase 1 코드 스타일 보완 (2026-11-10)
+
+역할별 탐색이 필요한 파일에 공통 표준의 세 줄 구분 주석과 번호 `#pragma region`을 적용했습니다. 작은 단일 기능 파일에는 강제하지 않았습니다. LLM Key/Provider 설정은 **현재 미구현**이며 `Docs/WAIN-System-Vault/04_Development/04_LLM-Configuration-Plan.md`에 구현 계획을 기록했습니다.

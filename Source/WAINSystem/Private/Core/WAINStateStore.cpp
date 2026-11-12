@@ -7,6 +7,11 @@
 
 #include "Core/WAINStateValidation.h"
 
+// ============================================================
+// 00. Session Initialization
+// ============================================================
+#pragma region 00_Session_Initialization
+
 bool FWAINStateStore::Initialize(
     const FWAINStateSnapshot& InitialWAIN,
     TSharedPtr<const IWAINGameStateSnapshot> InitialGame,
@@ -31,6 +36,14 @@ bool FWAINStateStore::Initialize(
     CurrentRoot = MakeShared<FWAINSessionRoot>(MoveTemp(InitialRoot));
     return true;
 }
+
+#pragma endregion
+
+
+// ============================================================
+// 01. Snapshot Read And Publication
+// ============================================================
+#pragma region 01_Snapshot_Read_And_Publication
 
 TSharedPtr<const FWAINSessionRoot> FWAINStateStore::Read() const
 {
@@ -59,3 +72,5 @@ bool FWAINStateStore::Publish(
     CurrentRoot = MakeShared<FWAINSessionRoot>(MoveTemp(NextRoot));
     return true;
 }
+
+#pragma endregion

@@ -5,6 +5,11 @@
 
 #include "Core/WAINInteractionProcessor.h"
 
+// ============================================================
+// 00. Session And Public API
+// ============================================================
+#pragma region 00_Session_And_Public_API
+
 FWAINInteractionProcessor::FWAINInteractionProcessor(
     TSharedRef<IWAINGameSnapshotAdapter> InGameAdapter,
     TSharedRef<IWAINProposalProvider> InProposalProvider,
@@ -76,6 +81,14 @@ TSharedPtr<const FWAINSessionRoot> FWAINInteractionProcessor::GetSnapshot() cons
     return StateStore.Read();
 }
 
+#pragma endregion
+
+
+// ============================================================
+// 01. Turn Execution
+// ============================================================
+#pragma region 01_Turn_Execution
+
 FWAINInteractionResult FWAINInteractionProcessor::ExecuteTurn(const FWAINInteractionRequest& Request)
 {
     const TSharedPtr<const FWAINSessionRoot> Current = StateStore.Read();
@@ -104,6 +117,14 @@ FWAINInteractionResult FWAINInteractionProcessor::ExecuteTurn(const FWAINInterac
     Result.Dialogue = Proposal.Dialogue;
     return Result;
 }
+
+#pragma endregion
+
+
+// ============================================================
+// 02. Request Validation And Errors
+// ============================================================
+#pragma region 02_Request_Validation_And_Errors
 
 bool FWAINInteractionProcessor::ValidateRequest(const FWAINInteractionRequest& Request, FString& OutError) const
 {
@@ -155,3 +176,5 @@ FWAINInteractionResult FWAINInteractionProcessor::Fail(
     Result.ErrorMessage = Message;
     return Result;
 }
+
+#pragma endregion

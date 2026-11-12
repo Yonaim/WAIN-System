@@ -9,6 +9,11 @@
 #include "WAINInterfaces.h"
 #include "Core/WAINStateStore.h"
 
+// ============================================================
+// 00. Commit Outcome
+// ============================================================
+#pragma region 00_Commit_Outcome
+
 struct FWAINCommitOutcome
 {
     EWAINInteractionError Error = EWAINInteractionError::None;
@@ -20,6 +25,14 @@ struct FWAINCommitOutcome
         return Error == EWAINInteractionError::None;
     }
 };
+
+#pragma endregion
+
+
+// ============================================================
+// 01. Coordinator Interface
+// ============================================================
+#pragma region 01_Coordinator_Interface
 
 class FWAINTransactionCoordinator final
 {
@@ -44,3 +57,5 @@ private:
         FString& OutError) const;
 
 };
+
+#pragma endregion
