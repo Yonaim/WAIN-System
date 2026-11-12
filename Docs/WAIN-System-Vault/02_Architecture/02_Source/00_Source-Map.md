@@ -125,3 +125,7 @@
 - `Private/Tests/WAINWorldStateTests.cpp`: 신규 9개 자동화 테스트 코드, 누적 68개(UE 미실행).
 
 [구현 상세](../../04_Development/11_World-State-Manager-Implementation.md).
+
+## 90. Testbed 실제 콘텐츠 Host 연결 (2026-11-12)
+
+`Source/WAINTestbed/WAINTestbedContentLoader.{h,cpp}`에서 정의 JSON을 로드·검증하고, `WAINTestbedRuntimeAdapters.{h,cpp}`의 Host Persona/Catalog/Game Snapshot/World Fact Reader/Narrative Guard로 Plugin에 주입한다. Widget은 `UWAINRuntimeSubsystem`의 성공한 Commit 결과를 소비한다. Plugin Core/Transaction C++는 이번 단계에서 변경하지 않았다. 실제 JSON 내용과 구현 범위는 [Development](../../04_Development/12_Testbed-Content-Integration.md) 참조.

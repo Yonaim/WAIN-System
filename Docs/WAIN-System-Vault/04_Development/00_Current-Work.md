@@ -99,3 +99,7 @@
 - `WAIN.World.*` 테스트 9개 추가, **누적 68개 Automation Test 등록**; 실제 UE 5.8 빌드·실행은 미검증.
 - Host Testbed 콘텐츠/JSON, WAIN 소유 별도 World Store, Obsidian/VS Code 설정 및 Engineering Standards는 수정하지 않음.
 - [ADR-011](../03_Decisions/11_ADR-011-World-Fact-Schema-and-Prepared-Validation.md) Proposed · [Implementation](11_World-State-Manager-Implementation.md).
+
+## 2026-11-12 — Testbed 콘텐츠 실제 JSON 연동
+
+Host가 Persona/6D Emotion/Expression/Narrative/World Fact를 JSON에서 파싱하고 동기 WAIN Runtime Session을 시작하도록 연결했다. Testbed UI는 Committed Snapshot만 조회하며, 실제 LLM/PNG Layered Renderer는 구현하지 않았다. 새 `WAIN.Testbed.*` 7개 Automation Test 코드를 작성했지만 UE 실행 미검증. [ADR-012](../03_Decisions/12_ADR-012-Testbed-Content-Bridge.md) · [Host 구현](12_Testbed-Content-Integration.md).

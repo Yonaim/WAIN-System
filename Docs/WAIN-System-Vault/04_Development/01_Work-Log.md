@@ -98,3 +98,11 @@
 - Reader 공통화(`IWAINNarrativeGameFactReader` 별칭), World Context 필터링, Schema 기반 Mutation/Prepared State 검증, 선택적 Manager 주입으로 기존 Mock 호환.
 - 테스트 `WAIN.World.*` 9개 작성(누적 68개 등록). Region·코드 주석·문서·ZIP 검증, UE 빌드/Automation 실행 미검증.
 - ADR-011 Proposed 기록, 기존 ADR·Engineering Standards·Obsidian 설정 유지. [구현 상세](11_World-State-Manager-Implementation.md).
+
+## 2026-11-12 — Host JSON/Session Integration
+
+- 기준: World State Manager Plugin 누적본 + `WAINTestbed-Source(1).zip`. Plugin C++ 코드는 수정하지 않음.
+- 신규 Host JSON Loader, Game Snapshot/World Reader, Persona/Expression Sources, Narrative Guard, Mock Proposal, Session Bootstrap, Widget Commit View 연결.
+- ManaEmotion을 6D 초기값으로 변경, CH01WorldFacts 신규 추가, CH01Narrative Goal 필드 추가. PNG 원본/경로 보존.
+- `WAIN.Testbed.*` 7개 Editor Automation Tests 코드 작성. Plugin 기존 68개 유지, 실제 UE 5.8 컴파일/실행 미검증.
+- [ADR-012](../03_Decisions/12_ADR-012-Testbed-Content-Bridge.md) Proposed. 실제 Host 문서 [Integration](12_Testbed-Content-Integration.md).

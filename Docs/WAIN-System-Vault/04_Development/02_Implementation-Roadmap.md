@@ -74,3 +74,9 @@
 - Game-owned 정수 Schema + 공개 Context + Mutation/Prepared Game 검증의 코드가 작성되었다.
 - **남은 작업:** Testbed 실제 콘텐츠 Loader, Game Flag/Quest 등 타입 확장, WAIN-owned World Facts, LLM Context serialization, 실 UE 5.8 컴파일·테스트 및 시나리오 기반 통합 검증.
 - 자동화 테스트 누적 68개 코드 등록(실행 미확인). [World Implementation](11_World-State-Manager-Implementation.md).
+
+## 2026-11-12 Host Integration 진행 상태
+
+- Plugin의 World State/Character/Presentation/Narrative API에 Testbed의 실제 `Content/Data` JSON을 연결하는 Host C++ 코드 작성.
+- **다음:** UE 5.8 빌드/Automation/PIE 검증 후 실 LLM Provider·Structured Output/Prompt 보안 또는 PNG Layered Renderer 개발.
+- 미지원: Unreal Cooked Non-UFS Staging, Reflection/Plan 자동 Reasoner 주입, Memory 저장, 자유 대사 내용 Hard Constraint 검사. [구현 상세](12_Testbed-Content-Integration.md).

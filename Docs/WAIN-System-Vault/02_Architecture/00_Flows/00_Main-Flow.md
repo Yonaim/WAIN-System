@@ -73,3 +73,7 @@ flowchart TD
 Current `Game Snapshot`을 공통 `IWAINWorldFactReader`로 읽는다. Context Preparation에서 Schema가 공개한 Fact만 Provider에게 제공하며, Proposal 생성 후 World State Manager가 Game Mutation 권한/범위를 검사한다. Game Adapter가 새로운 Prepared Snapshot을 반환하면 실제 값 전체를 다시 대조한 뒤 Narrative 평가와 기존 Publish 단계로 진행한다. **현재 Manager는 Game-owned int32 상태만 다루며, 실제 Host JSON 파싱과 Game Actor의 Apply는 포함하지 않는다.**
 
 [World State 구현](../../04_Development/11_World-State-Manager-Implementation.md).
+
+## 2026-11-12 실제 Host 전환 범위
+
+실제 Testbed Widget의 Text/Silence 입력이 `UWAINRuntimeSubsystem::ProcessMockTurn`으로 전달된다. 초기 Context 정의는 Host JSON Loader가 준비하고 World Fact/Narrative/Expression 권한 검사를 통과한 Proposal만 WAIN Root에 Publish된다. 화면은 Commit된 Dialogue/Beat/Trust/Expression ID를 읽는다. **실제 LLM·PNG 렌더링까지 연결했다는 의미는 아니다.** [Host 구현](../../04_Development/12_Testbed-Content-Integration.md).

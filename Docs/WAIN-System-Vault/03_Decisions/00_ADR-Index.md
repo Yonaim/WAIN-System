@@ -16,6 +16,7 @@
 | [ADR-010](10_ADR-010-Deterministic-Beat-Graph-MVP.md) | Chapter/Sequence/Beat Graph, Prepared State 기반 구조화 조건과 최소 Hard Rule | **Proposed (Phase 2 구현 선택)** |
 | [ADR-011](11_ADR-011-World-Fact-Schema-and-Prepared-Validation.md) | Host Fact Schema와 공통 World Reader, 제안/Prepared 검사 | **Proposed (Phase 2 구현 선택)** |
 
+| [ADR-012](12_ADR-012-Testbed-Content-Bridge.md) | Host JSON 정의를 WAIN Session으로 연결하고 Game-owned Flag/6D Emotion을 초기화 | **Proposed (Host MVP)** |
 
 **문서화 원칙:** 새로운 핵심 설계가 승인되면 관련 ADR을 생성·갱신하고 Architecture Contract, Flow, Development 현황을 함께 동기화한다. 아직 결정되지 않은 구현 최적화·타입·예외 복구는 Accepted로 기록하지 않는다.
 

@@ -120,3 +120,7 @@ A: LLM Only → B: A+Character Agent → C: B+World State Manager → D: C+Narra
 신규 9개: `WAIN.World.VisibleContext`, `MutationCommit`, `ReadOnlyReject`, `BoundsReject`, `UnregisteredKeyReject`, `DuplicateSchemaReject`, `InvalidInitialReject`, `PreparedDriftReject`, `ReplayNoDoubleCommit`.
 
 의도된 검증: 비공개 Key의 Context 제외, Schema 권한 및 범위, 연속 Mutation, 초기 Schema 오류, Game Adapter가 의도치 않게 변경한 Prepared 값 차단, 원자적 No Commit, 재전송 중복 방지. **누적 68개 테스트 코드 등록이 실제 UE 컴파일·테스트 성공을 의미하지 않는다.**
+
+## 2026-11-12 Host 실제 콘텐츠 테스트 — 코드 작성, UE 미실행
+
+`WAIN.Testbed.Content.LoadAndValidate`, `Content.WorldFactVisibility`, `Runtime.IntroTransition`, `Runtime.ThreeBeatProgress`, `Runtime.ReplayDoesNotAdvance`, `Runtime.UnknownCharacterNoCommit`, `Runtime.ReadonlyFactRejected` 총 7개 Integration Test 코드를 추가했다. 실제 Testbed 프로젝트의 `Content/Data`가 필요하다. Plugin 기존 68개 테스트 코드와 함께 Editor에서 회귀 실행하되 실행 이전에 통과로 기록하지 않는다.
