@@ -12,7 +12,7 @@
 // ============================================================
 #pragma region 00_Unified_Memory_Record
 
-    /** @brief Reflection/Plan은 타입만 예약하며 이 단계에서는 Observation만 생성한다. */
+    /** @brief 모든 기억은 동일한 Stream에 저장되며 출처는 ID로 연결한다. */
     enum class EWAINMemoryType : uint8
     {
         Observation,
@@ -38,6 +38,13 @@
         int32 CreatedTurn = 0;
         float Importance = 0.5F;
         TArray<FGuid> SourceMemoryIds;
+
+        // Plan 전용 메타데이터. Reflection과 Observation은 기본값을 유지한다.
+        FName SceneId;
+        FName BeatId;
+        FName GoalId;
+        TArray<FString> PlanSteps;
+        int32 CurrentStepIndex = 0;
 
         // Embedding 및 접근 기록은 후속 구현용 선택 필드다.
         TArray<float> Embedding;

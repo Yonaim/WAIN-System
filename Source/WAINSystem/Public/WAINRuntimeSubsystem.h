@@ -9,6 +9,7 @@
 #include "CoreMinimal.h"
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "WAINInterfaces.h"
+#include "WAINMemoryReasoning.h"
 #include "WAINRuntimeTypes.h"
 #include "WAINRuntimeSubsystem.generated.h"
 // clang-format on
@@ -34,7 +35,8 @@ class WAINSYSTEM_API UWAINRuntimeSubsystem : public UGameInstanceSubsystem
                       TSharedRef<IWAINNarrativeEvaluator>  NarrativeEvaluator,
                       FString                             &OutError,
                       TSharedPtr<const IWAINPersonaSource> PersonaSource = nullptr,
-                      TSharedPtr<const IWAINPresentationCatalog> PresentationCatalog = nullptr);
+                      TSharedPtr<const IWAINPresentationCatalog> PresentationCatalog = nullptr,
+                      TSharedPtr<const IWAINMemoryReasoner> MemoryReasoner = nullptr);
 
     FWAINInteractionResult ProcessMockTurn(const FWAINInteractionRequest &Request);
 

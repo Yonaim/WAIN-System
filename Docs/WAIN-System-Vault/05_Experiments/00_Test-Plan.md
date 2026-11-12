@@ -100,3 +100,9 @@ A: LLM Only → B: A+Character Agent → C: B+World State Manager → D: C+Narra
 | `WAIN.Memory.SilenceTurn` | Silence 턴은 빈 Player 입력을 저장하지 않음 |
 
 **총 38개 Automation 테스트가 소스에 작성된 상태**로, UE 5.8 빌드/실행 합격을 의미하지 않는다. 반드시 이전 30개 테스트와 함께 회귀 실행한다. Reflection SourceMemoryIds, Embedding Retrieval, Save/Load는 후속 테스트 대상이다.
+
+## Phase 2 Reflection / Planning MVP Automation Tests — 코드 작성, UE 실행 전 (2026-11-11)
+
+신규 11개 테스트: `WAIN.MemoryReasoning.PlanCreated`, `ReflectionTrigger`, `ContextIncludesDerivedMemory`, `SceneChangeReplans`, `BeatChangeReplans`, `CharacterIsolation`, `InvalidPlanNoCommit`, `InvalidReflectionNoCommit`, `GameFailureSkipsReasoning`, `ReplayDoesNotRegenerate`, `InvalidActivePlanRejected`.
+
+**누적 테스트 코드 49개(기존 38 + 신규 11).** Reflection 출처·Plan Trigger·현재 Snapshot 불변·Provider/Adapter 실패를 검증하도록 작성. 실제 Unreal Automation 실행 및 결과는 기록되지 않았다. 이후 의미적 Reflection 품질, LLM 결과 구조/보안, 과도한 생성·장기 Memory 부하 테스트를 추가한다.

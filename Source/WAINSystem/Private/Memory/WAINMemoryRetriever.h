@@ -24,8 +24,12 @@ class FWAINMemoryRetriever final
     static TArray<FRankedMemory> RankCandidates(const FWAINInteractionRequest &Request,
                                                const FWAINStateSnapshot &Current);
 
-    static TArray<FWAINMemoryRecord> SelectTopObservations(const TArray<FRankedMemory> &Ranked,
+    static TArray<FWAINMemoryRecord> SelectTopMemories(const TArray<FRankedMemory> &Ranked,
                                                             const FWAINStateSnapshot &Current);
+
+    static void AppendActivePlan(FName CharacterId,
+                                 const FWAINStateSnapshot &Current,
+                                 TArray<FWAINMemoryRecord> &OutResults);
 
     static float CalculateRelevance(const FString &Query, const FString &Content);
     static float CalculateScore(const FWAINInteractionRequest &Request,

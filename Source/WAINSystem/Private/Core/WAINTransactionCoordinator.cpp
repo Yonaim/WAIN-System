@@ -8,6 +8,7 @@
 #include "Character/WAINCharacterStatePreparer.h"
 #include "Presentation/WAINPresentationValidator.h"
 #include "Memory/WAINMemoryWriter.h"
+#include "Memory/WAINMemoryReasoningPreparer.h"
 
 // ============================================================
 // 00. Commit Result Helper
@@ -38,7 +39,8 @@
                                                             FWAINStateStore                &StateStore,
                                                             const IWAINGameSnapshotAdapter &GameAdapter,
                                                             const IWAINNarrativeEvaluator  &NarrativeEvaluator,
-                                                            const FWAINPresentationOptions *AvailablePresentations) const
+                                                            const FWAINPresentationOptions *AvailablePresentations,
+                                                            const IWAINMemoryReasoner *MemoryReasoner) const
     {
         check(IsInGameThread());
 
@@ -72,6 +74,12 @@
         if (!NarrativeEvaluator.Evaluate(Request, *Current, PreparedWAIN, *PreparedGame, Error))
         {
             return WAINTransaction::Fail(EWAINInteractionError::NarrativeEvaluationFailed, Error);
+        }
+
+        if (MemoryReasoner &&
+            !FWAINMemoryReasoningPreparer().Prepare(Request, PreparedWAIN, *MemoryReasoner, Error))
+        {
+            return WAINTransaction::Fail(EWAINInteractionError::MemoryReasoningFailed, Error);
         }
 
         if (!WAINStateValidation::Validate(PreparedWAIN, Error) || !GameAdapter.Validate(*PreparedGame, Error))

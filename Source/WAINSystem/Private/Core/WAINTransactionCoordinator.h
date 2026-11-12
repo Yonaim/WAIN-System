@@ -8,6 +8,7 @@
 #include "Core/WAINStateStore.h"
 #include "CoreMinimal.h"
 #include "WAINInterfaces.h"
+#include "WAINMemoryReasoning.h"
 
 // ============================================================
 // 00. Commit Outcome
@@ -41,7 +42,8 @@
                                    FWAINStateStore                &StateStore,
                                    const IWAINGameSnapshotAdapter &GameAdapter,
                                    const IWAINNarrativeEvaluator  &NarrativeEvaluator,
-                                   const FWAINPresentationOptions *AvailablePresentations = nullptr) const;
+                                   const FWAINPresentationOptions *AvailablePresentations = nullptr,
+                                   const IWAINMemoryReasoner *MemoryReasoner = nullptr) const;
 
         private:
         bool ValidateProposal(const FWAINResponseProposal &Proposal,

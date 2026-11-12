@@ -14,7 +14,9 @@
                                                               const FWAINStateSnapshot &Current) const
     {
         const TArray<FRankedMemory> Ranked = RankCandidates(Request, Current);
-        return SelectTopObservations(Ranked, Current);
+        TArray<FWAINMemoryRecord> Results = SelectTopMemories(Ranked, Current);
+        AppendActivePlan(Request.CharacterId, Current, Results);
+        return Results;
     }
 
 #pragma endregion
@@ -32,7 +34,7 @@
         for (int32 Index = 0; Index < Current.MemoryStream.Num(); ++Index)
         {
             const FWAINMemoryRecord &Memory = Current.MemoryStream[Index];
-            if (Memory.CharacterId == Request.CharacterId && Memory.Type == EWAINMemoryType::Observation)
+            if (Memory.CharacterId == Request.CharacterId && Memory.Type != EWAINMemoryType::Plan)
             {
                 Ranked.Add({Index, CalculateScore(Request, Memory, Current.TurnCount)});
             }
@@ -49,7 +51,7 @@
         return Ranked;
     }
 
-    TArray<FWAINMemoryRecord> FWAINMemoryRetriever::SelectTopObservations(const TArray<FRankedMemory> &Ranked,
+    TArray<FWAINMemoryRecord> FWAINMemoryRetriever::SelectTopMemories(const TArray<FRankedMemory> &Ranked,
                                                                           const FWAINStateSnapshot &Current)
     {
         TArray<FWAINMemoryRecord> Results;
@@ -65,9 +67,33 @@
 #pragma endregion
 
 // ============================================================
-// 02. Temporary Lexical Scoring
+// 02. Active Plan Context
 // ============================================================
-#pragma region 02_Temporary_Lexical_Scoring
+#pragma region 02_Active_Plan_Context
+
+    void FWAINMemoryRetriever::AppendActivePlan(const FName CharacterId,
+                                                 const FWAINStateSnapshot &Current,
+                                                 TArray<FWAINMemoryRecord> &OutResults)
+    {
+        const FGuid *ActiveId = Current.ActivePlanIds.Find(CharacterId);
+        if (!ActiveId) return;
+
+        for (const FWAINMemoryRecord &Memory : Current.MemoryStream)
+        {
+            if (Memory.Id == *ActiveId && Memory.CharacterId == CharacterId && Memory.Type == EWAINMemoryType::Plan)
+            {
+                OutResults.Add(Memory);
+                return;
+            }
+        }
+    }
+
+#pragma endregion
+
+// ============================================================
+// 03. Temporary Lexical Scoring
+// ============================================================
+#pragma region 03_Temporary_Lexical_Scoring
 
     float FWAINMemoryRetriever::CalculateScore(const FWAINInteractionRequest &Request,
                                                 const FWAINMemoryRecord &Memory,

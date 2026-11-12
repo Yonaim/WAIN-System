@@ -14,12 +14,14 @@
                                                          TSharedRef<IWAINProposalProvider>    InProposalProvider,
                                                          TSharedRef<IWAINNarrativeEvaluator>  InNarrativeEvaluator,
                                                          TSharedPtr<const IWAINPersonaSource> InPersonaSource,
-                                                         TSharedPtr<const IWAINPresentationCatalog> InPresentationCatalog)
+                                                         TSharedPtr<const IWAINPresentationCatalog> InPresentationCatalog,
+                                                         TSharedPtr<const IWAINMemoryReasoner> InMemoryReasoner)
         : GameAdapter(MoveTemp(InGameAdapter)),
           ProposalProvider(MoveTemp(InProposalProvider)),
           NarrativeEvaluator(MoveTemp(InNarrativeEvaluator)),
           PersonaSource(MoveTemp(InPersonaSource)),
-          PresentationCatalog(MoveTemp(InPresentationCatalog))
+          PresentationCatalog(MoveTemp(InPresentationCatalog)),
+          MemoryReasoner(MoveTemp(InMemoryReasoner))
     {
     }
 
@@ -116,7 +118,8 @@
 
         const FWAINCommitOutcome Commit =
             Coordinator.Execute(Request, Proposal, StateStore, *GameAdapter, *NarrativeEvaluator,
-                                Context.bHasPresentationCatalog ? &Context.AvailablePresentations : nullptr);
+                                Context.bHasPresentationCatalog ? &Context.AvailablePresentations : nullptr,
+                                MemoryReasoner.Get());
         if (!Commit.Succeeded())
         {
             return Fail(Request, Commit.Error, Commit.Message);

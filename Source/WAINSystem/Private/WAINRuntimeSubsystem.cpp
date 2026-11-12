@@ -17,7 +17,8 @@
                                              TSharedRef<IWAINNarrativeEvaluator>  NarrativeEvaluator,
                                              FString                             &OutError,
                                              TSharedPtr<const IWAINPersonaSource> PersonaSource,
-                                             TSharedPtr<const IWAINPresentationCatalog> PresentationCatalog)
+                                             TSharedPtr<const IWAINPresentationCatalog> PresentationCatalog,
+                                             TSharedPtr<const IWAINMemoryReasoner> MemoryReasoner)
     {
         check(IsInGameThread());
 
@@ -32,7 +33,8 @@
                                                   MoveTemp(ProposalProvider),
                                                   MoveTemp(NarrativeEvaluator),
                                                   MoveTemp(PersonaSource),
-                                                  MoveTemp(PresentationCatalog));
+                                                  MoveTemp(PresentationCatalog),
+                                                  MoveTemp(MemoryReasoner));
 
         if (!NextProcessor->StartSession(InitialWAIN, OutError))
         {

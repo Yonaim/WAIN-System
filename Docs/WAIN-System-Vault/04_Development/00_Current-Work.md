@@ -73,3 +73,13 @@
 - 실제 UE 컴파일/Automation 통과 미검증. 확정된 구현 완료로 표시하지 않는다.
 - 다음 작업: Unreal 실행 검증 후 Embedding/Reflection/Planning, Host Adapter 및 Narrative 규칙 순차 확장.
 - [구현 계약](08_Memory-Observation-Implementation.md) · [설계 검토 ADR](../03_Decisions/08_ADR-008-Transactional-Observations.md)
+
+## Phase 2 Reflection / Planning MVP (2026-11-11)
+
+- **기반:** 직전 Memory Observation 누적 Plugin Source + Vault. 기존 Observation/Transaction 경계 유지.
+- **신규:** 선택형 Reasoner, Observation 누적 Trigger 기반 Reflection, Scene/Beat 기반 Plan 생성·재사용, Character별 Active Plan, Reflection/Plan Context 반영.
+- **정책:** 생성 실패는 전체 Turn No Commit. 기존 Mock 경로는 Reasoner 미주입으로 동일하게 동작.
+- **테스트:** `WAIN.MemoryReasoning.*` 11개 코드 신규 작성, 누적 49개 등록. 실제 UE 5.8 빌드/실행 **미검증**.
+- **제한:** 동기 Mock 생성기만 테스트, 실제 LLM·Embedding·계획 Step 진행·Save/Load 없음. 임계값/트리거는 **ADR-009 Proposed**.
+
+[Implementation](09_Memory-Reasoning-Implementation.md) · [ADR-009](../03_Decisions/09_ADR-009-Reflection-Planning-MVP.md).

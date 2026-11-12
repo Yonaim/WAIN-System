@@ -55,3 +55,9 @@
 - **아직 미구현:** Embedding Provider/Cosine, Reflection·Planning, 중요도 평가, 지속 저장·복원·압축, 실제 LLM Prompt 연결.
 - **검증 필요:** 현재 Phase 2 변경분 전부 UE 5.8 컴파일 및 `WAIN.Memory.*` + 기존 30개 테스트의 실제 실행 결과.
 - 이번 코드의 임시 검색 가중치는 Architecture의 최종 결정이 아니라 실험 파라미터다. [Memory 구현](08_Memory-Observation-Implementation.md).
+
+## 2026-11-11 Phase 2 Reflection / Planning 진행 상태
+
+- 단계 6 **MVP 일부 확장:** Reflection/Plan에 대한 주입형 결정론적 Reasoner 경로와 Scene/Beat 기반 Plan 유효성 검사가 소스에 포함됐다. 실 LLM 문장 생성, Embedding, Goal/World 변화 감지, Step 진행, 지속 저장은 **미구현**.
+- Reflection/Plan 생성은 Prepared Snapshot에 포함되어 Commit 전 실패 시 원상태가 유지된다. [ADR-009](../03_Decisions/09_ADR-009-Reflection-Planning-MVP.md) Proposed.
+- 신규 Automation Test 11개 작성, 전체 49개. UE 5.8 빌드·실행 검증 필요. 이후 단계 7의 Narrative Graph/Goal·Constraint 엔진으로 진행한다.

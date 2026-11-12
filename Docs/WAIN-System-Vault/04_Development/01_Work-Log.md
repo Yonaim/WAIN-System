@@ -74,3 +74,13 @@
 - Obsidian/VS Code 설정, Host Testbed 코드/JSON/PNG 및 기존 Runtime API 호출 방식은 유지.
 
 [Implementation](08_Memory-Observation-Implementation.md)
+
+## 2026-11-11 — Phase 2 Memory Reflection / Planning MVP
+
+- 기준: `WAINSystem-Phase2-Memory-Plugin-and-Vault.zip`.
+- 변경: `IWAINMemoryReasoner` 계약, `FWAINMemoryReasoningPreparer`, Memory Plan 필드와 ActivePlanIds, Search/Context, Final State Validation, Transaction 주입 경로.
+- 정책: 최초/Scene/Beat 변경 시 계획 갱신, Reflection 임계값, 근거 ID와 순서 검증. **생성기 주입 없으면 이전 기능 그대로**.
+- 신규 자동화 테스트 11개 작성(누적 49개). 현재 환경에서 UE 5.8 컴파일/테스트를 실행하지 못했으므로 정적 검사 결과만 기록한다.
+- 문서: [ADR-009](../03_Decisions/09_ADR-009-Reflection-Planning-MVP.md) Proposed. 표준 Obsidian/VS Code/테마 설정과 Host Testbed 코드는 변경 없음.
+
+[구현 상세](09_Memory-Reasoning-Implementation.md).

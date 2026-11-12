@@ -89,3 +89,18 @@
 | `Private/Tests/WAINMemoryTests.cpp` | 신규 8개 자동화 테스트 작성 (누적 38개) |
 
 이번 검색은 Embedding/Cosine이 아닌 임시 키워드 점수다. 실질적인 장기 Reflection/Planning은 미구현. [Memory 구현](../../04_Development/08_Memory-Observation-Implementation.md).
+
+## 70. Phase 2 Reflection / Planning MVP (2026-11-11)
+
+| 경로 (Source/WAINSystem 기준) | 책임 |
+|---|---|
+| `Public/WAINMemoryReasoning.h` | `IWAINMemoryReasoner` 생성기 계약 + Plan Draft |
+| `Private/Memory/WAINMemoryReasoningPreparer.{h,cpp}` | Trigger 평가·Reflection 근거 ID·Plan 생성·Active Plan 게시 준비 |
+| `Public/WAINMemoryTypes.h` | Plan의 Scene/Beat/Goal/Steps/Current Step |
+| `Public/WAINRuntimeTypes.h` | WAIN Snapshot의 `ActivePlanIds`와 Memory Reasoning 실패 코드 |
+| `Private/Memory/WAINMemoryRetriever.cpp` | 확정 Reflection 및 활성 Plan을 다음 Context에 포함 |
+| `Private/Core/WAINStateValidation.cpp` | 근거 ID 방향성·캐릭터 격리·Plan 필드·활성 ID 검증 |
+| `Private/Core/WAINTransactionCoordinator.cpp` | Narrative Evaluate 후 Reasoning Prepare, Final Validate 및 Publish |
+| `Private/Tests/WAINMemoryReasoningTests.cpp` | 11개 신규 Automation Test 코드(누적 49개) |
+
+과거 절의 'Reflection/Planning 미구현'은 당시 이력이다. **실제 AI Reflection, 완전한 Planning은 아직 미구현**. [구현 상세](../../04_Development/09_Memory-Reasoning-Implementation.md).

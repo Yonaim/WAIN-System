@@ -47,6 +47,7 @@
         InvalidProposal,
         UnsupportedMutation,
         MemoryPreparationFailed,
+        MemoryReasoningFailed,
         GamePrepareFailed,
         NarrativeEvaluationFailed,
         FinalValidationFailed,
@@ -116,6 +117,7 @@
     {
         TMap<FName, FWAINCharacterState> Characters;
         TArray<FWAINMemoryRecord>         MemoryStream;
+        TMap<FName, FGuid>                ActivePlanIds;
         FName                            ActiveBeatId;
         int32                            TurnCount = 0;
     };
