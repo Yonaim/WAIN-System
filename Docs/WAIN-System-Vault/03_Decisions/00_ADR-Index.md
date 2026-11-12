@@ -20,3 +20,4 @@
 
 **문서화 원칙:** 새로운 핵심 설계가 승인되면 관련 ADR을 생성·갱신하고 Architecture Contract, Flow, Development 현황을 함께 동기화한다. 아직 결정되지 않은 구현 최적화·타입·예외 복구는 Accepted로 기록하지 않는다.
 
+| [ADR-013](13_ADR-013-Testbed-Sprite-Assets.md) | Host Sprite 경로/Ready 메타데이터/UMG Layered Renderer | **Proposed (Testbed 구현 선택)** |

@@ -106,3 +106,11 @@
 - ManaEmotion을 6D 초기값으로 변경, CH01WorldFacts 신규 추가, CH01Narrative Goal 필드 추가. PNG 원본/경로 보존.
 - `WAIN.Testbed.*` 7개 Editor Automation Tests 코드 작성. Plugin 기존 68개 유지, 실제 UE 5.8 컴파일/실행 미검증.
 - [ADR-012](../03_Decisions/12_ADR-012-Testbed-Content-Bridge.md) Proposed. 실제 Host 문서 [Integration](12_Testbed-Content-Integration.md).
+
+## 2026-11-13 — Host Layered Sprite Renderer and Content Cleanup
+
+- 기존 Testbed 통합 소스를 기준으로 `Content` 폴더, 파츠 PNG 파일명을 구조화했다. 완성 PNG 27개와 배경 10개는 바이트 불변 이동, 미완성 6개는 동일 RGBA Canvas의 완전 투명 PNG.
+- JSON: `basePath = Images/Characters/Mana/Layers`, `path = <part_id>.png`, `ready/note` 메타데이터. Expression/Variant ID는 유지.
+- C++: Host Content Loader에서 파츠·Variant DTO 구성, Renderer에서 UMG 이미지 슬롯과 Texture2D 동기 로드, Commit Response 표정 연동.
+- 테스트: `WAIN.Testbed.Sprite.*` 6개 추가, 총 81개 등록. UBT·PIE 미실행.
+- ADR-013 Proposed. 기존 Plugin/Engineering Standards/Obsidian 설정 불변. [Host 구현 문서](../../../../../Docs/02_Implementation/03_Visual-Asset-System.md).

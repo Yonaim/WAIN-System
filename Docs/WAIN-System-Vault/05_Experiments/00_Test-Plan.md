@@ -124,3 +124,7 @@ A: LLM Only → B: A+Character Agent → C: B+World State Manager → D: C+Narra
 ## 2026-11-12 Host 실제 콘텐츠 테스트 — 코드 작성, UE 미실행
 
 `WAIN.Testbed.Content.LoadAndValidate`, `Content.WorldFactVisibility`, `Runtime.IntroTransition`, `Runtime.ThreeBeatProgress`, `Runtime.ReplayDoesNotAdvance`, `Runtime.UnknownCharacterNoCommit`, `Runtime.ReadonlyFactRejected` 총 7개 Integration Test 코드를 추가했다. 실제 Testbed 프로젝트의 `Content/Data`가 필요하다. Plugin 기존 68개 테스트 코드와 함께 Editor에서 회귀 실행하되 실행 이전에 통과로 기록하지 않는다.
+
+## Host Testbed Sprite Tests — 2026-11-13
+
+`WAIN.Testbed.Sprite.*` 6개: Catalog Path/Count, Default Layer Order, Multiple Overlays, Invalid Variant No Fallback, All PNG Dimensions, Placeholder Metadata. 기존 Plugin 68 + Host Integration 7 + Sprite 6 = **81개 Automation 코드 등록**. UE 5.8 컴파일·실행 미검증. 실제 UMG alpha 합성/렌더 화면은 별도 PIE 수동 검증해야 한다.

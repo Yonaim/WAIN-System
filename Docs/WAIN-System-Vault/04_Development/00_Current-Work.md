@@ -103,3 +103,7 @@
 ## 2026-11-12 — Testbed 콘텐츠 실제 JSON 연동
 
 Host가 Persona/6D Emotion/Expression/Narrative/World Fact를 JSON에서 파싱하고 동기 WAIN Runtime Session을 시작하도록 연결했다. Testbed UI는 Committed Snapshot만 조회하며, 실제 LLM/PNG Layered Renderer는 구현하지 않았다. 새 `WAIN.Testbed.*` 7개 Automation Test 코드를 작성했지만 UE 실행 미검증. [ADR-012](../03_Decisions/12_ADR-012-Testbed-Content-Bridge.md) · [Host 구현](12_Testbed-Content-Integration.md).
+
+## 2026-11-13 — Host Testbed Sprite Rendering
+
+Host `Content`를 Data/Images/UI/Maps로 정리하고 `Images/Characters/Mana/Layers` 공통 경로, 27개 파츠 파일명 변경, 미완성 6개 투명 Placeholder를 적용했다. `FWAINTestbedLayeredSpriteRenderer`가 확정 Expression/Variant를 UMG에 표시하도록 Host Source에 연결했다. Plugin C++ 핵심 모듈은 변경하지 않는다. 신규 Testbed Automation 6개(전체 코드 81개) 작성, 실제 UE 5.8 빌드·실행 미검증. [ADR-013](../03_Decisions/13_ADR-013-Testbed-Sprite-Assets.md) Proposed.

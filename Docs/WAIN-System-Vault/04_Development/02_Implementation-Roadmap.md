@@ -80,3 +80,9 @@
 - Plugin의 World State/Character/Presentation/Narrative API에 Testbed의 실제 `Content/Data` JSON을 연결하는 Host C++ 코드 작성.
 - **다음:** UE 5.8 빌드/Automation/PIE 검증 후 실 LLM Provider·Structured Output/Prompt 보안 또는 PNG Layered Renderer 개발.
 - 미지원: Unreal Cooked Non-UFS Staging, Reflection/Plan 자동 Reasoner 주입, Memory 저장, 자유 대사 내용 Hard Constraint 검사. [구현 상세](12_Testbed-Content-Integration.md).
+
+## 2026-11-13 — Presentation Sprite Roadmap
+
+- Host Testbed PNG 폴더 분류/작명 및 동일 해상도 자리 표시자, JSON·Loader/Layered Sprite UMG 구현 코드를 작성했다. 실제 Editor/PIE 테스트 전.
+- 현 단계 지원: PNG 파일 로드·확정 Response Expression/Variant 표시. 다음 단계: UE 컴파일·UMG 품질/메모리 검증 → Background 표시 → 패키징/비동기 Texture 최적화 → LLM Provider.
+- 기존 `04_Development/` Presentation 설계 문서의 미구현 표기는 작성 당시 이력이며 현재 범위는 [ADR-013](../03_Decisions/13_ADR-013-Testbed-Sprite-Assets.md)을 따른다.
