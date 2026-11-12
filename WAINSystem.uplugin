@@ -1,0 +1,19 @@
+{
+    "FileVersion": 3,
+    "Version": 1,
+    "VersionName": "0.1.0-mock",
+    "FriendlyName": "WAIN System",
+    "Description": "World-Agent Interactive Narrative System - first transactional runtime slice",
+    "Category": "Narrative",
+    "CreatedBy": "WAIN System",
+    "CanContainContent": false,
+    "IsBetaVersion": true,
+    "Installed": false,
+    "Modules": [
+        {
+            "Name": "WAINSystem",
+            "Type": "Runtime",
+            "LoadingPhase": "Default"
+        }
+    ]
+}

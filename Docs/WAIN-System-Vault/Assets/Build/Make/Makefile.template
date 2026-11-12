@@ -1,0 +1,43 @@
+# C 소규모 프로젝트용 원본 템플릿. Setup 시 {{PROJECT_NAME}}을 치환한다.
+# 표준 빌드 진입점: make / make build / make clean (직접 _compile 실행은 내부 전용).
+.DEFAULT_GOAL := all
+
+PROJECT := {{PROJECT_NAME}}
+CC := cc
+PYTHON ?= python3
+CPPFLAGS ?= -IInclude
+CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -g
+LDFLAGS ?=
+LDLIBS ?=
+
+SOURCES := $(wildcard Source/*.c)
+OBJECTS := $(patsubst Source/%.c,Build/%.o,$(SOURCES))
+TARGET := Build/$(PROJECT)
+
+.PHONY: all build format _compile clean
+all: build
+
+# 1) 포맷 완료 후 2) 별도 make 프로세스로 타임스탬프를 다시 평가한다.
+# 이렇게 해야 포맷으로 바뀐 소스도 동일 빌드에서 다시 컴파일된다.
+build:
+	$(PYTHON) Tools/format_before_build.py --root . --source Source --source Include
+	$(MAKE) --no-print-directory _compile
+
+format:
+	$(PYTHON) Tools/format_before_build.py --root . --source Source --source Include
+
+_compile: $(TARGET)
+
+$(TARGET): $(OBJECTS) | Build
+	$(CC) $(LDFLAGS) -o "$@" $(OBJECTS) $(LDLIBS)
+
+Build/%.o: Source/%.c | Build
+	$(CC) $(CPPFLAGS) $(CFLAGS) -MMD -MP -c "$<" -o "$@"
+
+Build:
+	mkdir -p Build
+
+-include $(OBJECTS:.o=.d)
+
+clean:
+	rm -rf Build

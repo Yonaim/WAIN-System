@@ -1,0 +1,29 @@
+# 일반 C++ 프로젝트 시작 템플릿. 기존 CMakeLists.txt가 있다면 교체하지 말고 필요한 부분만 병합.
+cmake_minimum_required(VERSION 3.21)
+project({{PROJECT_NAME}} LANGUAGES CXX)
+
+set(CMAKE_CXX_STANDARD {{CPP_STANDARD}})
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+find_package(Python3 REQUIRED COMPONENTS Interpreter)
+
+add_executable(${PROJECT_NAME}
+    Source/Main.cpp
+)
+
+# 출력 없는 custom target: 실제 빌드 요청 때마다 실행한다.
+add_custom_target(FormatBeforeBuild
+    COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/Tools/format_before_build.py"
+            --root "${PROJECT_SOURCE_DIR}" --source Source --source Include
+    WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}"
+    COMMENT "clang-format then Region indentation before compilation"
+    VERBATIM
+)
+
+# 이 의존성이 없으면 ALL 빌드에서 포맷과 컴파일이 병렬로 진행될 수 있다.
+add_dependencies(${PROJECT_NAME} FormatBeforeBuild)
+
+# Setup 에이전트: add_library/add_executable로 만든 다른 프로젝트 소유 타깃에도
+# add_dependencies(ActualTarget FormatBeforeBuild)를 추가한다.
+# 외부 SDK 타깃·생성 소스·UnrealBuildTool 프로젝트에는 적용하지 않는다.
