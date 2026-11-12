@@ -104,3 +104,14 @@
 | `Private/Tests/WAINMemoryReasoningTests.cpp` | 11개 신규 Automation Test 코드(누적 49개) |
 
 과거 절의 'Reflection/Planning 미구현'은 당시 이력이다. **실제 AI Reflection, 완전한 Planning은 아직 미구현**. [구현 상세](../../04_Development/09_Memory-Reasoning-Implementation.md).
+
+## 80. Phase 2 Narrative Beat Graph MVP (2026-11-11)
+
+- `Public/WAINNarrativeTypes.h`: 수치 조건·Chapter/Sequence/Beat·Hard Rule·Context·Host Fact Reader 계약.
+- `Public/WAINBeatGraphNarrativeEvaluator.h`, `Private/Narrative/WAINBeatGraphNarrativeEvaluator.cpp`: Graph 초기 검사, 활성 Goal 읽기, Hard Rule/Completion/Transition 평가.
+- `Public/WAINCharacterContext.h`, `Public/WAINInterfaces.h`, `Private/Core/WAINInteractionProcessor.cpp`: Narrative Context 전달 및 초기 검증 훅.
+- `Public/WAINRuntimeTypes.h`, `Private/Core/WAINStateValidation.cpp`: Prepared BeatHistory와 범위 검증.
+- `Private/Testing/WAINMapGameAdapter.{h,cpp}`: 결정론적 Mock Game Fact Reader.
+- `Private/Tests/WAINNarrativeTests.cpp`: 10개 신규 Unreal Automation Tests (총 59개 작성, Unreal 미실행).
+
+[ADR-010](../../03_Decisions/10_ADR-010-Deterministic-Beat-Graph-MVP.md) · [구현 상세](../../04_Development/10_Narrative-Graph-Implementation.md).

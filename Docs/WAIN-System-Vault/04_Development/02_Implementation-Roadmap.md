@@ -61,3 +61,10 @@
 - 단계 6 **MVP 일부 확장:** Reflection/Plan에 대한 주입형 결정론적 Reasoner 경로와 Scene/Beat 기반 Plan 유효성 검사가 소스에 포함됐다. 실 LLM 문장 생성, Embedding, Goal/World 변화 감지, Step 진행, 지속 저장은 **미구현**.
 - Reflection/Plan 생성은 Prepared Snapshot에 포함되어 Commit 전 실패 시 원상태가 유지된다. [ADR-009](../03_Decisions/09_ADR-009-Reflection-Planning-MVP.md) Proposed.
 - 신규 Automation Test 11개 작성, 전체 49개. UE 5.8 빌드·실행 검증 필요. 이후 단계 7의 Narrative Graph/Goal·Constraint 엔진으로 진행한다.
+
+## 2026-11-11 Phase 2 Narrative Graph 진행 상태
+
+- 단계 7: 구조화 정수 조건 기반 Beat Graph, 현재 Goal Context, Prepared 전이/Hard Rule을 **C++로 작성**했다. 기존 한 턴 한 Publish 정책 유지.
+- 신규 테스트 10개 작성(누적 59개). 모든 Phase 2 변경분의 실제 Unreal 빌드·Automation 실행은 사용자 환경에서 확인해야 한다.
+- **다음:** World State Manager의 Game Fact Query/Schema와 실제 Testbed 콘텐츠 로딩을 연결한 뒤 LLM/Response Validation을 확장. 완전한 Narrative Authoring 및 자유 형식 텍스트 Hard Constraint 검증은 차후 단계.
+- [Narrative 구현](10_Narrative-Graph-Implementation.md) · [ADR-010](../03_Decisions/10_ADR-010-Deterministic-Beat-Graph-MVP.md).

@@ -40,6 +40,11 @@
             return false;
         }
 
+        if (!NarrativeEvaluator->ValidateInitialState(InitialWAIN, *InitialGame, OutError))
+        {
+            return false;
+        }
+
         return StateStore.Initialize(InitialWAIN, MoveTemp(InitialGame), OutError);
     }
 
@@ -109,6 +114,12 @@
         {
             return Fail(Request, EWAINInteractionError::ContextPreparationFailed, Error);
         }
+
+        if (!NarrativeEvaluator->BuildContext(*Current, Context.Narrative, Error))
+        {
+            return Fail(Request, EWAINInteractionError::ContextPreparationFailed, Error);
+        }
+        Context.bHasNarrativeContext = !Context.Narrative.BeatId.IsNone();
 
         FWAINResponseProposal Proposal;
         if (!ProposalProvider->GenerateWithContext(Request, *Current, Context, Proposal, Error))

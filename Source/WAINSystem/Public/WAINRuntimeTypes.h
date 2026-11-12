@@ -113,12 +113,21 @@
         FWAINEmotionState Emotion;
     };
 
+    /** @brief Commit된 턴의 Beat 전이 이력. 이전 Snapshot은 변경되지 않는다. */
+    struct FWAINBeatTransitionRecord
+    {
+        FName FromBeatId;
+        FName ToBeatId;
+        int32 Turn = 0;
+    };
+
     struct FWAINStateSnapshot
     {
         TMap<FName, FWAINCharacterState> Characters;
         TArray<FWAINMemoryRecord>         MemoryStream;
         TMap<FName, FGuid>                ActivePlanIds;
         FName                            ActiveBeatId;
+        TArray<FWAINBeatTransitionRecord> BeatHistory;
         int32                            TurnCount = 0;
     };
 

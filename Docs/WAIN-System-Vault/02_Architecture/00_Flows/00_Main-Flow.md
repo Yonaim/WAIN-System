@@ -63,3 +63,7 @@ flowchart TD
 `Context Preparation`은 **직전 확정 MemoryStream**에서 CharacterId별 Observation을 읽어 `RelevantMemories`에 담는다. `Transaction Preparation`은 Player 입력과 NPC 응답을 **PreparedWAIN.MemoryStream**에 추가한다. 모든 Snapshot 검증 및 Game Prepare 이후 Root Publish에 성공해야만 기록된다. 실패·Replay·타 캐릭터 Context에서는 Memory가 새로 추가/노출되지 않는다.
 
 실제 Embedding 검색, Reflection, Plan, Save/Load, Prompt 직렬화는 아직 구현하지 않았다. [구현 상세](../../04_Development/08_Memory-Observation-Implementation.md).
+
+## Phase 2 Narrative Context + Prepared Beat Evaluation (2026-11-11)
+
+이번 코드에서 `Context Preparation`은 Character/Memory/Presentation 조회 후 `NarrativeEvaluator.BuildContext`로 **현재 활성 Beat 경로의 Goal·Soft Constraint**를 추가한다. Proposal을 만든 후 `NarrativeEvaluator.Evaluate`는 **Prepared WAIN + Prepared Game Snapshot**에서 구조화 Completion/Transition 조건, Chapter/Sequence/Beat Hard Rule을 평가한다. 전이 시 `BeatHistory`도 같은 Prepared Snapshot에 넣는다. Memory Planning은 새 Prepared Beat를 기준으로 재생성 여부를 판단한다. 이 기능은 실제 LLM Text Guard나 Scenario JSON Loader 구현을 의미하지 않는다. [구현 상세](../../04_Development/10_Narrative-Graph-Implementation.md).

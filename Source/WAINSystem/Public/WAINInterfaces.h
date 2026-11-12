@@ -82,7 +82,7 @@
                               FWAINResponseProposal         &OutProposal,
                               FString                       &OutError) const = 0;
 
-        /** @brief Persona 또는 Presentation Catalog가 전달되면 반드시 Override한다. Memory만 존재하는 Legacy Mock 경로는 유지한다. */
+        /** @brief Persona·Presentation·Narrative Context가 전달되면 반드시 Override한다. Memory만 존재하는 Legacy Mock 경로는 유지한다. */
         virtual bool GenerateWithContext(const FWAINInteractionRequest &Request,
                                          const FWAINSessionRoot &Current,
                                          const FWAINCharacterContext &Context,
@@ -90,9 +90,9 @@
                                          FString &OutError) const
         {
             // Persona가 제공됐는데 무시한 채 대화를 생성하지 않도록 명시적으로 실패시킨다.
-            if (Context.bHasPersona || Context.bHasPresentationCatalog)
+            if (Context.bHasPersona || Context.bHasPresentationCatalog || Context.bHasNarrativeContext)
             {
-                OutError = TEXT("Persona 또는 Presentation Catalog를 사용하는 Provider는 GenerateWithContext를 구현해야 합니다.");
+                OutError = TEXT("추가 Context를 사용하는 Provider는 GenerateWithContext를 구현해야 합니다.");
                 return false;
             }
 
@@ -112,6 +112,22 @@
     {
         public:
         virtual ~IWAINNarrativeEvaluator() = default;
+
+        /** @brief 초기 Beat와 Graph 계약의 검증. 레거시 Mock은 기존 동작을 유지한다. */
+        virtual bool ValidateInitialState(const FWAINStateSnapshot &InitialWAIN,
+                                          const IWAINGameStateSnapshot &InitialGame,
+                                          FString &OutError) const
+        {
+            return true;
+        }
+
+        /** @brief Context를 바꾸는 권위 상태 변경을 수행하지 않는다. */
+        virtual bool BuildContext(const FWAINSessionRoot &Current,
+                                  FWAINNarrativeContext &OutContext,
+                                  FString &OutError) const
+        {
+            return true;
+        }
 
         virtual bool Evaluate(const FWAINInteractionRequest &Request,
                               const FWAINSessionRoot        &Current,

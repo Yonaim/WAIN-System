@@ -29,7 +29,7 @@
 #pragma region 01_Map_Game_Adapter
 
     /** @brief 미리 등록된 Key에 한해서만 Set/Add 정수 Mutation을 지원한다. */
-    class FWAINMapGameAdapter final : public IWAINGameSnapshotAdapter
+    class FWAINMapGameAdapter final : public IWAINGameSnapshotAdapter, public IWAINNarrativeGameFactReader
     {
         public:
         explicit FWAINMapGameAdapter(TMap<FName, int32> InInitialValues);
@@ -41,6 +41,10 @@
                                                                  FString                          &OutError) const override;
 
         virtual bool Validate(const IWAINGameStateSnapshot &Prepared, FString &OutError) const override;
+
+        virtual bool ReadInteger(const IWAINGameStateSnapshot &Snapshot,
+                                 FName TargetId,
+                                 int32 &OutValue) const override;
 
         private:
         TMap<FName, int32> InitialValues;

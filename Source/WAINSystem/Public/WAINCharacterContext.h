@@ -8,6 +8,7 @@
 #include "CoreMinimal.h"
 #include "WAINRuntimeTypes.h"
 #include "WAINPresentationCatalog.h"
+#include "WAINNarrativeTypes.h"
 
 // ============================================================
 // 00. Persona Definition
@@ -55,6 +56,8 @@
         FWAINCharacterPersona Persona;
         bool bHasPresentationCatalog = false;
         FWAINPresentationOptions AvailablePresentations;
+        bool bHasNarrativeContext = false;
+        FWAINNarrativeContext Narrative;
     };
 
 #pragma endregion

@@ -110,3 +110,14 @@ Testbed Content JSON의 기존 `schema_version: 1`은 신규 Schema를 자동 �
 - `MemoryPreparationFailed`는 용량·Observation 내용 검증 실패 시 사용하고 전체 No Commit을 보장한다.
 
 [Memory 구현](../../04_Development/08_Memory-Observation-Implementation.md)
+
+## Phase 2 Narrative Graph 자료형 — 코드 작성 (2026-11-11)
+
+- `FWAINNarrativeGraph`: Chapter/Sequence/Beat의 정의 데이터 배열. Host 소유 정의 데이터이며 권위 Run-time State로 복사하지 않는다.
+- `FWAINNarrativeCondition`: `Source=CharacterTrust|TurnCount|GameInteger`, `Comparison=Equal|AtLeast|AtMost`, `TargetId`(GameInteger용), `Value:int32`.
+- `FWAINBeatTransition`: `TargetBeatId`, `Priority`, `Conditions`(AND, 빈 조건 true).
+- `FWAINNarrativeHardRule`: `GuardedGameTargetId`가 이번 턴에 증가할 때 `Prerequisites`(AND)를 Prepared State로 평가.
+- `FWAINStateSnapshot::BeatHistory`: `FromBeatId`, `ToBeatId`, `Turn` 기록, Publish 전까지 변경 없음.
+- `FWAINCharacterContext::Narrative`: 현재 Chapter/Sequence/Beat의 Goal과 SoftConstraints. 데이터 작성자는 아직 공개하면 안 되는 내용을 해당 Goal에 포함하지 않아야 한다.
+
+C++ DTO만 정의했으며 Unreal Reflection/JSON Parser/Blueprint API는 아직 없다. [ADR-010](../../03_Decisions/10_ADR-010-Deterministic-Beat-Graph-MVP.md).

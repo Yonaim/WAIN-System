@@ -33,6 +33,22 @@ namespace WAINStateValidation
             return false;
         }
 
+        if (Snapshot.BeatHistory.Num() > 2048)
+        {
+            OutError = TEXT("Beat 전이 이력 제한을 초과했습니다.");
+            return false;
+        }
+        for (const FWAINBeatTransitionRecord &Transition : Snapshot.BeatHistory)
+        {
+            if (Transition.FromBeatId.IsNone() || Transition.ToBeatId.IsNone() ||
+                Transition.FromBeatId == Transition.ToBeatId || Transition.Turn < 1 ||
+                Transition.Turn > Snapshot.TurnCount)
+            {
+                OutError = TEXT("Beat 전이 이력이 유효하지 않습니다.");
+                return false;
+            }
+        }
+
         return ValidateMemoryStream(Snapshot, OutError);
     }
 

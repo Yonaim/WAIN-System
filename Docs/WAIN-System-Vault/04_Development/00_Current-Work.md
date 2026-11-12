@@ -83,3 +83,11 @@
 - **제한:** 동기 Mock 생성기만 테스트, 실제 LLM·Embedding·계획 Step 진행·Save/Load 없음. 임계값/트리거는 **ADR-009 Proposed**.
 
 [Implementation](09_Memory-Reasoning-Implementation.md) · [ADR-009](../03_Decisions/09_ADR-009-Reflection-Planning-MVP.md).
+
+## Phase 2 Narrative Beat Graph MVP (2026-11-11)
+
+- 신규 `FWAINBeatGraphNarrativeEvaluator`: Chapter/Sequence/Beat 정의 검증, 현재 경로 Goal/Soft Constraint Context, Prepared Trust/TurnCount/Game Integer 기반 Completion/Transition 및 최소 Hard Rule.
+- 전이된 Beat는 `BeatHistory`에 함께 준비하고 기존 StateStore Publish에서만 확정. NoOp Evaluator 및 기존 Mock 경로 유지.
+- `WAIN.Narrative.*` 10개 테스트 코드를 추가해 **누적 59개**. 실제 UE 5.8 빌드 및 테스트 실행 **미검증**.
+- 남은 단계: 실제 Testbed Narrative JSON Loader/Fact Adapter 연동, Goal 기반 Plan 개선, World State Manager 및 LLM Provider, Save/Load.
+- [ADR-010](../03_Decisions/10_ADR-010-Deterministic-Beat-Graph-MVP.md) `Proposed` · [Implementation](10_Narrative-Graph-Implementation.md).

@@ -109,3 +109,32 @@
     }
 
 #pragma endregion
+
+// ============================================================
+// 03. Read-Only Narrative Facts
+// ============================================================
+#pragma region 03_Read_Only_Narrative_Facts
+
+    // 서사 조건식이 Game Snapshot을 조회하더라도 권위 State를 수정하지 않는다.
+
+    bool FWAINMapGameAdapter::ReadInteger(const IWAINGameStateSnapshot &Snapshot,
+                                         const FName TargetId,
+                                         int32 &OutValue) const
+    {
+        if (Snapshot.GetKind() != FWAINMapGameSnapshot().GetKind())
+        {
+            return false;
+        }
+
+        const FWAINMapGameSnapshot &State = static_cast<const FWAINMapGameSnapshot &>(Snapshot);
+        const int32 *Value = State.Values.Find(TargetId);
+        if (!Value)
+        {
+            return false;
+        }
+
+        OutValue = *Value;
+        return true;
+    }
+
+#pragma endregion

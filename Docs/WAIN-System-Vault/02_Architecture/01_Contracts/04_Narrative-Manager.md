@@ -26,3 +26,9 @@
 ## 미결정
 
 Transition Priority 정렬, 구조화 조건 언어, 실패 시 재평가, Parent 제약 합성 및 Narrative Authoring 도구.
+
+## Phase 2 Beat Graph MVP — 현재 작성된 코드 (2026-11-11)
+
+최소 결정론적 Evaluator: `Public/WAINNarrativeTypes.h`, `Public/WAINBeatGraphNarrativeEvaluator.h`, `Private/Narrative/WAINBeatGraphNarrativeEvaluator.cpp`. Chapter/Sequence/Beat 정의와 ID 참조 검증, 현재 활성 부모 Goal/Soft Constraint의 읽기 전용 Context, `Trust/TurnCount/GameInteger` 조건 AND, 단일 최고 Priority Transition, Prepared `BeatHistory` 기록을 지원한다.
+
+Game Fact는 `IWAINNarrativeGameFactReader`가 읽는다. MVP Hard Rule은 **지정된 Game Integer 증가 시** 준비된 State의 선행 조건을 요구한다. 자연어 텍스트 검열·행동의 의미 검증은 **없으므로**, 비밀 누설 방지 전체를 보장한다고 해석해서는 안 된다. 기존 `NoOp` 구현은 그대로 지원한다. JSON Loader·저장/복원·감정 조건은 미지원. [ADR-010](../../03_Decisions/10_ADR-010-Deterministic-Beat-Graph-MVP.md) · [Implementation](../../04_Development/10_Narrative-Graph-Implementation.md).

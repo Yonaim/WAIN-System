@@ -106,3 +106,11 @@ A: LLM Only → B: A+Character Agent → C: B+World State Manager → D: C+Narra
 신규 11개 테스트: `WAIN.MemoryReasoning.PlanCreated`, `ReflectionTrigger`, `ContextIncludesDerivedMemory`, `SceneChangeReplans`, `BeatChangeReplans`, `CharacterIsolation`, `InvalidPlanNoCommit`, `InvalidReflectionNoCommit`, `GameFailureSkipsReasoning`, `ReplayDoesNotRegenerate`, `InvalidActivePlanRejected`.
 
 **누적 테스트 코드 49개(기존 38 + 신규 11).** Reflection 출처·Plan Trigger·현재 Snapshot 불변·Provider/Adapter 실패를 검증하도록 작성. 실제 Unreal Automation 실행 및 결과는 기록되지 않았다. 이후 의미적 Reflection 품질, LLM 결과 구조/보안, 과도한 생성·장기 Memory 부하 테스트를 추가한다.
+
+## Phase 2 Narrative MVP Automation Tests — 코드 작성, Unreal 실행 전 (2026-11-11)
+
+10개: `WAIN.Narrative.ContextGoals`, `PreparedTransition`, `IncompleteBeat`, `TurnProgress`, `InvalidGraph`, `HardRuleReject`, `HardRulePreparedTrust`, `PriorityTieReject`, `UnknownFactReject`, `ReplayNoDoubleTransition`.
+
+검증 대상: 읽기 전용 Chapter/Sequence/Beat Context, Prepared WAIN/Game 값으로 조건 검사, 높은 Priority 선택, 턴당 최대 한 Beat 전이, 정의 오류·누락 Fact·Hard Rule 거절 시 **No Commit**, 중복 TurnId 무중복.
+
+**현재 누적 59개 Automation Test 코드 작성 상태. Unreal 5.8 컴파일/실행 결과는 아직 없다.** 회귀 실행은 기존 49개를 포함해야 한다. Soft Constraint 자연어 위반 탐지·실제 Scenario JSON Loader와 Host 연동 테스트는 아직 작성하지 않았다.

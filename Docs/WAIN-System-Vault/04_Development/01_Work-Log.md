@@ -84,3 +84,10 @@
 - 문서: [ADR-009](../03_Decisions/09_ADR-009-Reflection-Planning-MVP.md) Proposed. 표준 Obsidian/VS Code/테마 설정과 Host Testbed 코드는 변경 없음.
 
 [구현 상세](09_Memory-Reasoning-Implementation.md).
+
+## 2026-11-11 — Beat Graph MVP 작성
+
+- 직전 Reflection/Planning Plugin Source/Vault를 기준으로 신규 Narrative DTO·Evaluator·Fact Reader·준비 중 BeatHistory 및 Context 연결.
+- Graph 정의 오류, Prepared Trust/Game Fact에 의한 전이, Hard Rule 실패 No Commit, 동일 우선순위 충돌, 재전송 무중복 등 `WAIN.Narrative.*` 테스트 10개 작성(총 59개 코드 등록).
+- 기존 StateStore Publish·Transaction Coordinator의 단계 순서는 보존. 코드 포맷 체인은 개발 환경에서 `clang-format → indent_regions.py` 순서로 실행하는 것으로 가정하며 여기서는 UE 컴파일/Automation 실행 미검증.
+- 새 MVP 정책은 [ADR-010](../03_Decisions/10_ADR-010-Deterministic-Beat-Graph-MVP.md)에 `Proposed`로 작성.
