@@ -10,6 +10,7 @@
 #include "CoreMinimal.h"
 #include "Character/WAINCharacterContextBuilder.h"
 #include "WAINInterfaces.h"
+#include "WAINWorldStateManager.h"
 
 class FWAINInteractionProcessor final
 {
@@ -24,7 +25,8 @@ class FWAINInteractionProcessor final
                               TSharedRef<IWAINNarrativeEvaluator>  InNarrativeEvaluator,
                               TSharedPtr<const IWAINPersonaSource> InPersonaSource = nullptr,
                               TSharedPtr<const IWAINPresentationCatalog> InPresentationCatalog = nullptr,
-                              TSharedPtr<const IWAINMemoryReasoner> InMemoryReasoner = nullptr);
+                              TSharedPtr<const IWAINMemoryReasoner> InMemoryReasoner = nullptr,
+                              TSharedPtr<const FWAINWorldStateManager> InWorldManager = nullptr);
 
     bool StartSession(const FWAINStateSnapshot &InitialWAIN, FString &OutError);
 
@@ -68,6 +70,7 @@ class FWAINInteractionProcessor final
     TSharedPtr<const IWAINPersonaSource> PersonaSource;
     TSharedPtr<const IWAINPresentationCatalog> PresentationCatalog;
     TSharedPtr<const IWAINMemoryReasoner> MemoryReasoner;
+    TSharedPtr<const FWAINWorldStateManager> WorldManager;
     FWAINCharacterContextBuilder ContextBuilder;
 
     FWAINStateStore             StateStore;

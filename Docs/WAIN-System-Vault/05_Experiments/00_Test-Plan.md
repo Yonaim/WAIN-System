@@ -114,3 +114,9 @@ A: LLM Only → B: A+Character Agent → C: B+World State Manager → D: C+Narra
 검증 대상: 읽기 전용 Chapter/Sequence/Beat Context, Prepared WAIN/Game 값으로 조건 검사, 높은 Priority 선택, 턴당 최대 한 Beat 전이, 정의 오류·누락 Fact·Hard Rule 거절 시 **No Commit**, 중복 TurnId 무중복.
 
 **현재 누적 59개 Automation Test 코드 작성 상태. Unreal 5.8 컴파일/실행 결과는 아직 없다.** 회귀 실행은 기존 49개를 포함해야 한다. Soft Constraint 자연어 위반 탐지·실제 Scenario JSON Loader와 Host 연동 테스트는 아직 작성하지 않았다.
+
+## Phase 2 World State Manager — 테스트 작성, UE 실행 전 (2026-11-12)
+
+신규 9개: `WAIN.World.VisibleContext`, `MutationCommit`, `ReadOnlyReject`, `BoundsReject`, `UnregisteredKeyReject`, `DuplicateSchemaReject`, `InvalidInitialReject`, `PreparedDriftReject`, `ReplayNoDoubleCommit`.
+
+의도된 검증: 비공개 Key의 Context 제외, Schema 권한 및 범위, 연속 Mutation, 초기 Schema 오류, Game Adapter가 의도치 않게 변경한 Prepared 값 차단, 원자적 No Commit, 재전송 중복 방지. **누적 68개 테스트 코드 등록이 실제 UE 컴파일·테스트 성공을 의미하지 않는다.**

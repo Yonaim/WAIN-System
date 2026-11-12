@@ -9,6 +9,7 @@
 #include "WAINRuntimeTypes.h"
 #include "WAINPresentationCatalog.h"
 #include "WAINNarrativeTypes.h"
+#include "WAINWorldTypes.h"
 
 // ============================================================
 // 00. Persona Definition
@@ -58,6 +59,8 @@
         FWAINPresentationOptions AvailablePresentations;
         bool bHasNarrativeContext = false;
         FWAINNarrativeContext Narrative;
+        bool bHasWorldContext = false;
+        FWAINWorldContext World;
     };
 
 #pragma endregion

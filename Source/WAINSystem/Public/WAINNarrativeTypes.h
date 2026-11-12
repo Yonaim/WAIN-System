@@ -6,6 +6,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "WAINWorldTypes.h"
 
 class IWAINGameStateSnapshot;
 
@@ -46,16 +47,8 @@ class IWAINGameStateSnapshot;
         TArray<FWAINNarrativeCondition> Prerequisites;
     };
 
-    /** @brief Host Game의 불변 Prepared Snapshot에서 조건용 숫자만 읽는다. */
-    class IWAINNarrativeGameFactReader
-    {
-        public:
-        virtual ~IWAINNarrativeGameFactReader() = default;
-
-        virtual bool ReadInteger(const IWAINGameStateSnapshot &Snapshot,
-                                 FName TargetId,
-                                 int32 &OutValue) const = 0;
-    };
+    /** @brief 기존 Narrative Reader의 계약을 공통 World Fact Reader와 호환시킨다. */
+    using IWAINNarrativeGameFactReader = IWAINWorldFactReader;
 
 #pragma endregion
 

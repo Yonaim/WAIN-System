@@ -91,3 +91,10 @@
 - Graph 정의 오류, Prepared Trust/Game Fact에 의한 전이, Hard Rule 실패 No Commit, 동일 우선순위 충돌, 재전송 무중복 등 `WAIN.Narrative.*` 테스트 10개 작성(총 59개 코드 등록).
 - 기존 StateStore Publish·Transaction Coordinator의 단계 순서는 보존. 코드 포맷 체인은 개발 환경에서 `clang-format → indent_regions.py` 순서로 실행하는 것으로 가정하며 여기서는 UE 컴파일/Automation 실행 미검증.
 - 새 MVP 정책은 [ADR-010](../03_Decisions/10_ADR-010-Deterministic-Beat-Graph-MVP.md)에 `Proposed`로 작성.
+
+## 2026-11-12 — World State Manager & Game Adapter 검증 경계
+
+- 직전 Narrative Graph 전체 Plugin Source/Vault의 코드에 World Fact 관리 계층 추가.
+- Reader 공통화(`IWAINNarrativeGameFactReader` 별칭), World Context 필터링, Schema 기반 Mutation/Prepared State 검증, 선택적 Manager 주입으로 기존 Mock 호환.
+- 테스트 `WAIN.World.*` 9개 작성(누적 68개 등록). Region·코드 주석·문서·ZIP 검증, UE 빌드/Automation 실행 미검증.
+- ADR-011 Proposed 기록, 기존 ADR·Engineering Standards·Obsidian 설정 유지. [구현 상세](11_World-State-Manager-Implementation.md).

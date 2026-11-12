@@ -18,7 +18,8 @@
                                              FString                             &OutError,
                                              TSharedPtr<const IWAINPersonaSource> PersonaSource,
                                              TSharedPtr<const IWAINPresentationCatalog> PresentationCatalog,
-                                             TSharedPtr<const IWAINMemoryReasoner> MemoryReasoner)
+                                             TSharedPtr<const IWAINMemoryReasoner> MemoryReasoner,
+                                             TSharedPtr<const FWAINWorldStateManager> WorldManager)
     {
         check(IsInGameThread());
 
@@ -34,7 +35,8 @@
                                                   MoveTemp(NarrativeEvaluator),
                                                   MoveTemp(PersonaSource),
                                                   MoveTemp(PresentationCatalog),
-                                                  MoveTemp(MemoryReasoner));
+                                                  MoveTemp(MemoryReasoner),
+                                                  MoveTemp(WorldManager));
 
         if (!NextProcessor->StartSession(InitialWAIN, OutError))
         {

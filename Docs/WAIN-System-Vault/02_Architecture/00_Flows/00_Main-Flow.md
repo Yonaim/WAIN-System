@@ -67,3 +67,9 @@ flowchart TD
 ## Phase 2 Narrative Context + Prepared Beat Evaluation (2026-11-11)
 
 이번 코드에서 `Context Preparation`은 Character/Memory/Presentation 조회 후 `NarrativeEvaluator.BuildContext`로 **현재 활성 Beat 경로의 Goal·Soft Constraint**를 추가한다. Proposal을 만든 후 `NarrativeEvaluator.Evaluate`는 **Prepared WAIN + Prepared Game Snapshot**에서 구조화 Completion/Transition 조건, Chapter/Sequence/Beat Hard Rule을 평가한다. 전이 시 `BeatHistory`도 같은 Prepared Snapshot에 넣는다. Memory Planning은 새 Prepared Beat를 기준으로 재생성 여부를 판단한다. 이 기능은 실제 LLM Text Guard나 Scenario JSON Loader 구현을 의미하지 않는다. [구현 상세](../../04_Development/10_Narrative-Graph-Implementation.md).
+
+## Phase 2 World Manager Integration (2026-11-12)
+
+Current `Game Snapshot`을 공통 `IWAINWorldFactReader`로 읽는다. Context Preparation에서 Schema가 공개한 Fact만 Provider에게 제공하며, Proposal 생성 후 World State Manager가 Game Mutation 권한/범위를 검사한다. Game Adapter가 새로운 Prepared Snapshot을 반환하면 실제 값 전체를 다시 대조한 뒤 Narrative 평가와 기존 Publish 단계로 진행한다. **현재 Manager는 Game-owned int32 상태만 다루며, 실제 Host JSON 파싱과 Game Actor의 Apply는 포함하지 않는다.**
+
+[World State 구현](../../04_Development/11_World-State-Manager-Implementation.md).

@@ -40,7 +40,8 @@
                                                             const IWAINGameSnapshotAdapter &GameAdapter,
                                                             const IWAINNarrativeEvaluator  &NarrativeEvaluator,
                                                             const FWAINPresentationOptions *AvailablePresentations,
-                                                            const IWAINMemoryReasoner *MemoryReasoner) const
+                                                            const IWAINMemoryReasoner *MemoryReasoner,
+                                                            const FWAINWorldStateManager *WorldManager) const
     {
         check(IsInGameThread());
 
@@ -64,9 +65,18 @@
         }
 
         const TArray<FWAINStateMutation> GameMutations = CollectGameMutations(Proposal);
+        if (WorldManager && !WorldManager->ValidateMutations(*Current->Game, GameMutations, Error))
+        {
+            return WAINTransaction::Fail(EWAINInteractionError::InvalidProposal, Error);
+        }
 
         TSharedPtr<const IWAINGameStateSnapshot> PreparedGame = GameAdapter.Prepare(*Current->Game, GameMutations, Error);
         if (!PreparedGame.IsValid())
+        {
+            return WAINTransaction::Fail(EWAINInteractionError::GamePrepareFailed, Error);
+        }
+
+        if (WorldManager && !WorldManager->ValidatePrepared(*Current->Game, *PreparedGame, GameMutations, Error))
         {
             return WAINTransaction::Fail(EWAINInteractionError::GamePrepareFailed, Error);
         }

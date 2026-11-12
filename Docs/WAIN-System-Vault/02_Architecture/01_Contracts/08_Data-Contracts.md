@@ -121,3 +121,9 @@ Testbed Content JSON의 기존 `schema_version: 1`은 신규 Schema를 자동 �
 - `FWAINCharacterContext::Narrative`: 현재 Chapter/Sequence/Beat의 Goal과 SoftConstraints. 데이터 작성자는 아직 공개하면 안 되는 내용을 해당 Goal에 포함하지 않아야 한다.
 
 C++ DTO만 정의했으며 Unreal Reflection/JSON Parser/Blueprint API는 아직 없다. [ADR-010](../../03_Decisions/10_ADR-010-Deterministic-Beat-Graph-MVP.md).
+
+## Phase 2 World Fact Schema — 코드 작성 (2026-11-12)
+
+`FWAINWorldFactDefinition`: `Key`, `MinValue`, `MaxValue`, `bExposeToAgent`, `bWritableByProposal`; 현재 데이터 타입은 `int32` 단일. `FWAINWorldFactValue`: `Key`, `Value`; `FWAINWorldContext.VisibleFacts`: Host가 공개를 승인한 Key/Value 쌍. `IWAINWorldFactReader.ReadInteger()`는 Host의 Current 또는 Prepared Snapshot에서 값을 읽는다. 이 Schema는 **값을 저장하는 State가 아니며**, Game 정본은 `IWAINGameStateSnapshot`에 남는다.
+
+[World State 구현](../../04_Development/11_World-State-Manager-Implementation.md) · [ADR-011](../../03_Decisions/11_ADR-011-World-Fact-Schema-and-Prepared-Validation.md).

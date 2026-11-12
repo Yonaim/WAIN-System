@@ -115,3 +115,13 @@
 - `Private/Tests/WAINNarrativeTests.cpp`: 10개 신규 Unreal Automation Tests (총 59개 작성, Unreal 미실행).
 
 [ADR-010](../../03_Decisions/10_ADR-010-Deterministic-Beat-Graph-MVP.md) · [구현 상세](../../04_Development/10_Narrative-Graph-Implementation.md).
+
+## 90. Phase 2 World State Manager MVP (2026-11-12)
+
+- `Public/WAINWorldTypes.h`: 공통 Host World Reader, Schema와 공개 Context.
+- `Public/WAINWorldStateManager.h` 및 `Private/World/WAINWorldStateManager.cpp`: Schema/초기 상태 확인, 공개 Context, 순차 Mutation/Prepared Game 대조.
+- `Public/WAINNarrativeTypes.h`: Narrative Fact Reader를 공통 World Reader 별칭으로 제공.
+- `Private/Core/WAINInteractionProcessor.*`, `Private/Core/WAINTransactionCoordinator.*`: World Context와 Prepare 전후의 Validation.
+- `Private/Tests/WAINWorldStateTests.cpp`: 신규 9개 자동화 테스트 코드, 누적 68개(UE 미실행).
+
+[구현 상세](../../04_Development/11_World-State-Manager-Implementation.md).

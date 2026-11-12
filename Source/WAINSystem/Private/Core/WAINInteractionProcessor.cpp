@@ -15,13 +15,15 @@
                                                          TSharedRef<IWAINNarrativeEvaluator>  InNarrativeEvaluator,
                                                          TSharedPtr<const IWAINPersonaSource> InPersonaSource,
                                                          TSharedPtr<const IWAINPresentationCatalog> InPresentationCatalog,
-                                                         TSharedPtr<const IWAINMemoryReasoner> InMemoryReasoner)
+                                                         TSharedPtr<const IWAINMemoryReasoner> InMemoryReasoner,
+                                                         TSharedPtr<const FWAINWorldStateManager> InWorldManager)
         : GameAdapter(MoveTemp(InGameAdapter)),
           ProposalProvider(MoveTemp(InProposalProvider)),
           NarrativeEvaluator(MoveTemp(InNarrativeEvaluator)),
           PersonaSource(MoveTemp(InPersonaSource)),
           PresentationCatalog(MoveTemp(InPresentationCatalog)),
-          MemoryReasoner(MoveTemp(InMemoryReasoner))
+          MemoryReasoner(MoveTemp(InMemoryReasoner)),
+          WorldManager(MoveTemp(InWorldManager))
     {
     }
 
@@ -36,6 +38,11 @@
         }
 
         if (!GameAdapter->Validate(*InitialGame, OutError))
+        {
+            return false;
+        }
+
+        if (WorldManager.IsValid() && !WorldManager->ValidateInitial(*InitialGame, OutError))
         {
             return false;
         }
@@ -121,6 +128,15 @@
         }
         Context.bHasNarrativeContext = !Context.Narrative.BeatId.IsNone();
 
+        if (WorldManager.IsValid())
+        {
+            if (!WorldManager->BuildContext(*Current->Game, Context.World, Error))
+            {
+                return Fail(Request, EWAINInteractionError::ContextPreparationFailed, Error);
+            }
+            Context.bHasWorldContext = true;
+        }
+
         FWAINResponseProposal Proposal;
         if (!ProposalProvider->GenerateWithContext(Request, *Current, Context, Proposal, Error))
         {
@@ -130,7 +146,7 @@
         const FWAINCommitOutcome Commit =
             Coordinator.Execute(Request, Proposal, StateStore, *GameAdapter, *NarrativeEvaluator,
                                 Context.bHasPresentationCatalog ? &Context.AvailablePresentations : nullptr,
-                                MemoryReasoner.Get());
+                                MemoryReasoner.Get(), WorldManager.Get());
         if (!Commit.Succeeded())
         {
             return Fail(Request, Commit.Error, Commit.Message);

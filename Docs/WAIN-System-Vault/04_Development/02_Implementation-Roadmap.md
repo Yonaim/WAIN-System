@@ -68,3 +68,9 @@
 - 신규 테스트 10개 작성(누적 59개). 모든 Phase 2 변경분의 실제 Unreal 빌드·Automation 실행은 사용자 환경에서 확인해야 한다.
 - **다음:** World State Manager의 Game Fact Query/Schema와 실제 Testbed 콘텐츠 로딩을 연결한 뒤 LLM/Response Validation을 확장. 완전한 Narrative Authoring 및 자유 형식 텍스트 Hard Constraint 검증은 차후 단계.
 - [Narrative 구현](10_Narrative-Graph-Implementation.md) · [ADR-010](../03_Decisions/10_ADR-010-Deterministic-Beat-Graph-MVP.md).
+
+## 2026-11-12 Phase 2 World State 진행
+
+- Game-owned 정수 Schema + 공개 Context + Mutation/Prepared Game 검증의 코드가 작성되었다.
+- **남은 작업:** Testbed 실제 콘텐츠 Loader, Game Flag/Quest 등 타입 확장, WAIN-owned World Facts, LLM Context serialization, 실 UE 5.8 컴파일·테스트 및 시나리오 기반 통합 검증.
+- 자동화 테스트 누적 68개 코드 등록(실행 미확인). [World Implementation](11_World-State-Manager-Implementation.md).

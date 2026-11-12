@@ -91,3 +91,11 @@
 - `WAIN.Narrative.*` 10개 테스트 코드를 추가해 **누적 59개**. 실제 UE 5.8 빌드 및 테스트 실행 **미검증**.
 - 남은 단계: 실제 Testbed Narrative JSON Loader/Fact Adapter 연동, Goal 기반 Plan 개선, World State Manager 및 LLM Provider, Save/Load.
 - [ADR-010](../03_Decisions/10_ADR-010-Deterministic-Beat-Graph-MVP.md) `Proposed` · [Implementation](10_Narrative-Graph-Implementation.md).
+
+## Phase 2 World State Manager MVP (2026-11-12)
+
+- 기준: 최신 사용자 제공 `WAINSystem-Phase2-Narrative-Graph-Plugin-and-Vault(1).zip`.
+- C++ 코드 작성: World Fact Schema/Reader, 공개 Context, 제안의 쓰기권한·수치 범위, 실제 Prepared Game Snapshot 값 대조.
+- `WAIN.World.*` 테스트 9개 추가, **누적 68개 Automation Test 등록**; 실제 UE 5.8 빌드·실행은 미검증.
+- Host Testbed 콘텐츠/JSON, WAIN 소유 별도 World Store, Obsidian/VS Code 설정 및 Engineering Standards는 수정하지 않음.
+- [ADR-011](../03_Decisions/11_ADR-011-World-Fact-Schema-and-Prepared-Validation.md) Proposed · [Implementation](11_World-State-Manager-Implementation.md).

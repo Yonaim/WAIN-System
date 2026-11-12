@@ -22,3 +22,13 @@
 `Key`, `ValueType`, `Owner`, `Default`, `Constraints`, `Mutability`, `Visibility`. 실제 USTRUCT 및 직렬화는 후속 설계.
 
 [Commit Contract](05_Response-Validation-Commit.md) · [Data Contracts](08_Data-Contracts.md)
+
+## Phase 2 World State Manager MVP — 구현 이력 (2026-11-12)
+
+이 문서 상단의 `Adapter 미구현 / API 미확정`은 **최초 설계 단계의 설명**이다. 현재는 `FWAINWorldStateManager`를 추가하여 공개 Context 구성, Game Mutation 범위·쓰기 권한 검사, Adapter Prepared 결과 검증을 C++로 작성했다. 정수 Game Facts만 지원하고 Host Game Snapshot은 여전히 유일한 정본이다.
+
+- `IWAINWorldFactReader`는 `IWAINNarrativeGameFactReader`의 공통 원형이고 실제 값은 Host Snapshot에서만 조회한다.
+- `FWAINWorldFactDefinition`의 `bExposeToAgent`/`bWritableByProposal`은 별도 권한이다. 공개하지 않는 Key는 Context에 포함하지 않는다.
+- `FWAINWorldStateManager`는 Game Adapter 외부의 WAIN-owned World Store를 아직 구현하지 않았다.
+- **주의:** Provider에게 C++ `Current.Game` 객체가 전달되므로 `bExposeToAgent`는 보안 샌드박스가 아니며, 실제 LLM으로 전달할 자료만 선별하는 기준이다.
+- [ADR-011](../../03_Decisions/11_ADR-011-World-Fact-Schema-and-Prepared-Validation.md) · [Implementation](../../04_Development/11_World-State-Manager-Implementation.md).
