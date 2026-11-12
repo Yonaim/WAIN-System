@@ -66,3 +66,10 @@
 - **미구현:** Host JSON Loader, PNG 연출, 비동기·LLM, Memory·World/Beat 조건식, Catalog Revision 재확인.
 
 [ADR-002](../03_Decisions/02_ADR-002-Emotion-Expression.md) · [구현 문서](07_Presentation-Catalog-Implementation.md)
+
+## Phase 2 Memory Observation (2026-11-11)
+
+- 통합 Snapshot MemoryStream과 Observation Writer/Retriever, Character Context 연결을 코드로 추가.
+- 실제 UE 컴파일/Automation 통과 미검증. 확정된 구현 완료로 표시하지 않는다.
+- 다음 작업: Unreal 실행 검증 후 Embedding/Reflection/Planning, Host Adapter 및 Narrative 규칙 순차 확장.
+- [구현 계약](08_Memory-Observation-Implementation.md) · [설계 검토 ADR](../03_Decisions/08_ADR-008-Transactional-Observations.md)

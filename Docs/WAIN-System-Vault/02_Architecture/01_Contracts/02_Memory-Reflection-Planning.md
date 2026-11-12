@@ -23,3 +23,9 @@ Reflection은 근거 Observation/Reflection의 ID를 참조하여 **기억 간 �
 ## 시험 항목
 
 기억 출처 참조 유지, 잘못된 ID 거부, 관련성/최근성/중요도 변화 시 랭킹 비교, Trigger 충족 전 Reflection 생략, State 변화 후 Plan 재평가.
+
+## Phase 2 Observation MVP 구현 현황 (2026-11-11)
+
+위 도입부의 '구현 없음'은 기존 설계 단계의 기록이다. 현재 C++에는 **Observation 기록·현재 Snapshot 검색·Character Context 반영**이 추가됐다. Observation은 성공 Transaction에서만 `FWAINStateSnapshot::MemoryStream`에 게시된다. Reflection/Plan은 타입만 예약했고 Embedding 검색은 **미구현**이다.
+
+임시 검색은 공백 단위 단어 포함 여부 + 최근성 + 기본 Importance의 상위 6개이며, **임시 하이퍼파라미터를 최종 설계나 의미 검색으로 오인하면 안 된다**. 저장 한도와 향후 Persist 정책은 [구현 상세](../../04_Development/08_Memory-Observation-Implementation.md) 및 [ADR-008](../../03_Decisions/08_ADR-008-Transactional-Observations.md)을 따른다.

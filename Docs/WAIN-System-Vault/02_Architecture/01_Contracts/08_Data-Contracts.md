@@ -101,3 +101,12 @@ Testbed Content JSON의 기존 `schema_version: 1`은 신규 Schema를 자동 �
 - 기존 예시 JSON은 **구현된 Parser가 아니다**. 실제 Host Catalog Loader·LLM Structured Output Parser·Action/Event 규칙은 후속 구현이다.
 
 [구현 상세](../../04_Development/07_Presentation-Catalog-Implementation.md)
+
+## Phase 2 Unified Memory Snapshot (2026-11-11)
+
+- `FWAINMemoryRecord`: `Id:FGuid`, `CharacterId:FName`, `Type:Observation|Reflection|Plan`, `Speaker:Player|Character|System`, `Content:FString`, `CreatedTurn:int32`, `Importance:float`, `SourceMemoryIds:TArray<FGuid>`, 선택적 `Embedding`, `LastAccessedTurn`.
+- `FWAINStateSnapshot::MemoryStream`이 WAIN-owned **단일 통합 Stream**이다. 현재 코드는 Observation만 자동 작성하며 임베딩·근거 연결/Reflection·Plan·접근 시간 갱신은 미구현이다.
+- `FWAINCharacterContext::RelevantMemories`는 확정 Snapshot에서 검색한 동일 Character의 **읽기 전용 복사본**이다. 이전 Snapshot은 수정하지 않는다.
+- `MemoryPreparationFailed`는 용량·Observation 내용 검증 실패 시 사용하고 전체 No Commit을 보장한다.
+
+[Memory 구현](../../04_Development/08_Memory-Observation-Implementation.md)

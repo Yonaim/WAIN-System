@@ -152,7 +152,7 @@
             return false;
         }
 
-        if ((Request.InputKind == EWAINInputKind::Text && Request.Text.TrimStartAndEnd().IsEmpty()) ||
+        if ((Request.InputKind == EWAINInputKind::Text && (Request.Text.TrimStartAndEnd().IsEmpty() || Request.Text.Len() > 4096)) ||
             (Request.InputKind == EWAINInputKind::Silence && !Request.Text.IsEmpty()))
         {
             OutError = TEXT("Text와 Silence 입력 형식이 일치하지 않습니다.");

@@ -7,6 +7,7 @@
 #include "Core/WAINStateValidation.h"
 #include "Character/WAINCharacterStatePreparer.h"
 #include "Presentation/WAINPresentationValidator.h"
+#include "Memory/WAINMemoryWriter.h"
 
 // ============================================================
 // 00. Commit Result Helper
@@ -54,9 +55,10 @@
         }
 
         FWAINStateSnapshot PreparedWAIN;
-        if (!PrepareWAINState(Request, *Current, Proposal, PreparedWAIN, Error))
+        EWAINInteractionError PreparationError = EWAINInteractionError::UnsupportedMutation;
+        if (!PrepareWAINState(Request, *Current, Proposal, PreparedWAIN, PreparationError, Error))
         {
-            return WAINTransaction::Fail(EWAINInteractionError::UnsupportedMutation, Error);
+            return WAINTransaction::Fail(PreparationError, Error);
         }
 
         const TArray<FWAINStateMutation> GameMutations = CollectGameMutations(Proposal);
@@ -180,6 +182,7 @@
                                                        const FWAINSessionRoot        &Current,
                                                        const FWAINResponseProposal   &Proposal,
                                                        FWAINStateSnapshot            &OutPrepared,
+                                                       EWAINInteractionError         &OutErrorCode,
                                                        FString                       &OutError) const
     {
         OutPrepared = Current.WAIN;
@@ -196,6 +199,11 @@
         }
 
         ++OutPrepared.TurnCount;
+        if (!FWAINMemoryWriter().PrepareObservations(Request, Proposal, OutPrepared, OutError))
+        {
+            OutErrorCode = EWAINInteractionError::MemoryPreparationFailed;
+            return false;
+        }
         return true;
     }
 

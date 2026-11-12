@@ -82,7 +82,7 @@
                               FWAINResponseProposal         &OutProposal,
                               FString                       &OutError) const = 0;
 
-        /** @brief Persona가 전달되면 Context-aware Provider가 반드시 Override해야 한다. */
+        /** @brief Persona 또는 Presentation Catalog가 전달되면 반드시 Override한다. Memory만 존재하는 Legacy Mock 경로는 유지한다. */
         virtual bool GenerateWithContext(const FWAINInteractionRequest &Request,
                                          const FWAINSessionRoot &Current,
                                          const FWAINCharacterContext &Context,

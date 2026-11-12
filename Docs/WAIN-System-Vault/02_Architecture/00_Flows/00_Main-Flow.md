@@ -57,3 +57,9 @@ flowchart TD
 기존 흐름의 Character Context Builder가 Context Preparation 중 Host Catalog를 **한 번 조회·검증**하여 허용 ID/Variant/설명 목록을 Provider로 전달한다. Provider가 선택한 조합은 Transaction의 Response Validation 단계에서 동일한 목록과 대조하며, 성공한 경우에만 Prepared Snapshot과 Publish를 진행한다. Commit된 Expression/Variant는 `FWAINInteractionResult`에 포함된다. **실제 화면 표시·PNG 렌더링은 이번 Plugin 구현 범위가 아니다.**
 
 [구현 상세](../../04_Development/07_Presentation-Catalog-Implementation.md)
+
+## Phase 2 Observation Memory 추가 흐름 (2026-11-11)
+
+`Context Preparation`은 **직전 확정 MemoryStream**에서 CharacterId별 Observation을 읽어 `RelevantMemories`에 담는다. `Transaction Preparation`은 Player 입력과 NPC 응답을 **PreparedWAIN.MemoryStream**에 추가한다. 모든 Snapshot 검증 및 Game Prepare 이후 Root Publish에 성공해야만 기록된다. 실패·Replay·타 캐릭터 Context에서는 Memory가 새로 추가/노출되지 않는다.
+
+실제 Embedding 검색, Reflection, Plan, Save/Load, Prompt 직렬화는 아직 구현하지 않았다. [구현 상세](../../04_Development/08_Memory-Observation-Implementation.md).

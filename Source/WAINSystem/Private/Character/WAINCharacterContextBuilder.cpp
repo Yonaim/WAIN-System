@@ -5,6 +5,7 @@
 
 #include "Character/WAINCharacterContextBuilder.h"
 #include "Presentation/WAINPresentationValidator.h"
+#include "Memory/WAINMemoryRetriever.h"
 
 // ============================================================
 // 00. Context Assembly
@@ -32,6 +33,7 @@
         NextContext.StateRevision = Current.Revision;
         NextContext.TurnCount = Current.WAIN.TurnCount;
         NextContext.State = *Character;
+        NextContext.RelevantMemories = FWAINMemoryRetriever().Retrieve(Request, Current.WAIN);
 
         if (!LoadPersona(Request.CharacterId, PersonaSource, NextContext, OutError))
         {

@@ -75,3 +75,17 @@
 실제 LLM, Testbed Catalog JSON Loader/PNG Renderer, 비동기 Revision 재검증은 미구현. 전체 Unreal 빌드·신규 테스트 실행은 이 환경에서 미검증. 기존 파일들의 Phase 1 설명은 해당 당시의 이력으로 보존한다.
 
 [Implementation](../../04_Development/07_Presentation-Catalog-Implementation.md)
+
+## 60. Phase 2 Memory Observation MVP (2026-11-11)
+
+| 경로 (Source/WAINSystem 기준) | 책임 |
+|---|---|
+| `Public/WAINMemoryTypes.h` | 통합 Memory Record/Type/Speaker |
+| `Public/WAINRuntimeTypes.h` | Snapshot에 MemoryStream 포함 |
+| `Private/Memory/WAINMemoryWriter.{h,cpp}` | Prepared Snapshot에 Player/Character Observation 기록 |
+| `Private/Memory/WAINMemoryRetriever.{h,cpp}` | 확정 Snapshot에서 캐릭터별 검색·정렬·상위 K 조회 |
+| `Private/Character/WAINCharacterContextBuilder.cpp` | 검색 결과를 `RelevantMemories`로 Provider에 전달 |
+| `Private/Core/WAINTransactionCoordinator.cpp` | 실패 시 Memory No Commit, Publish 시 함께 확정 |
+| `Private/Tests/WAINMemoryTests.cpp` | 신규 8개 자동화 테스트 작성 (누적 38개) |
+
+이번 검색은 Embedding/Cosine이 아닌 임시 키워드 점수다. 실질적인 장기 Reflection/Planning은 미구현. [Memory 구현](../../04_Development/08_Memory-Observation-Implementation.md).

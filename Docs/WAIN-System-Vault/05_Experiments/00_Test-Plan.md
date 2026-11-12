@@ -85,3 +85,18 @@ A: LLM Only → B: A+Character Agent → C: B+World State Manager → D: C+Narra
 | `WAIN.Presentation.ReplaySkipsCatalog` | 동일 TurnId 재처리 시 조회·생성·Commit 중복 방지 |
 
 총 등록 코드: **기존 19개 + 신규 11개 = 30개**. 테스트 코드는 작성됐지만 UE 컴파일·실행 통과는 주장하지 않는다. 회귀: `WAIN.Transaction.*`, `WAIN.Character.*`, `WAIN.CharacterContext.*`, `WAIN.Presentation.*`.
+
+## Phase 2 Observation Memory Automation Tests — 작성, UE 실행 전 (2026-11-11)
+
+| 테스트 | 검증 범위 |
+|---|---|
+| `WAIN.Memory.ObservationCommit` | Player/Character Observation을 성공 턴에만 기록, 이전 Snapshot 불변 |
+| `WAIN.Memory.NextTurnContext` | 다음 턴에서 직전 확정 Memory Context 검색 |
+| `WAIN.Memory.CharacterIsolation` | MemoryStream은 통합, 조회는 Character별 격리 |
+| `WAIN.Memory.QueryRanking` | 임시 어휘 관련성 기반 우선순위 확인 |
+| `WAIN.Memory.PrepareFailureNoCommit` | Game Prepare 실패 시 Observation No Commit |
+| `WAIN.Memory.InvalidProposalNoCommit` | Proposal Validation 실패 시 Observation No Commit |
+| `WAIN.Memory.DuplicateTurn` | Replay에서 Observation 중복 작성·재조회 없음 |
+| `WAIN.Memory.SilenceTurn` | Silence 턴은 빈 Player 입력을 저장하지 않음 |
+
+**총 38개 Automation 테스트가 소스에 작성된 상태**로, UE 5.8 빌드/실행 합격을 의미하지 않는다. 반드시 이전 30개 테스트와 함께 회귀 실행한다. Reflection SourceMemoryIds, Embedding Retrieval, Save/Load는 후속 테스트 대상이다.

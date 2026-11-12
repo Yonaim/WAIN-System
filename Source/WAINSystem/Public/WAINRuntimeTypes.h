@@ -6,6 +6,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "WAINMemoryTypes.h"
 
 // ============================================================
 // 00. Interaction Enums
@@ -45,6 +46,7 @@
         ContextPreparationFailed,
         InvalidProposal,
         UnsupportedMutation,
+        MemoryPreparationFailed,
         GamePrepareFailed,
         NarrativeEvaluationFailed,
         FinalValidationFailed,
@@ -113,6 +115,7 @@
     struct FWAINStateSnapshot
     {
         TMap<FName, FWAINCharacterState> Characters;
+        TArray<FWAINMemoryRecord>         MemoryStream;
         FName                            ActiveBeatId;
         int32                            TurnCount = 0;
     };

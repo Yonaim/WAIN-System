@@ -62,3 +62,15 @@
 - 변경하지 않음: Host Testbed UI·JSON·PNG, Unreal Build Hook, Obsidian 테마/플러그인 설정.
 
 [Implementation](07_Presentation-Catalog-Implementation.md)
+
+## 2026-11-11 — Phase 2 Observation Memory (저장·검색·Context)
+
+- 기준: 직전 `WAINSystem-Phase2-Presentation-Catalog-Plugin-and-Vault.zip` 누적 Plugin 및 Vault.
+- 추가: 통합 `FWAINMemoryRecord`, `MemoryStream` Snapshot, `FWAINMemoryWriter`, `FWAINMemoryRetriever`, Context `RelevantMemories`.
+- 처리: 성공 Transaction에만 Player/Character 발화를 기록하고, 다음 Turn은 확정 Memory에서 캐릭터별 Observation을 검색한다. 실패/Replay/다른 Character가 Stream을 오염시키지 않도록 처리.
+- 데이터: Observation만 구현. 임시 키워드·최근성·Importance 점수 및 상위 6개 설정을 구현 세부사항으로 명시, Embedding/Reflection/Plan은 미구현.
+- 테스트: `WAIN.Memory.*` 8개 신규 소스 작성, 기존 30개 유지 (총 38개). 신규 구현분은 **Unreal 5.8에서 컴파일·실행 미검증**.
+- ADR: [ADR-008](../03_Decisions/08_ADR-008-Transactional-Observations.md) **Proposed** 추가; 기존 Accepted ADR-001~007은 변경하지 않음.
+- Obsidian/VS Code 설정, Host Testbed 코드/JSON/PNG 및 기존 Runtime API 호출 방식은 유지.
+
+[Implementation](08_Memory-Observation-Implementation.md)

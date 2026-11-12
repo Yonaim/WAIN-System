@@ -54,6 +54,7 @@
                               const FWAINSessionRoot        &Current,
                               const FWAINResponseProposal   &Proposal,
                               FWAINStateSnapshot            &OutPrepared,
+                              EWAINInteractionError         &OutErrorCode,
                               FString                       &OutError) const;
     };
 

@@ -48,3 +48,10 @@
 - 아직 연결되지 않은 실제 게임 콘텐츠: `ManaExpressions.json` 로더, Pose·Stage/PNG Variant 선택, Host Widget 렌더러.
 - **다음 단계 후보:** Host Game의 World State 조회 계약 또는 Memory Stream 최소 구현. LLM 연결은 Context의 기본 입력 출처를 충분히 확보한 뒤 진행.
 - 이전 Roadmap 표에서 Catalog를 미구현으로 표시한 것은 작성 당시의 이력이며 현재 현황은 본 절을 따른다.
+
+## 2026-11-11 Phase 2 Memory 진행 상태
+
+- **단계 6 일부:** Snapshot 내부 Observation append·keyword fallback retrieval·Character Context 전달과 8개 Automation Test **코드 작성**.
+- **아직 미구현:** Embedding Provider/Cosine, Reflection·Planning, 중요도 평가, 지속 저장·복원·압축, 실제 LLM Prompt 연결.
+- **검증 필요:** 현재 Phase 2 변경분 전부 UE 5.8 컴파일 및 `WAIN.Memory.*` + 기존 30개 테스트의 실제 실행 결과.
+- 이번 코드의 임시 검색 가중치는 Architecture의 최종 결정이 아니라 실험 파라미터다. [Memory 구현](08_Memory-Observation-Implementation.md).
