@@ -41,65 +41,91 @@
                                                             const IWAINNarrativeEvaluator  &NarrativeEvaluator,
                                                             const FWAINPresentationOptions *AvailablePresentations,
                                                             const IWAINMemoryReasoner      *MemoryReasoner,
-                                                            const FWAINWorldStateManager   *WorldManager) const
+                                                            const FWAINWorldStateManager   *WorldManager,
+                                                            FWAINInteractionDebugRecord   *OutDebug) const
     {
         check(IsInGameThread());
 
         FString Error;
+        auto Trace = [OutDebug](const FName Name, const EWAINTraceStatus Status, const FString &Detail = FString())
+        {
+            if (OutDebug) OutDebug->AddStep(Name, Status, Detail);
+        };
+
         if (!ValidateProposal(Proposal, AvailablePresentations, Error))
         {
+            Trace(TEXT("Proposal Validation"), EWAINTraceStatus::Failed, Error);
             return WAINTransaction::Fail(EWAINInteractionError::InvalidProposal, Error);
         }
+        Trace(TEXT("Proposal Validation"), EWAINTraceStatus::Passed);
 
         const TSharedPtr<const FWAINSessionRoot> Current = StateStore.Read();
         if (!Current.IsValid() || !Current->Game.IsValid())
         {
+            Trace(TEXT("Snapshot Read"), EWAINTraceStatus::Failed, TEXT("확정된 Session Root가 없습니다."));
             return WAINTransaction::Fail(EWAINInteractionError::SessionNotStarted, TEXT("확정된 Session Root가 없습니다."));
         }
+        Trace(TEXT("Snapshot Read"), EWAINTraceStatus::Passed);
 
         FWAINStateSnapshot    PreparedWAIN;
         EWAINInteractionError PreparationError = EWAINInteractionError::UnsupportedMutation;
         if (!PrepareWAINState(Request, *Current, Proposal, PreparedWAIN, PreparationError, Error))
         {
+            Trace(TEXT("WAIN Preparation"), EWAINTraceStatus::Failed, Error);
             return WAINTransaction::Fail(PreparationError, Error);
         }
+        Trace(TEXT("WAIN Preparation"), EWAINTraceStatus::Passed);
 
         const TArray<FWAINStateMutation> GameMutations = CollectGameMutations(Proposal);
         if (WorldManager && !WorldManager->ValidateMutations(*Current->Game, GameMutations, Error))
         {
+            Trace(TEXT("World Mutation Validation"), EWAINTraceStatus::Failed, Error);
             return WAINTransaction::Fail(EWAINInteractionError::InvalidProposal, Error);
         }
+        Trace(TEXT("World Mutation Validation"), WorldManager ? EWAINTraceStatus::Passed : EWAINTraceStatus::Skipped);
 
         TSharedPtr<const IWAINGameStateSnapshot> PreparedGame = GameAdapter.Prepare(*Current->Game, GameMutations, Error);
         if (!PreparedGame.IsValid())
         {
+            Trace(TEXT("Game Preparation"), EWAINTraceStatus::Failed, Error);
             return WAINTransaction::Fail(EWAINInteractionError::GamePrepareFailed, Error);
         }
+        Trace(TEXT("Game Preparation"), EWAINTraceStatus::Passed);
 
         if (WorldManager && !WorldManager->ValidatePrepared(*Current->Game, *PreparedGame, GameMutations, Error))
         {
+            Trace(TEXT("Prepared World Validation"), EWAINTraceStatus::Failed, Error);
             return WAINTransaction::Fail(EWAINInteractionError::GamePrepareFailed, Error);
         }
+        Trace(TEXT("Prepared World Validation"), WorldManager ? EWAINTraceStatus::Passed : EWAINTraceStatus::Skipped);
 
         if (!NarrativeEvaluator.Evaluate(Request, *Current, PreparedWAIN, *PreparedGame, Error))
         {
+            Trace(TEXT("Narrative Evaluation"), EWAINTraceStatus::Failed, Error);
             return WAINTransaction::Fail(EWAINInteractionError::NarrativeEvaluationFailed, Error);
         }
+        Trace(TEXT("Narrative Evaluation"), EWAINTraceStatus::Passed);
 
         if (MemoryReasoner && !FWAINMemoryReasoningPreparer().Prepare(Request, PreparedWAIN, *MemoryReasoner, Error))
         {
+            Trace(TEXT("Memory Reasoning"), EWAINTraceStatus::Failed, Error);
             return WAINTransaction::Fail(EWAINInteractionError::MemoryReasoningFailed, Error);
         }
+        Trace(TEXT("Memory Reasoning"), MemoryReasoner ? EWAINTraceStatus::Passed : EWAINTraceStatus::Skipped);
 
         if (!WAINStateValidation::Validate(PreparedWAIN, Error) || !GameAdapter.Validate(*PreparedGame, Error))
         {
+            Trace(TEXT("Final Validation"), EWAINTraceStatus::Failed, Error);
             return WAINTransaction::Fail(EWAINInteractionError::FinalValidationFailed, Error);
         }
+        Trace(TEXT("Final Validation"), EWAINTraceStatus::Passed);
 
         if (!StateStore.Publish(Current->Revision, MoveTemp(PreparedWAIN), MoveTemp(PreparedGame)))
         {
+            Trace(TEXT("Atomic Publish"), EWAINTraceStatus::Failed, TEXT("확정 Revision이 변경되었습니다."));
             return WAINTransaction::Fail(EWAINInteractionError::RevisionConflict, TEXT("확정 Revision이 변경되었습니다."));
         }
+        Trace(TEXT("Atomic Publish"), EWAINTraceStatus::Passed);
 
         FWAINCommitOutcome Outcome;
         Outcome.Revision = Current->Revision + 1;

@@ -17,3 +17,7 @@
 - Host Presentation Catalog Public API 및 검증 코드를 도입하고, Character Context → Transaction 검증 → Result 반환 경로에 연결했다.
 - ADR-002/ADR-007 구현 상태를 갱신하고, Source Map·Contracts·Test Plan·Work Log에 실제 지원·미지원 범위를 명시했다.
 - WAIN `00_Engineering-Standards`, Obsidian 설정, Host Testbed 콘텐츠는 변경하지 않았다. UE 5.8 빌드/테스트 실행 미검증.
+
+## 2026-11-13 — DEV Inspector / Turn Diagnostics
+
+Host DEV 버튼을 탭형 Debug Inspector로 확장했다. Plugin에서 최근 48개 실제 단계·Context·Proposal을 읽기 전용으로 조회하고 Testbed Snapshot Delta·Memory·Narrative와 조합해 표시한다. [ADR-015](03_Decisions/15_ADR-015-Turn-Diagnostics-and-DEV-Inspector.md) Proposed. Automation 테스트 소스 7개 추가, 빌드 미검증.

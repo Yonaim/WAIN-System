@@ -11,6 +11,7 @@
 #include "CoreMinimal.h"
 #include "WAINInterfaces.h"
 #include "WAINWorldStateManager.h"
+#include "WAINInteractionDebug.h"
 
 class FWAINInteractionProcessor final
 {
@@ -34,6 +35,9 @@ class FWAINInteractionProcessor final
 
     TSharedPtr<const FWAINSessionRoot> GetSnapshot() const;
 
+    /** @brief 최신 48개 턴 기록에서 해당 TurnId를 조회한다. Replay는 기존 기록을 변경하지 않는다. */
+    bool GetDebugRecord(const FGuid &TurnId, FWAINInteractionDebugRecord &OutRecord) const;
+
     private:
 #pragma endregion
 
@@ -50,7 +54,10 @@ class FWAINInteractionProcessor final
 
     bool ValidateRequest(const FWAINInteractionRequest &Request, FString &OutError) const;
 
-    FWAINInteractionResult ExecuteTurn(const FWAINInteractionRequest &Request);
+    FWAINInteractionResult ExecuteTurn(const FWAINInteractionRequest &Request,
+                                      FWAINInteractionDebugRecord &OutDebug);
+
+    void SaveDebugRecord(FWAINInteractionDebugRecord &Record, const FWAINInteractionResult &Result);
 
     static bool IsSameRequest(const FWAINInteractionRequest &Left, const FWAINInteractionRequest &Right);
 
@@ -76,6 +83,8 @@ class FWAINInteractionProcessor final
     FWAINStateStore             StateStore;
     FWAINTransactionCoordinator Coordinator;
     TMap<FGuid, FRecordedTurn>  CompletedTurns;
+    TMap<FGuid, FWAINInteractionDebugRecord> DebugRecords;
+    TArray<FGuid> DebugOrder;
     bool                        bProcessing = false;
 #pragma endregion
 };

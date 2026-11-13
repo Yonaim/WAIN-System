@@ -129,3 +129,15 @@
 ## 90. Testbed 실제 콘텐츠 Host 연결 (2026-11-12)
 
 `Source/WAINTestbed/WAINTestbedContentLoader.{h,cpp}`에서 정의 JSON을 로드·검증하고, `WAINTestbedRuntimeAdapters.{h,cpp}`의 Host Persona/Catalog/Game Snapshot/World Fact Reader/Narrative Guard로 Plugin에 주입한다. Widget은 `UWAINRuntimeSubsystem`의 성공한 Commit 결과를 소비한다. Plugin Core/Transaction C++는 이번 단계에서 변경하지 않았다. 실제 JSON 내용과 구현 범위는 [Development](../../04_Development/12_Testbed-Content-Integration.md) 참조.
+
+## 90. Phase 2 — Turn Diagnostics (2026-11-13)
+
+| 코드 (Source/WAINSystem 기준) | 역할 |
+|---|---|
+| `Public/WAINInteractionDebug.h` | 단계 PASS/FAIL/SKIP 및 Proposal·Context·Revision 기록 DTO |
+| `Private/Core/WAINInteractionProcessor.{h,cpp}` | 실제 실행 Stage 수집, 최근 48 TurnId 조회·보존, Replay 불변 |
+| `Private/Core/WAINTransactionCoordinator.{h,cpp}` | 실제 실행된 Transaction 단계에 한해 Stage 결과 기록 |
+| `Public/WAINRuntimeSubsystem.h`, `Private/WAINRuntimeSubsystem.cpp` | Host 읽기 전용 `GetDebugRecord(TurnId)` 노출 |
+| `Private/Tests/WAINInteractionDebugTests.cpp` | 정상/거절/Replay 기록 3개 테스트 코드 |
+
+Host `FWAINTestbedDebugInspector`는 Plugin의 기록과 Game Snapshot의 전후 요약을 조합한다. 실제 Rule 평가 개별 Trace·Memory Score는 아직 미수집. [ADR-015](../../03_Decisions/15_ADR-015-Turn-Diagnostics-and-DEV-Inspector.md).

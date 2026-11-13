@@ -82,6 +82,12 @@
         return Processor ? Processor->GetSnapshot() : nullptr;
     }
 
+    bool UWAINRuntimeSubsystem::GetDebugRecord(const FGuid &TurnId, FWAINInteractionDebugRecord &OutRecord) const
+    {
+        check(IsInGameThread());
+        return Processor && Processor->GetDebugRecord(TurnId, OutRecord);
+    }
+
     void UWAINRuntimeSubsystem::EndSession()
     {
         check(IsInGameThread());

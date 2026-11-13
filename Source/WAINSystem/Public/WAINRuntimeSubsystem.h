@@ -12,6 +12,7 @@
 #include "WAINMemoryReasoning.h"
 #include "WAINRuntimeTypes.h"
 #include "WAINWorldStateManager.h"
+#include "WAINInteractionDebug.h"
 #include "WAINRuntimeSubsystem.generated.h"
 // clang-format on
 
@@ -43,6 +44,9 @@ class WAINSYSTEM_API UWAINRuntimeSubsystem : public UGameInstanceSubsystem
     FWAINInteractionResult ProcessMockTurn(const FWAINInteractionRequest &Request);
 
     TSharedPtr<const FWAINSessionRoot> GetStateSnapshot() const;
+
+    /** @brief 개발 패널 전용 조회. State 정본이나 Turn 실행 결과를 변경하지 않는다. */
+    bool GetDebugRecord(const FGuid &TurnId, FWAINInteractionDebugRecord &OutRecord) const;
 
     FOnWAINStateCommitted &OnStateCommitted()
     {

@@ -10,6 +10,7 @@
 #include "WAINInterfaces.h"
 #include "WAINMemoryReasoning.h"
 #include "WAINWorldStateManager.h"
+#include "WAINInteractionDebug.h"
 
 // ============================================================
 // 00. Commit Outcome
@@ -45,7 +46,8 @@
                                    const IWAINNarrativeEvaluator  &NarrativeEvaluator,
                                    const FWAINPresentationOptions *AvailablePresentations = nullptr,
                                    const IWAINMemoryReasoner      *MemoryReasoner = nullptr,
-                                   const FWAINWorldStateManager   *WorldManager = nullptr) const;
+                                   const FWAINWorldStateManager   *WorldManager = nullptr,
+                                   FWAINInteractionDebugRecord   *OutDebug = nullptr) const;
 
         private:
         bool ValidateProposal(const FWAINResponseProposal    &Proposal,

@@ -107,3 +107,10 @@ Host가 Persona/6D Emotion/Expression/Narrative/World Fact를 JSON에서 파싱�
 ## 2026-11-13 — Host Testbed Sprite Rendering
 
 Host `Content`를 Data/Images/UI/Maps로 정리하고 `Images/Characters/Mana/Layers` 공통 경로, 27개 파츠 파일명 변경, 미완성 6개 투명 Placeholder를 적용했다. `FWAINTestbedLayeredSpriteRenderer`가 확정 Expression/Variant를 UMG에 표시하도록 Host Source에 연결했다. Plugin C++ 핵심 모듈은 변경하지 않는다. 신규 Testbed Automation 6개(전체 코드 81개) 작성, 실제 UE 5.8 빌드·실행 미검증. [ADR-013](../03_Decisions/13_ADR-013-Testbed-Sprite-Assets.md) Proposed.
+
+## 2026-11-13 — Runtime Turn Diagnostics
+
+- 최근 48개 Turn의 Context/Proposal/실제 Pipeline 단계 PASS·FAIL·SKIP 및 지연시간(전체 턴) 기록을 추가. Commit과 Authoritative Snapshot 계약은 변경하지 않음.
+- Host `DEV`의 4개 탭과 과거 턴 보기/Result·State Delta 표시 구현. Dialogue LOG는 별개.
+- 신규 Plugin Automation Test 3개와 Host 4개 코드 작성. 소스 누적 93개 등록(UE 5.8 컴파일/실행 **미검증**).
+- [ADR-015](../03_Decisions/15_ADR-015-Turn-Diagnostics-and-DEV-Inspector.md) Proposed. Production debug 정보 노출/보존 정책은 후속 결정.

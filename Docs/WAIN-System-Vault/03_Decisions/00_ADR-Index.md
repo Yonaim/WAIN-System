@@ -22,3 +22,4 @@
 
 | [ADR-013](13_ADR-013-Testbed-Sprite-Assets.md) | Host Sprite 경로/Ready 메타데이터/UMG Layered Renderer | **Proposed (Testbed 구현 선택)** |
 | [ADR-014](14_ADR-014-Testbed-VN-Presentation.md) | Host 소유 VN 배경·날짜·Backlog Presentation | **Proposed (Testbed 구현 선택)** |
+| [ADR-015](15_ADR-015-Turn-Diagnostics-and-DEV-Inspector.md) | 최근 48개 Turn Trace와 Host DEV Inspector, LOG 분리 | **Proposed (Host MVP)** |

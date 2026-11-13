@@ -4,6 +4,7 @@
  */
 
 #include "Core/WAINInteractionProcessor.h"
+#include "HAL/PlatformTime.h"
 
 // ============================================================
 // 00. Session And Public API
@@ -63,41 +64,88 @@
         {
             if (!IsSameRequest(Previous->Request, Request))
             {
-                return Fail(Request,
-                            EWAINInteractionError::DuplicateTurnConflict,
+                return Fail(Request, EWAINInteractionError::DuplicateTurnConflict,
                             TEXT("동일 TurnId에 다른 입력을 사용할 수 없습니다."));
             }
-
             FWAINInteractionResult Replay = Previous->Result;
             Replay.bReplayed = true;
             return Replay;
         }
 
+        FWAINInteractionDebugRecord Debug;
+        Debug.Request = Request;
+        const double StartSeconds = FPlatformTime::Seconds();
+        const TSharedPtr<const FWAINSessionRoot> Before = StateStore.Read();
+        Debug.RevisionBefore = Before.IsValid() ? Before->Revision : 0;
+
         FString Error;
         if (!ValidateRequest(Request, Error))
         {
-            return Fail(Request, EWAINInteractionError::InvalidRequest, Error);
+            Debug.AddStep(TEXT("Request Validation"), EWAINTraceStatus::Failed, Error);
+            const FWAINInteractionResult Result = Fail(Request, EWAINInteractionError::InvalidRequest, Error);
+            Debug.ElapsedMs = (FPlatformTime::Seconds() - StartSeconds) * 1000.0;
+            SaveDebugRecord(Debug, Result);
+            return Result;
         }
+        Debug.AddStep(TEXT("Request Validation"), EWAINTraceStatus::Passed);
 
         if (bProcessing)
         {
-            return Fail(Request, EWAINInteractionError::Busy, TEXT("다른 Turn을 처리하고 있습니다."));
+            Debug.AddStep(TEXT("Turn Availability"), EWAINTraceStatus::Failed, TEXT("다른 Turn 처리 중"));
+            const FWAINInteractionResult Result = Fail(Request, EWAINInteractionError::Busy,
+                                                        TEXT("다른 Turn을 처리하고 있습니다."));
+            Debug.ElapsedMs = (FPlatformTime::Seconds() - StartSeconds) * 1000.0;
+            SaveDebugRecord(Debug, Result);
+            return Result;
         }
 
         bProcessing = true;
-        const FWAINInteractionResult Result = ExecuteTurn(Request);
+        const FWAINInteractionResult Result = ExecuteTurn(Request, Debug);
         bProcessing = false;
 
         FRecordedTurn Record;
         Record.Request = Request;
         Record.Result = Result;
         CompletedTurns.Add(Request.TurnId, MoveTemp(Record));
+        Debug.ElapsedMs = (FPlatformTime::Seconds() - StartSeconds) * 1000.0;
+        SaveDebugRecord(Debug, Result);
         return Result;
     }
 
     TSharedPtr<const FWAINSessionRoot> FWAINInteractionProcessor::GetSnapshot() const
     {
         return StateStore.Read();
+    }
+
+    bool FWAINInteractionProcessor::GetDebugRecord(const FGuid &TurnId,
+                                                   FWAINInteractionDebugRecord &OutRecord) const
+    {
+        if (const FWAINInteractionDebugRecord *Found = DebugRecords.Find(TurnId))
+        {
+            OutRecord = *Found;
+            return true;
+        }
+        return false;
+    }
+
+    void FWAINInteractionProcessor::SaveDebugRecord(FWAINInteractionDebugRecord &Record,
+                                                     const FWAINInteractionResult &Result)
+    {
+        Record.Result = Result;
+        const TSharedPtr<const FWAINSessionRoot> After = StateStore.Read();
+        Record.RevisionAfter = After.IsValid() ? After->Revision : Record.RevisionBefore;
+
+        // TurnId가 없는 잘못된 요청은 조회 키가 없으므로 기록을 남기지 않는다.
+        if (!Record.Request.TurnId.IsValid()) return;
+
+        // 최근 48건만 진단 Context/Proposal 사본을 보관한다. 권위 State와 Replay 캐시는 별개다.
+        if (DebugOrder.Num() >= 48)
+        {
+            DebugRecords.Remove(DebugOrder[0]);
+            DebugOrder.RemoveAt(0);
+        }
+        DebugOrder.Add(Record.Request.TurnId);
+        DebugRecords.Add(Record.Request.TurnId, MoveTemp(Record));
     }
 
 #pragma endregion
@@ -107,51 +155,66 @@
 // ============================================================
 #pragma region 01_Turn_Execution
 
-    FWAINInteractionResult FWAINInteractionProcessor::ExecuteTurn(const FWAINInteractionRequest &Request)
+    FWAINInteractionResult FWAINInteractionProcessor::ExecuteTurn(const FWAINInteractionRequest &Request,
+                                                                   FWAINInteractionDebugRecord &OutDebug)
     {
         const TSharedPtr<const FWAINSessionRoot> Current = StateStore.Read();
         if (!Current.IsValid())
         {
-            return Fail(Request, EWAINInteractionError::SessionNotStarted, TEXT("WAIN 세션이 시작되지 않았습니다."));
+            const FString Error = TEXT("WAIN 세션이 시작되지 않았습니다.");
+            OutDebug.AddStep(TEXT("Snapshot Read"), EWAINTraceStatus::Failed, Error);
+            return Fail(Request, EWAINInteractionError::SessionNotStarted, Error);
         }
+        OutDebug.AddStep(TEXT("Snapshot Read"), EWAINTraceStatus::Passed);
 
         FWAINCharacterContext Context;
-        FString               Error;
+        FString Error;
         if (!ContextBuilder.Build(Request, *Current, PersonaSource.Get(), PresentationCatalog.Get(), Context, Error))
         {
+            OutDebug.AddStep(TEXT("Character Context"), EWAINTraceStatus::Failed, Error);
             return Fail(Request, EWAINInteractionError::ContextPreparationFailed, Error);
         }
+        OutDebug.AddStep(TEXT("Character Context"), EWAINTraceStatus::Passed);
 
         if (!NarrativeEvaluator->BuildContext(*Current, Context.Narrative, Error))
         {
+            OutDebug.AddStep(TEXT("Narrative Context"), EWAINTraceStatus::Failed, Error);
             return Fail(Request, EWAINInteractionError::ContextPreparationFailed, Error);
         }
         Context.bHasNarrativeContext = !Context.Narrative.BeatId.IsNone();
+        OutDebug.AddStep(TEXT("Narrative Context"), EWAINTraceStatus::Passed);
 
         if (WorldManager.IsValid())
         {
             if (!WorldManager->BuildContext(*Current->Game, Context.World, Error))
             {
+                OutDebug.AddStep(TEXT("World Context"), EWAINTraceStatus::Failed, Error);
                 return Fail(Request, EWAINInteractionError::ContextPreparationFailed, Error);
             }
             Context.bHasWorldContext = true;
+            OutDebug.AddStep(TEXT("World Context"), EWAINTraceStatus::Passed);
+        }
+        else
+        {
+            OutDebug.AddStep(TEXT("World Context"), EWAINTraceStatus::Skipped);
         }
 
+        OutDebug.Context = Context;
+        OutDebug.bHasContext = true;
         FWAINResponseProposal Proposal;
         if (!ProposalProvider->GenerateWithContext(Request, *Current, Context, Proposal, Error))
         {
+            OutDebug.AddStep(TEXT("Proposal Generation"), EWAINTraceStatus::Failed, Error);
             return Fail(Request, EWAINInteractionError::ProposalGenerationFailed, Error);
         }
+        OutDebug.AddStep(TEXT("Proposal Generation"), EWAINTraceStatus::Passed);
+        OutDebug.Proposal = Proposal;
+        OutDebug.bHasProposal = true;
 
-        const FWAINCommitOutcome Commit =
-            Coordinator.Execute(Request,
-                                Proposal,
-                                StateStore,
-                                *GameAdapter,
-                                *NarrativeEvaluator,
-                                Context.bHasPresentationCatalog ? &Context.AvailablePresentations : nullptr,
-                                MemoryReasoner.Get(),
-                                WorldManager.Get());
+        const FWAINCommitOutcome Commit = Coordinator.Execute(
+            Request, Proposal, StateStore, *GameAdapter, *NarrativeEvaluator,
+            Context.bHasPresentationCatalog ? &Context.AvailablePresentations : nullptr,
+            MemoryReasoner.Get(), WorldManager.Get(), &OutDebug);
         if (!Commit.Succeeded())
         {
             return Fail(Request, Commit.Error, Commit.Message);

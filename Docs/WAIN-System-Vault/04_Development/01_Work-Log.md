@@ -120,3 +120,13 @@
 - `FWAINWorldStateManager`와 `FWAINBeatGraphNarrativeEvaluator`를 Host 모듈에서 사용할 수 있도록 `WAINSYSTEM_API` export를 추가했다. 공개 함수 서명과 동작 계약은 변경하지 않았다.
 - UE 5.8 `WAINTestbedEditor Win64 DebugGame` 빌드 성공. Plugin/Host C++ 컴파일 및 링크 완료.
 - Pre-build formatter의 44개 C/C++ 파일 결과를 반복 실행 해시로 비교해 내용 변경이 없음을 확인했다. Automation/PIE는 실행하지 않았다.
+
+## 2026-11-13 — DEV Inspector / Bounded Turn Trace
+
+- 기준: 사용자가 업로드한 `WAINTestbed-Source(2).zip` (현재 소스 기준).
+- Runtime `WAINInteractionDebug` 추가, Processor/Coordinator 실행 단계와 실제 Proposal/Context 수집.
+- Testbed `WAINTestbedDebugInspector` 및 기존 DEV 버튼에 State/Narrative/Memory/Trace + 턴 선택 UI 바인딩. 실패한 턴의 미확정 State나 미실행 단계를 추정하지 않음.
+- 7개 Automation 테스트 소스 작성(기존 86개 + 신규 7개, 누적 93개). 현재 환경에서 Unreal 컴파일/PIE/Automation **미실행**.
+- Obsidian 설정·Engineering Standards 및 Host Content 에셋 미변경.
+
+[ADR-015](../03_Decisions/15_ADR-015-Turn-Diagnostics-and-DEV-Inspector.md) · [구현](11_Turn-Debug-Trace-Implementation.md).

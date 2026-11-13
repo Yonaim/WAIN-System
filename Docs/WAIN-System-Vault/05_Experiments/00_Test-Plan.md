@@ -132,3 +132,9 @@ A: LLM Only → B: A+Character Agent → C: B+World State Manager → D: C+Narra
 ## 2026-11-13 — UE 5.8 Editor Build Verification
 
 `WAINTestbedEditor Win64 DebugGame` 빌드 성공. Plugin/Host 모듈과 81개 Automation 테스트 소스가 컴파일·링크됐다. Automation 테스트 실행 및 PIE 검증은 수행하지 않았다.
+
+## Phase 2 DEV Inspector / Debug Trace (2026-11-13, 코드 작성·미실행)
+
+신규 Plugin: `WAIN.DebugTrace.SuccessfulTurn`, `FailedProposalNoCommit`, `ReplayPreservesOriginal` 3개. 신규 Testbed: `WAIN.Testbed.Debug.StateDelta`, `NarrativeTransition`, `MemoryProvenance`, `ExecutedStages` 4개.
+
+검증: 단계의 실제 수행 여부, Proposal와 Revision/No Commit, State Diff, BeatHistory, Memory Retrieval·Source, Replay 불변. 기존 86개 회귀 포함 총 93개 Automation Test 소스 등록. **실제 UE 5.8 Editor 실행/테스트 결과는 없다.**
