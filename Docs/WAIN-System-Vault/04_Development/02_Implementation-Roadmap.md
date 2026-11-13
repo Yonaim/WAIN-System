@@ -86,3 +86,10 @@
 - Host Testbed PNG 폴더 분류/작명 및 동일 해상도 자리 표시자, JSON·Loader/Layered Sprite UMG 구현 코드를 작성했다. 실제 Editor/PIE 테스트 전.
 - 현 단계 지원: PNG 파일 로드·확정 Response Expression/Variant 표시. 다음 단계: UE 컴파일·UMG 품질/메모리 검증 → Background 표시 → 패키징/비동기 Texture 최적화 → LLM Provider.
 - 기존 `04_Development/` Presentation 설계 문서의 미구현 표기는 작성 당시 이력이며 현재 범위는 [ADR-013](../03_Decisions/13_ADR-013-Testbed-Sprite-Assets.md)을 따른다.
+
+## 2026-11-13 — LLM Bridge 작성 상태
+
+- **코드 작성:** OpenAI Responses API Async HTTP + Schema + Runtime Queued Proposal 인계. 기존 Sync Mock과 Transaction 흐름 유지.
+- **다음 검증:** UE 5.8 전체 빌드/Automation 106개/PIE와 라이브 API 1턴, API 오류·거부·비정상 JSON No Commit 확인.
+- **후속:** Embedding Retrieval, Reflection/Plan 실제 Reasoner, API 비용·지연 메트릭, Save/Load, 배포용 서버 Proxy.
+- [Host LLM 구현](../../../../../Docs/02_Implementation/09_LLM-Structured-Output-Implementation.md).

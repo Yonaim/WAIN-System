@@ -41,9 +41,15 @@ class WAINSYSTEM_API UWAINRuntimeSubsystem : public UGameInstanceSubsystem
                       TSharedPtr<const IWAINMemoryReasoner>      MemoryReasoner = nullptr,
                       TSharedPtr<const FWAINWorldStateManager>   WorldManager = nullptr);
 
+    FWAINInteractionResult ProcessTurn(const FWAINInteractionRequest &Request);
+
+    /** @brief 이전 Testbed 호출부 호환성 유지. Provider 구현에 따라 LLM Proposal도 처리할 수 있다. */
     FWAINInteractionResult ProcessMockTurn(const FWAINInteractionRequest &Request);
 
     TSharedPtr<const FWAINSessionRoot> GetStateSnapshot() const;
+
+    bool PrepareTurnContext(const FWAINInteractionRequest &Request,
+                            FWAINCharacterContext &OutContext, FString &OutError) const;
 
     /** @brief 개발 패널 전용 조회. State 정본이나 Turn 실행 결과를 변경하지 않는다. */
     bool GetDebugRecord(const FGuid &TurnId, FWAINInteractionDebugRecord &OutRecord) const;

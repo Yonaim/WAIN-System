@@ -49,6 +49,11 @@
 
     FWAINInteractionResult UWAINRuntimeSubsystem::ProcessMockTurn(const FWAINInteractionRequest &Request)
     {
+        return ProcessTurn(Request);
+    }
+
+    FWAINInteractionResult UWAINRuntimeSubsystem::ProcessTurn(const FWAINInteractionRequest &Request)
+    {
         check(IsInGameThread());
 
         if (!Processor)
@@ -80,6 +85,18 @@
     {
         check(IsInGameThread());
         return Processor ? Processor->GetSnapshot() : nullptr;
+    }
+
+    bool UWAINRuntimeSubsystem::PrepareTurnContext(const FWAINInteractionRequest &Request,
+                                                    FWAINCharacterContext &OutContext, FString &OutError) const
+    {
+        check(IsInGameThread());
+        if (!Processor)
+        {
+            OutError = TEXT("WAIN 세션이 시작되지 않았습니다.");
+            return false;
+        }
+        return Processor->PrepareTurnContext(Request, OutContext, OutError);
     }
 
     bool UWAINRuntimeSubsystem::GetDebugRecord(const FGuid &TurnId, FWAINInteractionDebugRecord &OutRecord) const

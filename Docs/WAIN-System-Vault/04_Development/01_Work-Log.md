@@ -130,3 +130,11 @@
 - Obsidian 설정·Engineering Standards 및 Host Content 에셋 미변경.
 
 [ADR-015](../03_Decisions/15_ADR-015-Turn-Diagnostics-and-DEV-Inspector.md) · [구현](11_Turn-Debug-Trace-Implementation.md).
+
+## 2026-11-13 — Async LLM Provider + Structured Output
+
+- 현재 DEV Inspector 소스 기준 `TurnNavigation` 지역 변수명을 수정.
+- WAIN Context Preview/JSON Schema/Strict Parser, Testbed 비동기 HTTP Provider + Revision Queue, Widget 요청 대기 상태/오류 처리를 연결했다.
+- `OpenAI Responses API` 호출은 명시적인 환경변수 모드로만 허용. DEV Trace는 기존 Pipeline Commit의 실제 Stage를 기록한다.
+- 13개 자동화 테스트 코드 작성(누적 106개). Unreal Build/PIE/API 실증은 미검증.
+- [ADR-016](../03_Decisions/16_ADR-016-Asynchronous-LLM-Proposal-Handoff.md).

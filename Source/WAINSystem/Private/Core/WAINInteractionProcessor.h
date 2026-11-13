@@ -35,6 +35,10 @@ class FWAINInteractionProcessor final
 
     TSharedPtr<const FWAINSessionRoot> GetSnapshot() const;
 
+    /** @brief 네트워크 대기 전에 현재 Revision의 LLM 입력 Context를 읽기 전용으로 조회한다. */
+    bool PrepareTurnContext(const FWAINInteractionRequest &Request,
+                            FWAINCharacterContext &OutContext, FString &OutError) const;
+
     /** @brief 최신 48개 턴 기록에서 해당 TurnId를 조회한다. Replay는 기존 기록을 변경하지 않는다. */
     bool GetDebugRecord(const FGuid &TurnId, FWAINInteractionDebugRecord &OutRecord) const;
 
@@ -58,6 +62,10 @@ class FWAINInteractionProcessor final
                                       FWAINInteractionDebugRecord &OutDebug);
 
     void SaveDebugRecord(FWAINInteractionDebugRecord &Record, const FWAINInteractionResult &Result);
+
+    bool BuildContext(const FWAINInteractionRequest &Request, const FWAINSessionRoot &Current,
+                      FWAINCharacterContext &OutContext, FString &OutError,
+                      FWAINInteractionDebugRecord *Debug = nullptr) const;
 
     static bool IsSameRequest(const FWAINInteractionRequest &Left, const FWAINInteractionRequest &Right);
 

@@ -114,3 +114,10 @@ Host `Content`를 Data/Images/UI/Maps로 정리하고 `Images/Characters/Mana/La
 - Host `DEV`의 4개 탭과 과거 턴 보기/Result·State Delta 표시 구현. Dialogue LOG는 별개.
 - 신규 Plugin Automation Test 3개와 Host 4개 코드 작성. 소스 누적 93개 등록(UE 5.8 컴파일/실행 **미검증**).
 - [ADR-015](../03_Decisions/15_ADR-015-Turn-Diagnostics-and-DEV-Inspector.md) Proposed. Production debug 정보 노출/보존 정책은 후속 결정.
+
+## Phase 2 Async LLM Proposal MVP (2026-11-13)
+
+- OpenAI HTTP 호출은 Host에서 **비동기** 수행하고 결과를 동기 WAIN `IWAINProposalProvider`에 TurnId/Revision 기반으로 인계.
+- Local `FWAINStructuredProposal` 파서와 OpenAI JSON Schema 추가, 실제 Game/Narrative 검증은 기존 Transaction 유지.
+- 기본 Mock 경로 보존. 13개 테스트 소스 신규 작성·누적 106개, UE 컴파일/API 실증 미검증.
+- [Host 구현](../../../../../Docs/02_Implementation/09_LLM-Structured-Output-Implementation.md) · [ADR-016](../03_Decisions/16_ADR-016-Asynchronous-LLM-Proposal-Handoff.md)

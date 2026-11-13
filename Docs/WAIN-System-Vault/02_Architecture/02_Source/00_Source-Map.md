@@ -141,3 +141,14 @@
 | `Private/Tests/WAINInteractionDebugTests.cpp` | 정상/거절/Replay 기록 3개 테스트 코드 |
 
 Host `FWAINTestbedDebugInspector`는 Plugin의 기록과 Game Snapshot의 전후 요약을 조합한다. 실제 Rule 평가 개별 Trace·Memory Score는 아직 미수집. [ADR-015](../../03_Decisions/15_ADR-015-Turn-Diagnostics-and-DEV-Inspector.md).
+
+## Phase 2 LLM Output Validation (2026-11-13)
+
+| 파일 | 역할 |
+|---|---|
+| `Public/WAINStructuredProposal.h`, `Private/LLM/WAINStructuredProposal.cpp` | Strict JSON typed parser and JSON Schema |
+| `Private/Core/WAINInteractionProcessor.*`, `Public/WAINRuntimeSubsystem.h` | 네트워크 전에 읽을 ReadOnly Context 공통 생성 API |
+| `Source/WAINTestbed/WAINTestbedLLM.{h,cpp}` (Host) | Async API + Revision Queue Provider |
+| `Source/WAINTestbed/WAINTestbedVNWidget.cpp` (Host) | UI 비동기 Request 및 Commit 결과 표시 |
+
+[ADR-016](../../03_Decisions/16_ADR-016-Asynchronous-LLM-Proposal-Handoff.md).

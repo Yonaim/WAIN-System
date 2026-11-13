@@ -138,3 +138,9 @@ A: LLM Only → B: A+Character Agent → C: B+World State Manager → D: C+Narra
 신규 Plugin: `WAIN.DebugTrace.SuccessfulTurn`, `FailedProposalNoCommit`, `ReplayPreservesOriginal` 3개. 신규 Testbed: `WAIN.Testbed.Debug.StateDelta`, `NarrativeTransition`, `MemoryProvenance`, `ExecutedStages` 4개.
 
 검증: 단계의 실제 수행 여부, Proposal와 Revision/No Commit, State Diff, BeatHistory, Memory Retrieval·Source, Replay 불변. 기존 86개 회귀 포함 총 93개 Automation Test 소스 등록. **실제 UE 5.8 Editor 실행/테스트 결과는 없다.**
+
+## 2026-11-13 — Structured Proposal and Host LLM Handoff Tests
+
+- `WAIN.StructuredProposal.*` 8개: Schema JSON, 정상 출력, Unknown/Missing/Wrong Type, Expression/Variant, 정수 Mutation 및 Fraction 거절.
+- `WAIN.Testbed.LLM.*` 5개: Responses Envelope, incomplete/refusal, Queue Revision 불일치 및 1회 소비.
+- 기존 93개와 함께 총 106개 Automation Test 코드 등록. **실제 Unreal 실행 미검증**. 외부 API를 네트워크로 호출하는 테스트는 의도적으로 추가하지 않았다.

@@ -169,36 +169,10 @@
 
         FWAINCharacterContext Context;
         FString Error;
-        if (!ContextBuilder.Build(Request, *Current, PersonaSource.Get(), PresentationCatalog.Get(), Context, Error))
+        if (!BuildContext(Request, *Current, Context, Error, &OutDebug))
         {
-            OutDebug.AddStep(TEXT("Character Context"), EWAINTraceStatus::Failed, Error);
             return Fail(Request, EWAINInteractionError::ContextPreparationFailed, Error);
         }
-        OutDebug.AddStep(TEXT("Character Context"), EWAINTraceStatus::Passed);
-
-        if (!NarrativeEvaluator->BuildContext(*Current, Context.Narrative, Error))
-        {
-            OutDebug.AddStep(TEXT("Narrative Context"), EWAINTraceStatus::Failed, Error);
-            return Fail(Request, EWAINInteractionError::ContextPreparationFailed, Error);
-        }
-        Context.bHasNarrativeContext = !Context.Narrative.BeatId.IsNone();
-        OutDebug.AddStep(TEXT("Narrative Context"), EWAINTraceStatus::Passed);
-
-        if (WorldManager.IsValid())
-        {
-            if (!WorldManager->BuildContext(*Current->Game, Context.World, Error))
-            {
-                OutDebug.AddStep(TEXT("World Context"), EWAINTraceStatus::Failed, Error);
-                return Fail(Request, EWAINInteractionError::ContextPreparationFailed, Error);
-            }
-            Context.bHasWorldContext = true;
-            OutDebug.AddStep(TEXT("World Context"), EWAINTraceStatus::Passed);
-        }
-        else
-        {
-            OutDebug.AddStep(TEXT("World Context"), EWAINTraceStatus::Skipped);
-        }
-
         OutDebug.Context = Context;
         OutDebug.bHasContext = true;
         FWAINResponseProposal Proposal;
@@ -232,9 +206,73 @@
 #pragma endregion
 
 // ============================================================
-// 02. Request Validation And Errors
+// 02. Shared Read-Only Context Preparation
 // ============================================================
-#pragma region 02_Request_Validation_And_Errors
+#pragma region 02_Shared_Read_Only_Context_Preparation
+
+    bool FWAINInteractionProcessor::PrepareTurnContext(const FWAINInteractionRequest &Request,
+                                                       FWAINCharacterContext &OutContext,
+                                                       FString &OutError) const
+    {
+        check(IsInGameThread());
+        const TSharedPtr<const FWAINSessionRoot> Current = StateStore.Read();
+        if (!Current.IsValid() || !ValidateRequest(Request, OutError))
+        {
+            if (OutError.IsEmpty()) OutError = TEXT("WAIN 세션이 시작되지 않았습니다.");
+            return false;
+        }
+        return BuildContext(Request, *Current, OutContext, OutError);
+    }
+
+    bool FWAINInteractionProcessor::BuildContext(const FWAINInteractionRequest &Request,
+                                                 const FWAINSessionRoot &Current,
+                                                 FWAINCharacterContext &OutContext, FString &OutError,
+                                                 FWAINInteractionDebugRecord *Debug) const
+    {
+        const auto Trace = [Debug](const TCHAR *Name, const EWAINTraceStatus Status, const FString &Message = FString())
+        {
+            if (Debug) Debug->AddStep(Name, Status, Message);
+        };
+
+        if (!ContextBuilder.Build(Request, Current, PersonaSource.Get(), PresentationCatalog.Get(),
+                                  OutContext, OutError))
+        {
+            Trace(TEXT("Character Context"), EWAINTraceStatus::Failed, OutError);
+            return false;
+        }
+        Trace(TEXT("Character Context"), EWAINTraceStatus::Passed);
+
+        if (!NarrativeEvaluator->BuildContext(Current, OutContext.Narrative, OutError))
+        {
+            Trace(TEXT("Narrative Context"), EWAINTraceStatus::Failed, OutError);
+            return false;
+        }
+        OutContext.bHasNarrativeContext = !OutContext.Narrative.BeatId.IsNone();
+        Trace(TEXT("Narrative Context"), EWAINTraceStatus::Passed);
+
+        if (WorldManager.IsValid())
+        {
+            if (!Current.Game.IsValid() || !WorldManager->BuildContext(*Current.Game, OutContext.World, OutError))
+            {
+                Trace(TEXT("World Context"), EWAINTraceStatus::Failed, OutError);
+                return false;
+            }
+            OutContext.bHasWorldContext = true;
+            Trace(TEXT("World Context"), EWAINTraceStatus::Passed);
+        }
+        else
+        {
+            Trace(TEXT("World Context"), EWAINTraceStatus::Skipped);
+        }
+        return true;
+    }
+
+#pragma endregion
+
+// ============================================================
+// 03. Request Validation And Errors
+// ============================================================
+#pragma region 03_Request_Validation_And_Errors
 
     bool FWAINInteractionProcessor::ValidateRequest(const FWAINInteractionRequest &Request, FString &OutError) const
     {
