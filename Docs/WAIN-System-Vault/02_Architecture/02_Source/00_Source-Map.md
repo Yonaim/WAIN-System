@@ -152,3 +152,23 @@ Host `FWAINTestbedDebugInspector`는 Plugin의 기록과 Game Snapshot의 전후
 | `Source/WAINTestbed/WAINTestbedVNWidget.cpp` (Host) | UI 비동기 Request 및 Commit 결과 표시 |
 
 [ADR-016](../../03_Decisions/16_ADR-016-Asynchronous-LLM-Proposal-Handoff.md).
+
+## 2026-11-14 — Plugin LLM Internal Layers (현재 정본)
+
+> 위의 역사적 Host `WAINTestbedLLM.*`/Public OpenAI Client 경로는 구버전이다. **다음 표가 최신 소스 경로**다.
+
+| 경로 (`Source/WAINSystem/` 기준) | 책임 |
+|---|---|
+| `Public/LLM/WAINLLMConfig.h` | Host-owned JSON 로드 API 및 실행 설정 DTO |
+| `Public/LLM/WAINLLMTypes.h` | Revision Queue Provider, 요청/조직 사용량 진단 DTO, Host 경고 포맷 |
+| `Public/LLM/WAINLLMTurnService.h` | Async GET → POST 단일 Turn API |
+| `Private/LLM/Config/WAINLLMConfig.cpp` | JSON + 로컬 Key + 환경변수 병합 |
+| `Private/LLM/Prompt/WAINPromptBuilder.{h,cpp}` | System Instruction + Context Prompt 구성 |
+| `Private/LLM/Providers/WAINOpenAIClient.{h,cpp}` | Private OpenAI Responses HTTP / Envelope / Error |
+| `Private/LLM/Validation/WAINStructuredProposal.{h,cpp}` | Private Typed JSON Schema 및 Strict Parser |
+| `Private/LLM/Monitoring/WAINOrganizationUsageMonitor.{h,cpp}` | Private Admin Usage API 조회 / 집계 |
+| `Private/LLM/WAINLLMTurnService.cpp` | 비동기 단계 조율 |
+| `Private/LLM/WAINQueuedProposalProvider.cpp` | Game Thread 한 번 소비되는 TurnId/Revision Guard |
+| `Private/Tests/WAINPromptBuilderTests.cpp` | Prompt 경계 3개 신규 오프라인 테스트 |
+
+[ADR-019](../../03_Decisions/19_ADR-019-LLM-Internal-Layers.md) · [Host LLM Structure](../../../../../../Docs/02_Implementation/11_LLM-Internal-Structure.md)

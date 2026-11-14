@@ -14,7 +14,7 @@
 | Snapshot / Game Transaction 확장 | [Snapshot ADR](03_Decisions/04_ADR-004-Snapshot-State.md), [MVP Adapter ADR](03_Decisions/05_ADR-005-Minimal-Game-Adapter.md), [Commit](02_Architecture/01_Contracts/05_Response-Validation-Commit.md) | 실패 주입·Atomic State 테스트 |
 | Game-owned World State | [World State](02_Architecture/01_Contracts/03_World-State-Manager.md), [Ownership ADR](03_Decisions/01_ADR-001-State-Ownership.md) | Adapter·Commit 계약 |
 | Beat/Goal/Constraint | [Narrative](02_Architecture/01_Contracts/04_Narrative-Manager.md) | Response Validation·Test Plan |
-| 외부 LLM/Embedding | [AI Services](02_Architecture/01_Contracts/06_Shared-AI-Services.md) | Data Contracts·Observability |
+| 외부 LLM/Embedding | [AI Services](02_Architecture/01_Contracts/06_Shared-AI-Services.md), [LLM Internal Structure](../../../../Docs/02_Implementation/11_LLM-Internal-Structure.md) | [ADR-019](03_Decisions/19_ADR-019-LLM-Internal-Layers.md)·Data Contracts·Observability |
 | `EXP_*` 검증, 표정 variant | [Emotion/Expression Contract](02_Architecture/01_Contracts/07_Emotion-Expression-Boundary.md) | 호스트 `Docs/02_Visual-Asset-System.md`, `Content/Data/Characters/ManaExpressions.json` |
 | 데이터 Schema/Save | [Data Contracts](02_Architecture/01_Contracts/08_Data-Contracts.md) | 관련 모듈·Test Plan |
 | 평가·성능 | [Test Plan](05_Experiments/00_Test-Plan.md), [Validation](05_Experiments/01_Validation-and-Tests.md) | 실측이 있을 때만 Performance 문서 갱신 |

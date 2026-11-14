@@ -18,17 +18,20 @@
         FString Provider = TEXT("mock");
         FString Model = TEXT("gpt-5.4-mini");
         FString ReasoningEffort = TEXT("high");
-        float TimeoutSeconds = 60.0F;
+        float   TimeoutSeconds = 60.0F;
         FString ApiKey;
         FString AdminApiKey;
 
         // Organization Usage API counts are an estimate, NOT a free-token balance.
-        bool bUsageMonitorEnabled = true;
+        bool  bUsageMonitorEnabled = true;
         int64 DailyQuotaTokens = 2500000;
         int64 WarningThresholdTokens = 2400000;
         int64 CriticalThresholdTokens = 2490000;
 
-        bool IsOpenAI() const { return Provider.Equals(TEXT("openai"), ESearchCase::IgnoreCase); }
+        bool IsOpenAI() const
+        {
+            return Provider.Equals(TEXT("openai"), ESearchCase::IgnoreCase);
+        }
     };
 
 #pragma endregion
@@ -40,7 +43,7 @@
 
     class WAINSYSTEM_API FWAINLLMConfigLoader final
     {
-      public:
+        public:
         /** @brief Public JSON -> Local secret JSON -> 환경변수 Override 순서로 합친다. */
         static bool Load(FWAINLLMConfig &OutConfig, FString &OutError);
 

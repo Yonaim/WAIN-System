@@ -153,3 +153,10 @@
 - Testbed C++를 `Gameplay/Data/Integration/Presentation/UI/Tests`로 재배치하고 Host HTTP 의존성을 Plugin으로 옮겼다.
 - `Content/` 데이터·이미지와 로컬 비밀키는 보존했다. ADR-018, Architecture, LLM/Usage 문서를 갱신했다.
 - 정적 변경 검토만 수행했다. UE 5.8 빌드, Automation, PIE, API 실호출은 실행하지 않았다.
+
+## 2026-11-14 — LLM 내부 계층 책임 분리 (ADR-019 Proposed)
+
+- `Private/LLM`을 Config, Prompt, Providers, Validation, Monitoring으로 나누고 Prompt Builder를 OpenAI HTTP 구현에서 분리했다.
+- Public LLM 계약을 Config, Types, TurnService로 제한하고 OpenAI/Usage/Structured Proposal 구현을 Private으로 옮겼다. Host Adapter/UI와 Automation 테스트도 새 API에 맞췄다.
+- Prompt 오프라인 테스트 3개를 추가했다. 정적 경로/헤더 검토만 수행했으며 UE 5.8 빌드, Automation, PIE, 외부 API 호출은 실행하지 않았다.
+- [ADR-019](../03_Decisions/19_ADR-019-LLM-Internal-Layers.md) · [Source Map](../02_Architecture/02_Source/00_Source-Map.md) · [Host Architecture](../../../../../Docs/02_Implementation/00_Testbed-Architecture.md).

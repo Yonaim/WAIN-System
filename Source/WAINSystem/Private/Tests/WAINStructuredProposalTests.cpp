@@ -3,10 +3,10 @@
  * @brief 모델 JSON의 필수 필드·타입·Mutation 규칙 및 Schema 생성 결과를 검증한다.
  */
 
+#include "../LLM/Validation/WAINStructuredProposal.h"
 #include "Dom/JsonObject.h"
 #include "Serialization/JsonReader.h"
 #include "Serialization/JsonSerializer.h"
-#include "WAINStructuredProposal.h"
 
 #if WITH_DEV_AUTOMATION_TESTS
 

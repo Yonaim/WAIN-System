@@ -4,7 +4,6 @@
  */
 
 #include "LLM/WAINLLMConfig.h"
-
 #include "Dom/JsonObject.h"
 #include "HAL/PlatformMisc.h"
 #include "Misc/FileHelper.h"
@@ -17,7 +16,8 @@ namespace WAINLLMConfigPrivate
     TSharedPtr<FJsonObject> ParseObject(const FString &Json)
     {
         TSharedPtr<FJsonObject> Root;
-        if (Json.IsEmpty() || Json.Len() > 16384) return nullptr;
+        if (Json.IsEmpty() || Json.Len() > 16384)
+            return nullptr;
         const TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(Json);
         return FJsonSerializer::Deserialize(Reader, Root) ? Root : nullptr;
     }
@@ -25,9 +25,10 @@ namespace WAINLLMConfigPrivate
     void OverrideIfSet(const TCHAR *Variable, FString &OutValue)
     {
         const FString Override = FPlatformMisc::GetEnvironmentVariable(Variable);
-        if (!Override.IsEmpty()) OutValue = Override;
+        if (!Override.IsEmpty())
+            OutValue = Override;
     }
-}
+} // namespace WAINLLMConfigPrivate
 
 // ============================================================
 // 00. Project Config Loading
@@ -39,16 +40,17 @@ namespace WAINLLMConfigPrivate
     bool FWAINLLMConfigLoader::Load(FWAINLLMConfig &OutConfig, FString &OutError)
     {
         FWAINLLMConfig Config;
-        const FString Folder = FPaths::Combine(FPaths::ProjectConfigDir(), TEXT("WAIN"));
-        const FString PublicPath = FPaths::Combine(Folder, TEXT("LLMConfig.json"));
-        const FString SecretPath = FPaths::Combine(Folder, TEXT("LLMConfig.local.json"));
+        const FString  Folder = FPaths::Combine(FPaths::ProjectConfigDir(), TEXT("WAIN"));
+        const FString  PublicPath = FPaths::Combine(Folder, TEXT("LLMConfig.json"));
+        const FString  SecretPath = FPaths::Combine(Folder, TEXT("LLMConfig.local.json"));
 
         FString Json;
         if (FPaths::FileExists(PublicPath))
         {
             if (!FFileHelper::LoadFileToString(Json, *PublicPath) || !ParsePublicJson(Json, Config, OutError))
             {
-                if (OutError.IsEmpty()) OutError = TEXT("LLM 공개 설정 파일을 읽지 못했습니다.");
+                if (OutError.IsEmpty())
+                    OutError = TEXT("LLM 공개 설정 파일을 읽지 못했습니다.");
                 return false;
             }
         }
@@ -56,7 +58,8 @@ namespace WAINLLMConfigPrivate
         {
             if (!FFileHelper::LoadFileToString(Json, *SecretPath) || !ParseLocalJson(Json, Config, OutError))
             {
-                if (OutError.IsEmpty()) OutError = TEXT("LLM 로컬 Secret 파일을 읽지 못했습니다.");
+                if (OutError.IsEmpty())
+                    OutError = TEXT("LLM 로컬 Secret 파일을 읽지 못했습니다.");
                 return false;
             }
         }
@@ -67,7 +70,8 @@ namespace WAINLLMConfigPrivate
         WAINLLMConfigPrivate::OverrideIfSet(TEXT("WAIN_OPENAI_API_KEY"), Config.ApiKey);
         WAINLLMConfigPrivate::OverrideIfSet(TEXT("WAIN_OPENAI_ADMIN_API_KEY"), Config.AdminApiKey);
 
-        if (!Validate(Config, OutError)) return false;
+        if (!Validate(Config, OutError))
+            return false;
         OutConfig = MoveTemp(Config);
         return true;
     }
@@ -79,9 +83,7 @@ namespace WAINLLMConfigPrivate
 // ============================================================
 #pragma region 01_Public_And_Local_JSON_Parsing
 
-    bool FWAINLLMConfigLoader::ParsePublicJson(const FString &Json,
-                                                      FWAINLLMConfig &InOutConfig,
-                                                      FString &OutError)
+    bool FWAINLLMConfigLoader::ParsePublicJson(const FString &Json, FWAINLLMConfig &InOutConfig, FString &OutError)
     {
         const TSharedPtr<FJsonObject> Root = WAINLLMConfigPrivate::ParseObject(Json);
         if (!Root.IsValid())
@@ -144,16 +146,17 @@ namespace WAINLLMConfigPrivate
                 OutError = TEXT("usageMonitor.enabled는 Boolean이어야 합니다.");
                 return false;
             }
-            double Number = 0.0;
-            const TCHAR *Names[] = { TEXT("dailyQuotaTokens"), TEXT("warningThreshold"), TEXT("criticalThreshold") };
-            int64 *Outputs[] = { &InOutConfig.DailyQuotaTokens, &InOutConfig.WarningThresholdTokens,
-                                 &InOutConfig.CriticalThresholdTokens };
+            double       Number = 0.0;
+            const TCHAR *Names[] = {TEXT("dailyQuotaTokens"), TEXT("warningThreshold"), TEXT("criticalThreshold")};
+            int64       *Outputs[] = {&InOutConfig.DailyQuotaTokens,
+                                      &InOutConfig.WarningThresholdTokens,
+                                      &InOutConfig.CriticalThresholdTokens};
             for (int32 Index = 0; Index < 3; ++Index)
             {
                 if ((*Monitor)->HasField(Names[Index]))
                 {
-                    if (!(*Monitor)->TryGetNumberField(Names[Index], Number) || !FMath::IsFinite(Number) ||
-                        Number < 1.0 || Number > 1000000000.0 || Number != FMath::FloorToDouble(Number))
+                    if (!(*Monitor)->TryGetNumberField(Names[Index], Number) || !FMath::IsFinite(Number) || Number < 1.0 ||
+                        Number > 1000000000.0 || Number != FMath::FloorToDouble(Number))
                     {
                         OutError = TEXT("usageMonitor 임계값은 양의 정수여야 합니다.");
                         return false;
@@ -165,9 +168,7 @@ namespace WAINLLMConfigPrivate
         return true;
     }
 
-    bool FWAINLLMConfigLoader::ParseLocalJson(const FString &Json,
-                                                     FWAINLLMConfig &InOutConfig,
-                                                     FString &OutError)
+    bool FWAINLLMConfigLoader::ParseLocalJson(const FString &Json, FWAINLLMConfig &InOutConfig, FString &OutError)
     {
         const TSharedPtr<FJsonObject> Root = WAINLLMConfigPrivate::ParseObject(Json);
         if (!Root.IsValid())
@@ -180,8 +181,7 @@ namespace WAINLLMConfigPrivate
             OutError = TEXT("LLMConfig.local.json의 apiKey는 문자열이어야 합니다.");
             return false;
         }
-        if (Root->HasField(TEXT("adminApiKey")) &&
-            !Root->TryGetStringField(TEXT("adminApiKey"), InOutConfig.AdminApiKey))
+        if (Root->HasField(TEXT("adminApiKey")) && !Root->TryGetStringField(TEXT("adminApiKey"), InOutConfig.AdminApiKey))
         {
             OutError = TEXT("LLMConfig.local.json의 adminApiKey는 문자열이어야 합니다.");
             return false;
@@ -209,16 +209,15 @@ namespace WAINLLMConfigPrivate
             OutError = TEXT("LLM Model ID가 유효하지 않습니다.");
             return false;
         }
-        const bool bKnownEffort = Config.ReasoningEffort == TEXT("none") ||
-            Config.ReasoningEffort == TEXT("low") || Config.ReasoningEffort == TEXT("medium") ||
-            Config.ReasoningEffort == TEXT("high") || Config.ReasoningEffort == TEXT("xhigh");
+        const bool bKnownEffort = Config.ReasoningEffort == TEXT("none") || Config.ReasoningEffort == TEXT("low") ||
+                                  Config.ReasoningEffort == TEXT("medium") || Config.ReasoningEffort == TEXT("high") ||
+                                  Config.ReasoningEffort == TEXT("xhigh");
         if (!bKnownEffort)
         {
             OutError = TEXT("Reasoning Effort는 none/low/medium/high/xhigh 중 하나여야 합니다.");
             return false;
         }
-        if (!FMath::IsFinite(Config.TimeoutSeconds) || Config.TimeoutSeconds < 5.0F ||
-            Config.TimeoutSeconds > 300.0F)
+        if (!FMath::IsFinite(Config.TimeoutSeconds) || Config.TimeoutSeconds < 5.0F || Config.TimeoutSeconds > 300.0F)
         {
             OutError = TEXT("LLM Timeout은 5~300초 사이여야 합니다.");
             return false;

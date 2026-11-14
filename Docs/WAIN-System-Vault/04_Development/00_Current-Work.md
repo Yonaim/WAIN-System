@@ -127,8 +127,19 @@ Host `Content`를 Data/Images/UI/Maps로 정리하고 `Images/Characters/Mana/La
 
 WAINTestbed는 설정/조직 사용량 사전 조회/상단 팝업/DEV 진단 UI를 소유한다. WAINSystem Plugin은 해당 GET 호출이나 Admin 키와 무관하며 기존 Prepared Transaction만 수행한다. 조직 Usage는 무료 토큰의 확정 잔량이 아닌 모델 그룹별 지연 집계 추정이다. 신규 Automation 9개 코드 작성, UE 실제 빌드/PIE 미검증. [ADR-017](../03_Decisions/17_ADR-017-Host-Usage-Preflight-and-Warnings.md).
 
-## 2026-11-14 — LLM Plugin Ownership and Host Data Layout
 
-- OpenAI Client, Prompt/Structured Proposal, Config Loader, Usage Monitor, async Turn Service를 Plugin의 `Public/LLM` 및 `Private/LLM`로 이동했다.
-- Host C++를 `Gameplay / Data / Integration / Presentation / UI / Tests`로 분류하고 HTTP 의존성을 Plugin으로 옮겼다.
-- Host JSON/PNG와 로컬 키 설정은 보존했다. UE 5.8 빌드, Automation, PIE, API 실호출은 미검증이다. [Host Architecture](../../../../../Docs/02_Implementation/00_Testbed-Architecture.md) · [ADR-018](../03_Decisions/18_ADR-018-Plugin-LLM-and-Host-Directories.md).
+## 2026-11-14 — LLM Plugin 소유권 및 Host Data 구조 확정
+
+- `WAINTestbedLLM*`·Config·Usage 관련 기능을 WAINSystem Plugin `Public/LLM`, `Private/LLM`로 이동하고 `FWAINLLMTurnService`로 비동기 GET→POST를 묶었다.
+- Host `Source/WAINTestbed`를 `Gameplay / Data / Integration / Presentation / UI / Tests`로 정리하고 UBT/헤더 경로/기존 Automation 테스트 소속을 갱신했다.
+- Host 프로젝트 `Content/Data`의 JSON 및 PNG, `.obsidian`은 수정하지 않았다. 로컬 비밀키는 원본부터 포함하지 않았다.
+- 모듈 그림과 경계 규약: [Host Architecture](../../../../../Docs/02_Implementation/00_Testbed-Architecture.md) · [ADR-018](../03_Decisions/18_ADR-018-Plugin-LLM-and-Host-Directories.md).
+- **실행 검증 보류:** UE 5.8 UBT, PIE, API 실호출, Automation. 정적 확인과 ZIP 패키징만 수행.
+
+## 2026-11-14 — LLM 내부 계층 책임 분리 (ADR-019 Proposed)
+
+- 기존 Plugin 단일 `Private/LLM`에 모여 있던 LLM 구현을 `Config / Prompt / Providers / Validation / Monitoring`으로 그룹화했다.
+- Prompt Builder를 HTTP Client에서 추출하고, Host의 구체 OpenAI Client 헤더 의존을 공개 `WAINLLMTypes.h`로 대체했다.
+- Responses API, Admin Usage GET, Transaction/No Commit, Mock 기본값, 240만·249만 토큰 경고, 로컬 Config 경로는 유지했다.
+- 신규 `WAIN.LLM.Prompt.*` 테스트 코드 3개 작성, 총 **118개 등록**. Unreal 5.8 UBT/Automation/PIE/실제 API 호출은 미검증.
+- [ADR-019](../03_Decisions/19_ADR-019-LLM-Internal-Layers.md) · [LLM Internal Structure](../../../../../Docs/02_Implementation/11_LLM-Internal-Structure.md).

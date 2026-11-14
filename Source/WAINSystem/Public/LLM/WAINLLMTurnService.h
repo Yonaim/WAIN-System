@@ -6,8 +6,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "LLM/WAINOpenAIClient.h"
-#include "LLM/WAINOrganizationUsageMonitor.h"
+#include "LLM/WAINLLMConfig.h"
+#include "LLM/WAINLLMTypes.h"
 
 // ============================================================
 // 00. One-Turn Request Result
@@ -18,9 +18,9 @@
 
     struct WAINSYSTEM_API FWAINLLMTurnResult
     {
-        bool bSucceeded = false;
-        FWAINResponseProposal Proposal;
-        FString Error;
+        bool                   bSucceeded = false;
+        FWAINResponseProposal  Proposal;
+        FString                Error;
         FWAINLLMRequestMetrics Metrics;
     };
 
@@ -35,19 +35,19 @@
 
     class WAINSYSTEM_API FWAINLLMTurnService final
     {
-      public:
+        public:
         using FIsActive = TFunction<bool()>;
         using FOnUsage = TFunction<void(const FWAINOrganizationUsageSnapshot &)>;
         using FCompletion = TFunction<void(const FWAINLLMTurnResult &)>;
 
         /** @brief 정상 호출 시 Query(GET) 후 Generate(POST). 호출자가 취소되면 POST를 생략한다. */
         static bool Submit(const FWAINInteractionRequest &Request,
-                           const FWAINCharacterContext &Context,
-                           const FWAINLLMConfig &Config,
-                           FIsActive IsActive,
-                           FOnUsage OnUsage,
-                           FCompletion OnComplete,
-                           FString &OutError);
+                           const FWAINCharacterContext   &Context,
+                           const FWAINLLMConfig          &Config,
+                           FIsActive                      IsActive,
+                           FOnUsage                       OnUsage,
+                           FCompletion                    OnComplete,
+                           FString                       &OutError);
     };
 
 #pragma endregion

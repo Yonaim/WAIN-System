@@ -3,8 +3,7 @@
  * @brief 매 대화 전 비동기 Usage 조회와 실패 안전성을 유지하는 추정 사용량 계산을 구현한다.
  */
 
-#include "LLM/WAINOrganizationUsageMonitor.h"
-
+#include "WAINOrganizationUsageMonitor.h"
 #include "Dom/JsonObject.h"
 #include "HttpModule.h"
 #include "Interfaces/IHttpRequest.h"
@@ -18,8 +17,9 @@ namespace WAINOrganizationUsagePrivate
 
     TSharedPtr<FJsonObject> ParseJson(const FString &Json)
     {
-        if (Json.IsEmpty() || Json.Len() > MaxUsageResponseChars) return nullptr;
-        TSharedPtr<FJsonObject> Root;
+        if (Json.IsEmpty() || Json.Len() > MaxUsageResponseChars)
+            return nullptr;
+        TSharedPtr<FJsonObject>         Root;
         const TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(Json);
         return FJsonSerializer::Deserialize(Reader, Root) ? Root : nullptr;
     }
@@ -28,11 +28,12 @@ namespace WAINOrganizationUsagePrivate
     {
         double Number = 0.0;
         if (!Object.IsValid() || !Object->TryGetNumberField(Field, Number) || !FMath::IsFinite(Number) ||
-            Number < 0.0 || Number > 1000000000000.0 || Number != FMath::FloorToDouble(Number)) return false;
+            Number < 0.0 || Number > 1000000000000.0 || Number != FMath::FloorToDouble(Number))
+            return false;
         OutTokens = static_cast<int64>(Number);
         return true;
     }
-}
+} // namespace WAINOrganizationUsagePrivate
 
 // ============================================================
 // 00. Model Group Classification
@@ -43,22 +44,33 @@ namespace WAINOrganizationUsagePrivate
 
     bool FWAINOrganizationUsageMonitor::IsMiniIncentiveGroupModel(const FString &Model)
     {
-        static const TSet<FString> Eligible = {
-            TEXT("gpt-5.6-terra"), TEXT("gpt-5.6-luna"),
-            TEXT("gpt-5.4-mini"), TEXT("gpt-5.4-mini-2026-03-17"),
-            TEXT("gpt-5.4-nano"), TEXT("gpt-5.4-nano-2026-03-17"),
-            TEXT("gpt-5.1-codex-mini"), TEXT("gpt-5-mini"), TEXT("gpt-5-mini-2025-08-07"),
-            TEXT("gpt-5-nano"), TEXT("gpt-5-nano-2025-08-07"),
-            TEXT("gpt-4.1-mini"), TEXT("gpt-4.1-mini-2025-04-14"),
-            TEXT("gpt-4.1-nano"), TEXT("gpt-4.1-nano-2025-04-14"),
-            TEXT("gpt-4o-mini"), TEXT("gpt-4o-mini-2024-07-18"),
-            TEXT("o4-mini"), TEXT("o4-mini-2025-04-16"),
-            TEXT("o1-mini"), TEXT("o1-mini-2024-09-12"), TEXT("codex-mini-latest")
-        };
-        if (Eligible.Contains(Model)) return true;
+        static const TSet<FString> Eligible = {TEXT("gpt-5.6-terra"),
+                                               TEXT("gpt-5.6-luna"),
+                                               TEXT("gpt-5.4-mini"),
+                                               TEXT("gpt-5.4-mini-2026-03-17"),
+                                               TEXT("gpt-5.4-nano"),
+                                               TEXT("gpt-5.4-nano-2026-03-17"),
+                                               TEXT("gpt-5.1-codex-mini"),
+                                               TEXT("gpt-5-mini"),
+                                               TEXT("gpt-5-mini-2025-08-07"),
+                                               TEXT("gpt-5-nano"),
+                                               TEXT("gpt-5-nano-2025-08-07"),
+                                               TEXT("gpt-4.1-mini"),
+                                               TEXT("gpt-4.1-mini-2025-04-14"),
+                                               TEXT("gpt-4.1-nano"),
+                                               TEXT("gpt-4.1-nano-2025-04-14"),
+                                               TEXT("gpt-4o-mini"),
+                                               TEXT("gpt-4o-mini-2024-07-18"),
+                                               TEXT("o4-mini"),
+                                               TEXT("o4-mini-2025-04-16"),
+                                               TEXT("o1-mini"),
+                                               TEXT("o1-mini-2024-09-12"),
+                                               TEXT("codex-mini-latest")};
+        if (Eligible.Contains(Model))
+            return true;
         // API 응답은 alias 대신 dated snapshot 이름을 돌려줄 수 있다.
         return Model.StartsWith(TEXT("gpt-5.4-mini-")) || Model.StartsWith(TEXT("gpt-5.4-nano-")) ||
-            Model.StartsWith(TEXT("gpt-5.6-terra-")) || Model.StartsWith(TEXT("gpt-5.6-luna-"));
+               Model.StartsWith(TEXT("gpt-5.6-terra-")) || Model.StartsWith(TEXT("gpt-5.6-luna-"));
     }
 
 #pragma endregion
@@ -70,9 +82,9 @@ namespace WAINOrganizationUsagePrivate
 
     // group_by=model 결과 중 입력+출력 토큰을 읽는다. service_tier는 무료 잔액 보증이 아니다.
 
-    bool FWAINOrganizationUsageMonitor::ParseResponse(const FString &Json,
-                                                  FWAINOrganizationUsageSnapshot &OutUsage,
-                                                  FString &OutError)
+    bool FWAINOrganizationUsageMonitor::ParseResponse(const FString                  &Json,
+                                                      FWAINOrganizationUsageSnapshot &OutUsage,
+                                                      FString                        &OutError)
     {
         OutUsage = FWAINOrganizationUsageSnapshot();
         OutError.Empty();
@@ -82,10 +94,10 @@ namespace WAINOrganizationUsagePrivate
             OutError = TEXT("Organization Usage API가 유효한 JSON을 반환하지 않았습니다.");
             return false;
         }
-        bool bHasMore = false;
+        bool                                  bHasMore = false;
         const TArray<TSharedPtr<FJsonValue>> *Buckets = nullptr;
-        if (!Root->TryGetBoolField(TEXT("has_more"), bHasMore) ||
-            !Root->TryGetArrayField(TEXT("data"), Buckets) || !Buckets)
+        if (!Root->TryGetBoolField(TEXT("has_more"), bHasMore) || !Root->TryGetArrayField(TEXT("data"), Buckets) ||
+            !Buckets)
         {
             OutError = TEXT("Organization Usage API의 응답 형식이 누락되었습니다.");
             return false;
@@ -104,7 +116,7 @@ namespace WAINOrganizationUsagePrivate
                 OutError = TEXT("잘못된 Organization Usage 버킷입니다.");
                 return false;
             }
-            const TSharedPtr<FJsonObject> Bucket = BucketValue->AsObject();
+            const TSharedPtr<FJsonObject>         Bucket = BucketValue->AsObject();
             const TArray<TSharedPtr<FJsonValue>> *Results = nullptr;
             if (!Bucket->TryGetArrayField(TEXT("results"), Results) || !Results)
             {
@@ -119,7 +131,7 @@ namespace WAINOrganizationUsagePrivate
                     return false;
                 }
                 const TSharedPtr<FJsonObject> Row = ResultValue->AsObject();
-                int64 InputTokens = 0, OutputTokens = 0;
+                int64                         InputTokens = 0, OutputTokens = 0;
                 if (!WAINOrganizationUsagePrivate::ExtractTokenValue(Row, TEXT("input_tokens"), InputTokens) ||
                     !WAINOrganizationUsagePrivate::ExtractTokenValue(Row, TEXT("output_tokens"), OutputTokens))
                 {
@@ -159,15 +171,15 @@ namespace WAINOrganizationUsagePrivate
 
     // 경고는 정보용이며 경고/조회 실패만으로 플레이어나 Transaction을 중단하지 않는다.
 
-    FString FWAINOrganizationUsageMonitor::WarningText(const FWAINOrganizationUsageSnapshot &Usage,
-                                                   const FWAINLLMConfig &Config)
+    FString FWAINLLMUsageDiagnostics::WarningText(const FWAINOrganizationUsageSnapshot &Usage, const FWAINLLMConfig &Config)
     {
-        if (!Config.bUsageMonitorEnabled) return FString();
+        if (!Config.bUsageMonitorEnabled)
+            return FString();
         if (!Usage.bAvailable)
         {
             return TEXT("조직 사용량을 확인하지 못했습니다. 다른 API 호출의 사용량과 무료 혜택 잔량을 알 수 없습니다. ") +
-                (Usage.Error.IsEmpty() ? FString(TEXT("Admin API Key/연결을 확인하세요.")) : Usage.Error) +
-                TEXT("\n경고만 표시하며 LLM 요청은 계속 진행합니다.");
+                   (Usage.Error.IsEmpty() ? FString(TEXT("Admin API Key/연결을 확인하세요.")) : Usage.Error) +
+                   TEXT("\n경고만 표시하며 LLM 요청은 계속 진행합니다.");
         }
         if (Usage.bHasUnclassifiedModels && Usage.UnclassifiedTokens > 0)
         {
@@ -175,32 +187,35 @@ namespace WAINOrganizationUsagePrivate
                 TEXT("추가 요청은 과금될 수 있습니다.\n경고만 표시하며 LLM 요청은 계속 진행합니다.");
         }
         const int64 Tokens = Usage.GroupTokens;
-        if (Tokens < Config.WarningThresholdTokens) return FString();
+        if (Tokens < Config.WarningThresholdTokens)
+            return FString();
         const FString Level = Tokens >= Config.CriticalThresholdTokens ? TEXT("위험") : TEXT("주의");
-        return FString::Printf(
-            TEXT("[%s] 소형 모델 그룹의 조직 사용량이 %lld / %lld 토큰입니다. ")
-            TEXT("이 수치는 무료 잔액이 아닌 집계 지연이 있을 수 있는 추정값입니다. ")
-            TEXT("요청 전체가 유료 처리될 수 있습니다.\n경고만 표시하며 LLM 요청은 계속 진행합니다."),
-            *Level, static_cast<long long>(Tokens), static_cast<long long>(Config.DailyQuotaTokens));
+        return FString::Printf(TEXT("[%s] 소형 모델 그룹의 조직 사용량이 %lld / %lld 토큰입니다. ")
+                                   TEXT("이 수치는 무료 잔액이 아닌 집계 지연이 있을 수 있는 추정값입니다. ") TEXT(
+                                       "요청 전체가 유료 처리될 수 있습니다.\n경고만 표시하며 LLM 요청은 계속 진행합니다."),
+                               *Level,
+                               static_cast<long long>(Tokens),
+                               static_cast<long long>(Config.DailyQuotaTokens));
     }
 
-    FString FWAINOrganizationUsageMonitor::FormatDebug(const FWAINOrganizationUsageSnapshot &Usage,
-                                                   const FWAINLLMConfig &Config)
+    FString FWAINLLMUsageDiagnostics::FormatDebug(const FWAINOrganizationUsageSnapshot &Usage, const FWAINLLMConfig &Config)
     {
-        if (!Config.bUsageMonitorEnabled) return TEXT("Org Usage: monitoring disabled");
+        if (!Config.bUsageMonitorEnabled)
+            return TEXT("Org Usage: monitoring disabled");
         if (!Usage.bAvailable)
         {
             return TEXT("Org Usage: UNAVAILABLE (free balance unknown)\n") +
-                (Usage.Error.IsEmpty() ? FString(TEXT("사용량 조회 전")) : Usage.Error);
+                   (Usage.Error.IsEmpty() ? FString(TEXT("사용량 조회 전")) : Usage.Error);
         }
-        return FString::Printf(
-            TEXT("Org Usage (UTC %s):\nMini-group estimate: %lld / %lld tokens\n")
-            TEXT("Organization completions total: %lld tokens\n")
-            TEXT("Unclassified model tokens: %lld\n")
-            TEXT("NOT a free balance. Data-sharing eligibility and billing are unverified."),
-            *Usage.CheckedAtUtc.ToString(TEXT("%Y-%m-%d %H:%M:%S")),
-            static_cast<long long>(Usage.GroupTokens), static_cast<long long>(Config.DailyQuotaTokens),
-            static_cast<long long>(Usage.OrganizationTokens), static_cast<long long>(Usage.UnclassifiedTokens));
+        return FString::Printf(TEXT("Org Usage (UTC %s):\nMini-group estimate: %lld / %lld tokens\n")
+                                   TEXT("Organization completions total: %lld tokens\n")
+                                       TEXT("Unclassified model tokens: %lld\n")
+                                           TEXT("NOT a free balance. Data-sharing eligibility and billing are unverified."),
+                               *Usage.CheckedAtUtc.ToString(TEXT("%Y-%m-%d %H:%M:%S")),
+                               static_cast<long long>(Usage.GroupTokens),
+                               static_cast<long long>(Config.DailyQuotaTokens),
+                               static_cast<long long>(Usage.OrganizationTokens),
+                               static_cast<long long>(Usage.UnclassifiedTokens));
     }
 
 #pragma endregion
@@ -212,8 +227,10 @@ namespace WAINOrganizationUsagePrivate
 
     // 매 턴 시작 전 조직 전체의 당일 집계를 조회한다. 결과를 받으면 Host가 반드시 LLM POST로 이어간다.
 
-    bool FWAINOrganizationUsageMonitor::Query(const FString &AdminApiKey, const float TimeoutSeconds,
-                                         FCompletion Callback, FString &OutError)
+    bool FWAINOrganizationUsageMonitor::Query(const FString &AdminApiKey,
+                                              const float    TimeoutSeconds,
+                                              FCompletion    Callback,
+                                              FString       &OutError)
     {
         OutError.Empty();
         if (!IsInGameThread())
@@ -226,11 +243,10 @@ namespace WAINOrganizationUsagePrivate
             OutError = TEXT("Admin API Key가 설정되지 않았습니다.");
             return false;
         }
-        const int64 StartTime = FDateTime::UtcNow().GetDate().ToUnixTimestamp();
-        const FString Url = FString::Printf(
-            TEXT("https://api.openai.com/v1/organization/usage/completions?")
-            TEXT("start_time=%lld&bucket_width=1d&limit=1&group_by=model"),
-            static_cast<long long>(StartTime));
+        const int64   StartTime = FDateTime::UtcNow().GetDate().ToUnixTimestamp();
+        const FString Url = FString::Printf(TEXT("https://api.openai.com/v1/organization/usage/completions?")
+                                                TEXT("start_time=%lld&bucket_width=1d&limit=1&group_by=model"),
+                                            static_cast<long long>(StartTime));
         const TSharedRef<IHttpRequest, ESPMode::ThreadSafe> Http = FHttpModule::Get().CreateRequest();
         Http->SetURL(Url);
         Http->SetVerb(TEXT("GET"));
@@ -242,32 +258,34 @@ namespace WAINOrganizationUsagePrivate
         const TSharedRef<FCompletion> OnComplete = MakeShared<FCompletion>(MoveTemp(Callback));
         Http->OnProcessRequestComplete().BindLambda(
             [OnComplete](FHttpRequestPtr CompletedRequest, FHttpResponsePtr Response, const bool bTransportOK)
-        {
-            FWAINOrganizationUsageSnapshot Usage;
-            if (!bTransportOK || !Response.IsValid())
             {
-                Usage.Error = TEXT("Admin Usage API 연결 또는 시간 초과 오류입니다.");
-            }
-            else
-            {
-                Usage.HttpStatus = Response->GetResponseCode();
-                if (Usage.HttpStatus != 200)
+                FWAINOrganizationUsageSnapshot Usage;
+                if (!bTransportOK || !Response.IsValid())
                 {
-                    Usage.Error = FString::Printf(TEXT("Admin Usage API HTTP %d (응답 본문은 기록하지 않음)"),
-                                                  Usage.HttpStatus);
+                    Usage.Error = TEXT("Admin Usage API 연결 또는 시간 초과 오류입니다.");
                 }
                 else
                 {
-                    FString ParseError;
-                    if (!FWAINOrganizationUsageMonitor::ParseResponse(Response->GetContentAsString(), Usage, ParseError))
+                    Usage.HttpStatus = Response->GetResponseCode();
+                    if (Usage.HttpStatus != 200)
                     {
-                        Usage.Error = ParseError;
+                        Usage.Error =
+                            FString::Printf(TEXT("Admin Usage API HTTP %d (응답 본문은 기록하지 않음)"), Usage.HttpStatus);
                     }
-                    Usage.HttpStatus = 200;
+                    else
+                    {
+                        FString ParseError;
+                        if (!FWAINOrganizationUsageMonitor::ParseResponse(Response->GetContentAsString(),
+                                                                          Usage,
+                                                                          ParseError))
+                        {
+                            Usage.Error = ParseError;
+                        }
+                        Usage.HttpStatus = 200;
+                    }
                 }
-            }
-            (*OnComplete)(Usage);
-        });
+                (*OnComplete)(Usage);
+            });
         if (!Http->ProcessRequest())
         {
             Http->OnProcessRequestComplete().Unbind();

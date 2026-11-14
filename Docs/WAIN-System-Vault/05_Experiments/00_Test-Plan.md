@@ -144,3 +144,10 @@ A: LLM Only → B: A+Character Agent → C: B+World State Manager → D: C+Narra
 - `WAIN.StructuredProposal.*` 8개: Schema JSON, 정상 출력, Unknown/Missing/Wrong Type, Expression/Variant, 정수 Mutation 및 Fraction 거절.
 - `WAIN.Testbed.LLM.*` 5개: Responses Envelope, incomplete/refusal, Queue Revision 불일치 및 1회 소비.
 - 기존 93개와 함께 총 106개 Automation Test 코드 등록. **실제 Unreal 실행 미검증**. 외부 API를 네트워크로 호출하는 테스트는 의도적으로 추가하지 않았다.
+
+## 2026-11-14 — Plugin LLM Private Layers Tests
+
+- `WAIN.LLM.Prompt.*` 오프라인 테스트 3개로 System Instruction의 고정 계약, ReadOnly Context Prompt의 필드/누락 처리, 길이 제한을 확인한다.
+- Organization Usage 및 OpenAI/Structured Proposal 테스트를 Plugin의 Private 구현 경로로 이동하고 Host는 공개 `WAINLLMTypes` 계약만 사용한다.
+- 전체 Plugin/Host Automation 등록 코드는 **118개**다. UE 5.8 컴파일과 Automation 실행은 아직 수행하지 않았다.
+- [ADR-019](../03_Decisions/19_ADR-019-LLM-Internal-Layers.md) · [LLM Internal Structure](../../../../../Docs/02_Implementation/11_LLM-Internal-Structure.md).

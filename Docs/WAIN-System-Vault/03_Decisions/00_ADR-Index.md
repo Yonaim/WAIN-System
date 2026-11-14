@@ -28,3 +28,5 @@
 - [ADR-017 — Host Usage Preflight and Warning-only Policy](17_ADR-017-Host-Usage-Preflight-and-Warnings.md) — **Proposed**, Host 조직 사용량 추정·경고/키 보호
 
 - [ADR-018 — Plugin LLM Ownership and Host Directories](18_ADR-018-Plugin-LLM-and-Host-Directories.md) — **Proposed**, LLM 구현 Plugin 이동 / Host Data 명칭 확정
+
+- [ADR-019 — Private LLM Layers and Public Contract Minimization](19_ADR-019-LLM-Internal-Layers.md) — **Proposed**, Prompt/Provider/Validation/Usage 책임 분리 및 최소 Public API
