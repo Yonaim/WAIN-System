@@ -6,6 +6,7 @@
 #include "Core/WAINTransactionCoordinator.h"
 #include "Character/WAINCharacterStatePreparer.h"
 #include "Core/WAINStateValidation.h"
+#include "LLM/Validation/WAINDialogueValidator.h"
 #include "Memory/WAINMemoryReasoningPreparer.h"
 #include "Memory/WAINMemoryWriter.h"
 #include "Presentation/WAINPresentationValidator.h"
@@ -42,7 +43,8 @@
                                                             const FWAINPresentationOptions *AvailablePresentations,
                                                             const IWAINMemoryReasoner      *MemoryReasoner,
                                                             const FWAINWorldStateManager   *WorldManager,
-                                                            FWAINInteractionDebugRecord    *OutDebug) const
+                                                            FWAINInteractionDebugRecord    *OutDebug,
+                                                            const FWAINGlobalDialogueRules *DialogueRules) const
     {
         check(IsInGameThread());
 
@@ -53,10 +55,10 @@
                 OutDebug->AddStep(Name, Status, Detail);
         };
 
-        if (!ValidateProposal(Proposal, AvailablePresentations, Error))
+        if (!ValidateProposal(Proposal, AvailablePresentations, Error, DialogueRules))
         {
             Trace(TEXT("Proposal Validation"), EWAINTraceStatus::Failed, Error);
-            return WAINTransaction::Fail(EWAINInteractionError::InvalidProposal, Error);
+            return Fail(EWAINInteractionError::InvalidProposal, Error);
         }
         Trace(TEXT("Proposal Validation"), EWAINTraceStatus::Passed);
 
@@ -64,7 +66,7 @@
         if (!Current.IsValid() || !Current->Game.IsValid())
         {
             Trace(TEXT("Snapshot Read"), EWAINTraceStatus::Failed, TEXT("확정된 Session Root가 없습니다."));
-            return WAINTransaction::Fail(EWAINInteractionError::SessionNotStarted, TEXT("확정된 Session Root가 없습니다."));
+            return Fail(EWAINInteractionError::SessionNotStarted, TEXT("확정된 Session Root가 없습니다."));
         }
         Trace(TEXT("Snapshot Read"), EWAINTraceStatus::Passed);
 
@@ -73,7 +75,7 @@
         if (!PrepareWAINState(Request, *Current, Proposal, PreparedWAIN, PreparationError, Error))
         {
             Trace(TEXT("WAIN Preparation"), EWAINTraceStatus::Failed, Error);
-            return WAINTransaction::Fail(PreparationError, Error);
+            return Fail(PreparationError, Error);
         }
         Trace(TEXT("WAIN Preparation"), EWAINTraceStatus::Passed);
 
@@ -81,7 +83,7 @@
         if (WorldManager && !WorldManager->ValidateMutations(*Current->Game, GameMutations, Error))
         {
             Trace(TEXT("World Mutation Validation"), EWAINTraceStatus::Failed, Error);
-            return WAINTransaction::Fail(EWAINInteractionError::InvalidProposal, Error);
+            return Fail(EWAINInteractionError::InvalidProposal, Error);
         }
         Trace(TEXT("World Mutation Validation"), WorldManager ? EWAINTraceStatus::Passed : EWAINTraceStatus::Skipped);
 
@@ -89,42 +91,42 @@
         if (!PreparedGame.IsValid())
         {
             Trace(TEXT("Game Preparation"), EWAINTraceStatus::Failed, Error);
-            return WAINTransaction::Fail(EWAINInteractionError::GamePrepareFailed, Error);
+            return Fail(EWAINInteractionError::GamePrepareFailed, Error);
         }
         Trace(TEXT("Game Preparation"), EWAINTraceStatus::Passed);
 
         if (WorldManager && !WorldManager->ValidatePrepared(*Current->Game, *PreparedGame, GameMutations, Error))
         {
             Trace(TEXT("Prepared World Validation"), EWAINTraceStatus::Failed, Error);
-            return WAINTransaction::Fail(EWAINInteractionError::GamePrepareFailed, Error);
+            return Fail(EWAINInteractionError::GamePrepareFailed, Error);
         }
         Trace(TEXT("Prepared World Validation"), WorldManager ? EWAINTraceStatus::Passed : EWAINTraceStatus::Skipped);
 
         if (!NarrativeEvaluator.Evaluate(Request, *Current, PreparedWAIN, *PreparedGame, Error))
         {
             Trace(TEXT("Narrative Evaluation"), EWAINTraceStatus::Failed, Error);
-            return WAINTransaction::Fail(EWAINInteractionError::NarrativeEvaluationFailed, Error);
+            return Fail(EWAINInteractionError::NarrativeEvaluationFailed, Error);
         }
         Trace(TEXT("Narrative Evaluation"), EWAINTraceStatus::Passed);
 
         if (MemoryReasoner && !FWAINMemoryReasoningPreparer().Prepare(Request, PreparedWAIN, *MemoryReasoner, Error))
         {
             Trace(TEXT("Memory Reasoning"), EWAINTraceStatus::Failed, Error);
-            return WAINTransaction::Fail(EWAINInteractionError::MemoryReasoningFailed, Error);
+            return Fail(EWAINInteractionError::MemoryReasoningFailed, Error);
         }
         Trace(TEXT("Memory Reasoning"), MemoryReasoner ? EWAINTraceStatus::Passed : EWAINTraceStatus::Skipped);
 
         if (!WAINStateValidation::Validate(PreparedWAIN, Error) || !GameAdapter.Validate(*PreparedGame, Error))
         {
             Trace(TEXT("Final Validation"), EWAINTraceStatus::Failed, Error);
-            return WAINTransaction::Fail(EWAINInteractionError::FinalValidationFailed, Error);
+            return Fail(EWAINInteractionError::FinalValidationFailed, Error);
         }
         Trace(TEXT("Final Validation"), EWAINTraceStatus::Passed);
 
         if (!StateStore.Publish(Current->Revision, MoveTemp(PreparedWAIN), MoveTemp(PreparedGame)))
         {
             Trace(TEXT("Atomic Publish"), EWAINTraceStatus::Failed, TEXT("확정 Revision이 변경되었습니다."));
-            return WAINTransaction::Fail(EWAINInteractionError::RevisionConflict, TEXT("확정 Revision이 변경되었습니다."));
+            return Fail(EWAINInteractionError::RevisionConflict, TEXT("확정 Revision이 변경되었습니다."));
         }
         Trace(TEXT("Atomic Publish"), EWAINTraceStatus::Passed);
 
@@ -142,13 +144,25 @@
 
     bool FWAINTransactionCoordinator::ValidateProposal(const FWAINResponseProposal    &Proposal,
                                                        const FWAINPresentationOptions *AvailablePresentations,
-                                                       FString                        &OutError) const
+                                                       FString                        &OutError,
+                                                       const FWAINGlobalDialogueRules *DialogueRules) const
     {
-        if (Proposal.Dialogue.TrimStartAndEnd().IsEmpty())
+        if (Proposal.PresentationSteps.IsEmpty() || Proposal.PresentationSteps.Num() > 5)
         {
-            OutError = TEXT("Proposal에 대사가 없습니다.");
+            OutError = TEXT("Proposal에는 1~5개의 PresentationStep이 필요합니다.");
             return false;
         }
+        for (const FWAINPresentationStep &Step : Proposal.PresentationSteps)
+        {
+            if (Step.Dialogue.TrimStartAndEnd().IsEmpty() || Step.Dialogue.Len() > 800)
+            {
+                OutError = TEXT("PresentationStep 대사 길이 또는 내용이 잘못되었습니다.");
+                return false;
+            }
+        }
+
+        if (DialogueRules && !FWAINDialogueValidator::Validate(Proposal, *DialogueRules, OutError))
+            return false;
 
         // Action Schema는 아직 구현되지 않았으므로 미검증 Action은 거절한다.
         if (!Proposal.ActionId.IsNone())

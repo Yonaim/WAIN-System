@@ -5,6 +5,7 @@
 
 #include "WAINOpenAIClient.h"
 #include "../Prompt/WAINPromptBuilder.h"
+#include "../Validation/WAINDialogueValidator.h"
 #include "../Validation/WAINStructuredProposal.h"
 #include "Dom/JsonObject.h"
 #include "HttpModule.h"
@@ -232,7 +233,7 @@
 
         const TSharedRef<FJsonObject> System = MakeShared<FJsonObject>();
         System->SetStringField(TEXT("role"), TEXT("system"));
-        System->SetStringField(TEXT("content"), FWAINPromptBuilder::BuildSystemInstruction());
+        System->SetStringField(TEXT("content"), FWAINPromptBuilder::BuildSystemInstruction(&Context));
         const TSharedRef<FJsonObject> User = MakeShared<FJsonObject>();
         User->SetStringField(TEXT("role"), TEXT("user"));
         User->SetStringField(TEXT("content"), FWAINPromptBuilder::BuildUserPrompt(Request, Context));
@@ -258,7 +259,10 @@
 
         const TSharedRef<FCompletion> OnComplete = MakeShared<FCompletion>(MoveTemp(Callback));
         Http->OnProcessRequestComplete().BindLambda(
-            [OnComplete](FHttpRequestPtr CompletedRequest, FHttpResponsePtr Response, const bool bTransportOK)
+            [OnComplete, Rules = Context.GlobalDialogueRules, bCheckRules = Context.bHasGlobalDialogueRules](
+                FHttpRequestPtr  CompletedRequest,
+                FHttpResponsePtr Response,
+                const bool       bTransportOK)
             {
                 FWAINResponseProposal  Proposal;
                 FString                Error;
@@ -279,6 +283,8 @@
                     Metrics.HttpStatus = 200;
                     FWAINOpenAIClient::ExtractUsage(Response->GetContentAsString(), Metrics);
                     bValid = FWAINOpenAIClient::ExtractProposal(Response->GetContentAsString(), Proposal, Error);
+                    if (bValid && bCheckRules)
+                        bValid = FWAINDialogueValidator::Validate(Proposal, Rules, Error);
                 }
                 (*OnComplete)(bValid, Proposal, Error, Metrics);
             });

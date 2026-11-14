@@ -83,7 +83,7 @@
         FWAINResponseProposal MakeProposal(const bool bIncludeGameChange = true)
         {
             FWAINResponseProposal Proposal;
-            Proposal.Dialogue = TEXT("반가워!");
+            Proposal.PresentationSteps.Add({TEXT("반가워!"), FName(), FName()});
 
             FWAINStateMutation Relationship;
             Relationship.Owner = EWAINMutationOwner::Character;
@@ -252,7 +252,7 @@
     bool FWAINInvalidProposalTest::RunTest(const FString &Parameters)
     {
         FWAINResponseProposal Proposal = WAINTests::MakeProposal();
-        Proposal.ExpressionId = TEXT("EXP_NOT_REGISTERED");
+        Proposal.PresentationSteps.Last().ExpressionId = TEXT("EXP_NOT_REGISTERED");
 
         FString Error;
         auto    Processor = WAINTests::MakeProcessor(Proposal, Error);
@@ -504,6 +504,33 @@
         return true;
     }
 
+#pragma endregion
+
+// ============================================================
+// 09. Multi-Step Atomic Commit
+// ============================================================
+#pragma region 10_Multi_Step_Atomic_Commit
+    IMPLEMENT_SIMPLE_AUTOMATION_TEST(FWAINMultiStepAtomicTest,
+                                     "WAIN.Transaction.MultiStepSingleCommit",
+                                     EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+    bool FWAINMultiStepAtomicTest::RunTest(const FString &Parameters)
+    {
+        auto Proposal = WAINTests::MakeProposal(false);
+        Proposal.PresentationSteps.Add({TEXT("두 번째 말이야."), FName(), FName()});
+        FString Error;
+        auto    Processor = WAINTests::MakeProcessor(Proposal, Error);
+        if (!TestTrue(TEXT("세션 생성"), Processor != nullptr))
+            return false;
+        const auto Result = Processor->ProcessTurn(WAINTests::MakeRequest());
+        TestTrue(TEXT("턴당 한 Commit"), Result.Succeeded());
+        TestEqual(TEXT("Revision one"), Processor->GetSnapshot()->Revision, uint64(1));
+        TestEqual(TEXT("Presentation step two"), Result.PresentationSteps.Num(), 2);
+        TestEqual(TEXT("Memory 기록수: 입력 + 캐릭터"), Processor->GetSnapshot()->WAIN.MemoryStream.Num(), 2);
+        if (Processor->GetSnapshot()->WAIN.MemoryStream.Num() == 2)
+            TestTrue(TEXT("연속 대사 포함"),
+                     Processor->GetSnapshot()->WAIN.MemoryStream[1].Content.Contains(TEXT("두 번째 말이야.")));
+        return true;
+    }
 #pragma endregion
 
 #endif // WITH_DEV_AUTOMATION_TESTS

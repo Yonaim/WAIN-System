@@ -60,7 +60,7 @@
                                              FString                       &OutError) const override
             {
                 Captured.Add(Context);
-                OutProposal.Dialogue = TEXT("반가워!");
+                OutProposal.PresentationSteps.Add({TEXT("반가워!"), FName(), FName()});
 
                 FWAINStateMutation Trust;
                 Trust.Owner = EWAINMutationOwner::Character;
@@ -90,7 +90,7 @@
                                   FString                       &OutError) const override
             {
                 ++Calls;
-                OutProposal.Dialogue = TEXT("이전 Provider 호출");
+                OutProposal.PresentationSteps.Add({TEXT("이전 Provider 호출"), FName(), FName()});
                 return true;
             }
         };

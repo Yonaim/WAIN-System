@@ -195,7 +195,8 @@
                                 Context.bHasPresentationCatalog ? &Context.AvailablePresentations : nullptr,
                                 MemoryReasoner.Get(),
                                 WorldManager.Get(),
-                                &OutDebug);
+                                &OutDebug,
+                                Context.bHasGlobalDialogueRules ? &Context.GlobalDialogueRules : nullptr);
         if (!Commit.Succeeded())
         {
             return Fail(Request, Commit.Error, Commit.Message);
@@ -204,9 +205,7 @@
         FWAINInteractionResult Result;
         Result.TurnId = Request.TurnId;
         Result.CommittedRevision = Commit.Revision;
-        Result.Dialogue = Proposal.Dialogue;
-        Result.ExpressionId = Proposal.ExpressionId;
-        Result.ExpressionVariantId = Proposal.ExpressionVariantId;
+        Result.PresentationSteps = Proposal.PresentationSteps;
         return Result;
     }
 

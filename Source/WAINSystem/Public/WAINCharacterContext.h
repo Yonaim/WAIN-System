@@ -8,6 +8,7 @@
 #include "CoreMinimal.h"
 #include "WAINNarrativeTypes.h"
 #include "WAINPresentationCatalog.h"
+#include "WAINRelationshipTypes.h"
 #include "WAINRuntimeTypes.h"
 #include "WAINWorldTypes.h"
 
@@ -19,12 +20,13 @@
     /** @brief Host가 제공하는 고정 캐릭터 정의. 런타임 State나 공개 불가 서사 정보는 포함하지 않는다. */
     struct FWAINCharacterPersona
     {
-        FName           CharacterId;
-        FString         DisplayName;
-        TArray<FString> Traits;
-        FString         SpeechStyle;
-        FString         Background;
-        TArray<FString> Preferences;
+        FName                                            CharacterId;
+        FString                                          DisplayName;
+        TArray<FString>                                  Traits;
+        FString                                          SpeechStyle;
+        FString                                          Background;
+        TArray<FString>                                  Preferences;
+        TMap<FName, FWAINCharacterRelationshipResponses> RelationshipResponses;
     };
 
     /** @brief Persona 정의의 정본은 Host에 있으며, WAIN은 조회만 수행한다. */
@@ -34,6 +36,15 @@
         virtual ~IWAINPersonaSource() = default;
 
         virtual bool GetPersona(FName CharacterId, FWAINCharacterPersona &OutPersona, FString &OutError) const = 0;
+        virtual bool GetRelationshipDefinitions(TMap<FName, FWAINRelationshipDefinition> &OutDefinitions,
+                                                FString                                  &OutError) const
+        {
+            return false;
+        }
+        virtual bool GetGlobalDialogueRules(FWAINGlobalDialogueRules &OutRules, FString &OutError) const
+        {
+            return false;
+        }
     };
 
 #pragma endregion
@@ -46,21 +57,24 @@
     /** @brief 현재 확정된 Character State·Host 정의·검색된 Memory를 포함한 읽기 전용 Context. */
     struct FWAINCharacterContext
     {
-        FName                     CharacterId;
-        FName                     SceneId;
-        FName                     ActiveBeatId;
-        uint64                    StateRevision = 0;
-        int32                     TurnCount = 0;
-        FWAINCharacterState       State;
-        TArray<FWAINMemoryRecord> RelevantMemories;
-        bool                      bHasPersona = false;
-        FWAINCharacterPersona     Persona;
-        bool                      bHasPresentationCatalog = false;
-        FWAINPresentationOptions  AvailablePresentations;
-        bool                      bHasNarrativeContext = false;
-        FWAINNarrativeContext     Narrative;
-        bool                      bHasWorldContext = false;
-        FWAINWorldContext         World;
+        FName                                    CharacterId;
+        FName                                    SceneId;
+        FName                                    ActiveBeatId;
+        uint64                                   StateRevision = 0;
+        int32                                    TurnCount = 0;
+        FWAINCharacterState                      State;
+        TArray<FWAINMemoryRecord>                RelevantMemories;
+        bool                                     bHasPersona = false;
+        FWAINCharacterPersona                    Persona;
+        TMap<FName, FWAINRelationshipDefinition> RelationshipDefinitions;
+        FWAINGlobalDialogueRules                 GlobalDialogueRules;
+        bool                                     bHasGlobalDialogueRules = false;
+        bool                                     bHasPresentationCatalog = false;
+        FWAINPresentationOptions                 AvailablePresentations;
+        bool                                     bHasNarrativeContext = false;
+        FWAINNarrativeContext                    Narrative;
+        bool                                     bHasWorldContext = false;
+        FWAINWorldContext                        World;
     };
 
 #pragma endregion

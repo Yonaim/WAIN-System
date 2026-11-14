@@ -1,5 +1,13 @@
 # Work Log
 
+## 2026-11-14 — Relationship Semantics / PresentationStep 패키지 적용
+
+- **입력:** `WAINTestbed-Relationship-PresentationSteps-Source-and-Data` 적용 패키지.
+- **Plugin:** 5개 Relationship 정수 파라미터, `FWAINPresentationStep` 단일 응답 계약, Strict Structured Output, 공통 대사 Validator, 단일 Commit 후 Step 재생을 반영했다.
+- **Testbed:** Relationship/Dialogue JSON Loader, CH01 시작 관계 상태, `PresentationSequencePlayer`, NEXT 기반 VN UI, DEV Inspector와 관련 자동화 테스트를 반영했다.
+- **문서:** ADR-020, Relationship/PresentationStep 구현 문서, Source Map, Current Work를 동기화했다. 기존 로컬 `Content/Images`·오디오·`AudioCatalog.json`은 보존했다.
+- **검증:** JSON 파싱·참조 경로·소스 계약 정적 검토와 `WAINTestbedEditor Win64 Development` 빌드를 수행해 성공했다. Automation Test, PIE, OpenAI 실호출은 아직 실행하지 않았다.
+
 ## 2026-11-10 — Vault & Data Contract Initialization
 
 - **입력:** `testbed.zip`, `Universal-Agent-Vault.zip`(v5.9), 기존 프로젝트 문서·중간발표 자료.

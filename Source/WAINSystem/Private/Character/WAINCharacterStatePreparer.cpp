@@ -1,6 +1,6 @@
 /**
  * @file WAINCharacterStatePreparer.cpp
- * @brief Trust와 독립 6차원 Emotion Delta를 Prepared Character State에 반영한다.
+ * @brief 다섯 관계 파라미터와 독립 6차원 Emotion Delta를 Prepared Character State에 반영한다.
  */
 
 #include "Character/WAINCharacterStatePreparer.h"
@@ -42,9 +42,9 @@
                                                     FWAINCharacterState      &Character,
                                                     FString                  &OutError) const
     {
-        if (Mutation.TargetId == TEXT("relationship.trust"))
+        if (Mutation.TargetId.ToString().StartsWith(TEXT("relationship.")))
         {
-            return ApplyTrust(Mutation, Character, OutError);
+            return ApplyRelationship(Mutation, Character, OutError);
         }
 
         return ApplyEmotionDelta(Mutation, Character, OutError);
@@ -57,27 +57,41 @@
 // ============================================================
 #pragma region 01_Relationship_Update
 
-    bool FWAINCharacterStatePreparer::ApplyTrust(const FWAINStateMutation &Mutation,
-                                                 FWAINCharacterState      &Character,
-                                                 FString                  &OutError) const
+    bool FWAINCharacterStatePreparer::ApplyRelationship(const FWAINStateMutation &Mutation,
+                                                        FWAINCharacterState      &Character,
+                                                        FString                  &OutError) const
     {
+        int32 *Target = nullptr;
+        if (Mutation.TargetId == TEXT("relationship.trust"))
+            Target = &Character.Trust;
+        else if (Mutation.TargetId == TEXT("relationship.affection"))
+            Target = &Character.Affection;
+        else if (Mutation.TargetId == TEXT("relationship.familiarity"))
+            Target = &Character.Familiarity;
+        else if (Mutation.TargetId == TEXT("relationship.comfort"))
+            Target = &Character.Comfort;
+        else if (Mutation.TargetId == TEXT("relationship.romantic_attraction"))
+            Target = &Character.RomanticAttraction;
+        if (!Target)
+        {
+            OutError = TEXT("등록되지 않은 Relationship Target입니다.");
+            return false;
+        }
         if (Mutation.Operation != EWAINMutationOperation::AddInteger &&
             Mutation.Operation != EWAINMutationOperation::SetInteger)
         {
-            OutError = TEXT("Trust에는 정수 Set/Add 연산만 허용됩니다.");
+            OutError = TEXT("관계 파라미터에는 정수 Set/Add만 허용됩니다.");
             return false;
         }
-
-        const int64 NextTrust = Mutation.Operation == EWAINMutationOperation::AddInteger
-                                    ? static_cast<int64>(Character.Trust) + Mutation.IntegerValue
-                                    : static_cast<int64>(Mutation.IntegerValue);
-        if (NextTrust < 0 || NextTrust > 100)
+        const int64 Next = Mutation.Operation == EWAINMutationOperation::AddInteger
+                               ? static_cast<int64>(*Target) + Mutation.IntegerValue
+                               : static_cast<int64>(Mutation.IntegerValue);
+        if (Next < 0 || Next > 100)
         {
-            OutError = TEXT("Trust는 0부터 100 사이여야 합니다.");
+            OutError = TEXT("관계 파라미터는 0부터 100 사이여야 합니다.");
             return false;
         }
-
-        Character.Trust = static_cast<int32>(NextTrust);
+        *Target = static_cast<int32>(Next);
         return true;
     }
 

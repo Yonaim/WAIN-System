@@ -17,7 +17,8 @@
         namespace WAINStructuredProposal
         {
             constexpr int32 MaxResponseChars = 32768;
-            constexpr int32 MaxDialogueChars = 4096;
+            constexpr int32 MaxDialogueChars = 800;
+            constexpr int32 MaxSteps = 5;
             constexpr int32 MaxMutations = 8;
 
             bool RequireExactFields(const TSharedPtr<FJsonObject> &Object, const TArray<FString> &Keys, FString &OutError)
@@ -162,38 +163,54 @@
             OutError = TEXT("LLM 응답이 유효한 JSON 객체가 아닙니다.");
             return false;
         }
-        const TArray<FString> Keys = {TEXT("dialogue"),
-                                      TEXT("actionId"),
-                                      TEXT("expressionId"),
-                                      TEXT("expressionVariantId"),
-                                      TEXT("mutations")};
+        const TArray<FString> Keys = {TEXT("presentationSteps"), TEXT("actionId"), TEXT("mutations")};
         if (!WAINStructuredProposal::RequireExactFields(Root, Keys, OutError))
             return false;
 
         FWAINResponseProposal Parsed;
-        FString               Action, Expression, Variant;
-        if (!WAINStructuredProposal::ReadBoundedString(Root,
-                                                       TEXT("dialogue"),
-                                                       WAINStructuredProposal::MaxDialogueChars,
-                                                       Parsed.Dialogue,
-                                                       OutError) ||
-            Parsed.Dialogue.TrimStartAndEnd().IsEmpty() ||
-            !WAINStructuredProposal::ReadBoundedString(Root, TEXT("actionId"), 128, Action, OutError) ||
-            !WAINStructuredProposal::ReadBoundedString(Root, TEXT("expressionId"), 128, Expression, OutError) ||
-            !WAINStructuredProposal::ReadBoundedString(Root, TEXT("expressionVariantId"), 128, Variant, OutError))
-        {
-            if (OutError.IsEmpty())
-                OutError = TEXT("LLM 대사가 비어 있습니다.");
+        FString               Action;
+        if (!WAINStructuredProposal::ReadBoundedString(Root, TEXT("actionId"), 128, Action, OutError))
             return false;
-        }
-        if (Expression.IsEmpty() != Variant.IsEmpty())
-        {
-            OutError = TEXT("Expression과 Variant는 모두 비어 있거나 모두 지정해야 합니다.");
-            return false;
-        }
         Parsed.ActionId = FName(*Action);
-        Parsed.ExpressionId = FName(*Expression);
-        Parsed.ExpressionVariantId = FName(*Variant);
+
+        const TArray<TSharedPtr<FJsonValue>> *Steps = nullptr;
+        if (!Root->TryGetArrayField(TEXT("presentationSteps"), Steps) || !Steps || Steps->Num() < 1 ||
+            Steps->Num() > WAINStructuredProposal::MaxSteps)
+        {
+            OutError = TEXT("PresentationStep 배열은 1~5개여야 합니다.");
+            return false;
+        }
+        const TArray<FString> StepKeys = {TEXT("dialogue"), TEXT("expressionId"), TEXT("expressionVariantId")};
+        for (const TSharedPtr<FJsonValue> &Value : *Steps)
+        {
+            if (!Value.IsValid() || Value->Type != EJson::Object ||
+                !WAINStructuredProposal::RequireExactFields(Value->AsObject(), StepKeys, OutError))
+                return false;
+            const TSharedPtr<FJsonObject> StepObject = Value->AsObject();
+            FWAINPresentationStep         Step;
+            FString                       Expression, Variant;
+            if (!WAINStructuredProposal::ReadBoundedString(StepObject,
+                                                           TEXT("dialogue"),
+                                                           WAINStructuredProposal::MaxDialogueChars,
+                                                           Step.Dialogue,
+                                                           OutError) ||
+                Step.Dialogue.TrimStartAndEnd().IsEmpty() ||
+                !WAINStructuredProposal::ReadBoundedString(StepObject, TEXT("expressionId"), 128, Expression, OutError) ||
+                !WAINStructuredProposal::ReadBoundedString(StepObject, TEXT("expressionVariantId"), 128, Variant, OutError))
+            {
+                if (OutError.IsEmpty())
+                    OutError = TEXT("PresentationStep에 대사가 없습니다.");
+                return false;
+            }
+            if (Expression.IsEmpty() != Variant.IsEmpty())
+            {
+                OutError = TEXT("Expression과 Variant는 함께 지정해야 합니다.");
+                return false;
+            }
+            Step.ExpressionId = FName(*Expression);
+            Step.ExpressionVariantId = FName(*Variant);
+            Parsed.PresentationSteps.Add(MoveTemp(Step));
+        }
 
         const TArray<TSharedPtr<FJsonValue>> *Mutations = nullptr;
         if (!Root->TryGetArrayField(TEXT("mutations"), Mutations) || !Mutations ||
@@ -229,17 +246,19 @@
     {
         // OpenAI Responses API text.format.schema에 사용하는 닫힌 형식이다.
         return TEXT("{\"type\":\"object\",\"additionalProperties\":false,\"properties\":{") TEXT(
-            "\"dialogue\":{\"type\":\"string\"},") TEXT("\"actionId\":{\"type\":\"string\"},")
-            TEXT("\"expressionId\":{\"type\":\"string\"},") TEXT("\"expressionVariantId\":{\"type\":\"string\"},") TEXT(
-                "\"mutations\":{\"type\":\"array\",\"items\":{")
-                TEXT("\"type\":\"object\",\"additionalProperties\":false,\"properties\":{") TEXT(
-                    "\"owner\":{\"type\":\"string\",\"enum\":[\"character\",\"game\"]},")
-                    TEXT("\"targetId\":{\"type\":\"string\"},") TEXT(
-                        "\"operation\":{\"type\":\"string\",\"enum\":[\"addInteger\",\"setInteger\",\"addFloat\"]},")
-                        TEXT("\"integerValue\":{\"type\":\"integer\"},") TEXT("\"floatValue\":{\"type\":\"number\"}},")
-                            TEXT("\"required\":[\"owner\",\"targetId\",\"operation\",\"integerValue\",\"floatValue\"]}}},")
-                                TEXT("\"required\":[\"dialogue\",\"actionId\",\"expressionId\",\"expressionVariantId\","
-                                     "\"mutations\"]}");
+            "\"presentationSteps\":{\"type\":\"array\",")
+            TEXT("\"items\":{\"type\":\"object\",\"additionalProperties\":false,") TEXT(
+                "\"properties\":{\"dialogue\":{\"type\":\"string\"},") TEXT("\"expressionId\":{\"type\":\"string\"},")
+                TEXT("\"expressionVariantId\":{\"type\":\"string\"}},") TEXT(
+                    "\"required\":[\"dialogue\",\"expressionId\",\"expressionVariantId\"]}},")
+                    TEXT("\"actionId\":{\"type\":\"string\"},") TEXT("\"mutations\":{\"type\":\"array\",\"items\":{") TEXT(
+                        "\"type\":\"object\",\"additionalProperties\":false,\"properties\":{")
+                        TEXT("\"owner\":{\"type\":\"string\",\"enum\":[\"character\",\"game\"]},") TEXT(
+                            "\"targetId\":{\"type\":\"string\"},") TEXT("\"operation\":{\"type\":\"string\",\"enum\":["
+                                                                        "\"addInteger\",\"setInteger\",\"addFloat\"]},")
+                            TEXT("\"integerValue\":{\"type\":\"integer\"},\"floatValue\":{\"type\":\"number\"}},") TEXT(
+                                "\"required\":[\"owner\",\"targetId\",\"operation\",\"integerValue\",\"floatValue\"]}}},")
+                                TEXT("\"required\":[\"presentationSteps\",\"actionId\",\"mutations\"]}");
     }
 
 #pragma endregion

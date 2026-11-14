@@ -70,7 +70,7 @@
 
             FProvider()
             {
-                Proposal.Dialogue = TEXT("좋아, 기억하고 있어.");
+                Proposal.PresentationSteps.Add({TEXT("좋아, 기억하고 있어."), FName(), FName()});
             }
 
             virtual bool Generate(const FWAINInteractionRequest &Request,

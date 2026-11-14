@@ -89,6 +89,28 @@
 
         Context.Persona = MoveTemp(Persona);
         Context.bHasPersona = true;
+        if (PersonaSource->GetRelationshipDefinitions(Context.RelationshipDefinitions, OutError))
+        {
+            for (const TPair<FName, FWAINRelationshipDefinition> &Entry : Context.RelationshipDefinitions)
+            {
+                const FWAINRelationshipDefinition &Definition = Entry.Value;
+                if (Definition.Min != 0 || Definition.Max != 100 ||
+                    !(Definition.Low.Value < Definition.Neutral.Value &&
+                      Definition.Neutral.Value < Definition.High.Value) ||
+                    Definition.Low.Description.IsEmpty() || Definition.Neutral.Description.IsEmpty() ||
+                    Definition.High.Description.IsEmpty())
+                {
+                    OutError = TEXT("관계 Semantic Anchors가 유효하지 않습니다.");
+                    return false;
+                }
+            }
+        }
+        else if (!OutError.IsEmpty())
+            return false;
+        if (PersonaSource->GetGlobalDialogueRules(Context.GlobalDialogueRules, OutError))
+            Context.bHasGlobalDialogueRules = true;
+        else if (!OutError.IsEmpty())
+            return false;
         return true;
     }
 

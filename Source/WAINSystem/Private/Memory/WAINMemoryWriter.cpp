@@ -25,9 +25,16 @@
             return false;
         }
 
+        FString CharacterDialogue;
+        for (const FWAINPresentationStep &Step : Proposal.PresentationSteps)
+        {
+            if (!CharacterDialogue.IsEmpty())
+                CharacterDialogue += TEXT("\n");
+            CharacterDialogue += Step.Dialogue;
+        }
         return AppendObservation(Request.CharacterId,
                                  EWAINMemorySpeaker::Character,
-                                 Proposal.Dialogue,
+                                 CharacterDialogue,
                                  Prepared.TurnCount,
                                  Prepared,
                                  OutError);

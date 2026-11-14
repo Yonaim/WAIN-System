@@ -28,7 +28,7 @@
                                   FWAINResponseProposal         &OutProposal,
                                   FString                       &OutError) const override
             {
-                OutProposal.Dialogue = TEXT("약속을 기억하고 있어.");
+                OutProposal.PresentationSteps.Add({TEXT("약속을 기억하고 있어."), FName(), FName()});
                 return true;
             }
         };
@@ -54,7 +54,7 @@
                                              FString                       &OutError) const override
             {
                 Contexts.Add(Context);
-                OutProposal.Dialogue = TEXT("약속을 기억하고 있어.");
+                OutProposal.PresentationSteps.Add({TEXT("약속을 기억하고 있어."), FName(), FName()});
                 if (bInvalidGameMutation)
                 {
                     FWAINStateMutation Mutation;

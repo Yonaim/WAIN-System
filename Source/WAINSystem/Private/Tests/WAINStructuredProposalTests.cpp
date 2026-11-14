@@ -21,16 +21,18 @@
     {
         FString Valid()
         {
-            return TEXT("{\"dialogue\":\"안녕!\",\"actionId\":\"\",\"expressionId\":\"EXP_MANA_NEUTRAL\","
-                        "\"expressionVariantId\":\"default\",\"mutations\":[]}");
+            return TEXT("{\"presentationSteps\":[{\"dialogue\":\"안녕!\",\"expressionId\":\"EXP_MANA_NEUTRAL\",")
+                TEXT("\"expressionVariantId\":\"default\"}],\"actionId\":\"\",\"mutations\":[]}");
         }
 
         FString WithMutation(const FString &Mutation)
         {
-            return TEXT("{\"dialogue\":\"안녕!\",\"actionId\":\"\",\"expressionId\":\"\","
-                        "\"expressionVariantId\":\"\",\"mutations\":[") +
-                   Mutation + TEXT("]}");
+            FString       Json = Valid();
+            const FString Replacement = FString(TEXT("\"mutations\":[")) + Mutation + TEXT("]");
+            Json.ReplaceInline(TEXT("\"mutations\":[]"), *Replacement);
+            return Json;
         }
+
     } // namespace WAINStructuredTests
 
 #pragma endregion
@@ -49,8 +51,8 @@
         FString               Error;
         FWAINResponseProposal Proposal;
         TestTrue(TEXT("Valid Proposal"), FWAINStructuredProposal::Parse(WAINStructuredTests::Valid(), Proposal, Error));
-        TestEqual(TEXT("대사"), Proposal.Dialogue, FString(TEXT("안녕!")));
-        TestTrue(TEXT("표정 ID"), Proposal.ExpressionId == TEXT("EXP_MANA_NEUTRAL"));
+        TestEqual(TEXT("대사"), Proposal.PresentationSteps[0].Dialogue, FString(TEXT("안녕!")));
+        TestTrue(TEXT("표정 ID"), Proposal.PresentationSteps[0].ExpressionId == TEXT("EXP_MANA_NEUTRAL"));
         TestEqual(TEXT("Mutation 없음"), Proposal.StateChanges.Num(), 0);
         return true;
     }
@@ -167,6 +169,29 @@
                                                    "\"targetId\":\"relationship.trust\",\"operation\":\"addInteger\","
                                                    "\"integerValue\":1.5,\"floatValue\":0}"));
         TestFalse(TEXT("Fractional integer"), FWAINStructuredProposal::Parse(Json, Proposal, Error));
+        return true;
+    }
+
+    IMPLEMENT_SIMPLE_AUTOMATION_TEST(FWAINStructuredMultiStepTest,
+                                     "WAIN.StructuredProposal.MultipleStepsStrict",
+                                     EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+
+    bool FWAINStructuredMultiStepTest::RunTest(const FString &Parameters)
+    {
+        FString Json = WAINStructuredTests::Valid();
+        Json.ReplaceInline(
+            TEXT("}],\"actionId\":"),
+            TEXT("},{\"dialogue\":\"또 보자.\",\"expressionId\":\"\",\"expressionVariantId\":\"\"}],\"actionId\":"));
+        FWAINResponseProposal Proposal;
+        FString               Error;
+        TestTrue(TEXT("Step 2개 허용"), FWAINStructuredProposal::Parse(Json, Proposal, Error));
+        TestEqual(TEXT("2 Steps"), Proposal.PresentationSteps.Num(), 2);
+        if (Proposal.PresentationSteps.Num() == 2)
+            TestEqual(TEXT("Second dialogue"), Proposal.PresentationSteps[1].Dialogue, FString(TEXT("또 보자.")));
+        TestFalse(TEXT("이전 단일 Dialogue 계약 거절"),
+                  FWAINStructuredProposal::Parse(TEXT("{\"dialogue\":\"안녕\",\"actionId\":\"\",\"mutations\":[]}"),
+                                                 Proposal,
+                                                 Error));
         return true;
     }
 

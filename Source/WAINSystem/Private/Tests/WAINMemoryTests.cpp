@@ -41,7 +41,7 @@
                                              FString                       &OutError) const override
             {
                 Contexts.Add(Context);
-                OutProposal.Dialogue = bEmptyDialogue ? TEXT("") : TEXT("그래, 기억할게.");
+                OutProposal.PresentationSteps.Add({bEmptyDialogue ? TEXT("") : TEXT("그래, 기억할게."), FName(), FName()});
                 if (bInvalidGameMutation)
                 {
                     FWAINStateMutation Mutation;

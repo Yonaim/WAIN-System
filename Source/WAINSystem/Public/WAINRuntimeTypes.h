@@ -80,13 +80,19 @@
         float                  FloatValue = 0.0F;
     };
 
+    /** @brief 동일 턴 안에서 순차 재생되는 대사와 화면 표정. Narrative Beat와 별개이다. */
+    struct FWAINPresentationStep
+    {
+        FString Dialogue;
+        FName   ExpressionId;
+        FName   ExpressionVariantId;
+    };
+
     struct FWAINResponseProposal
     {
-        FString                    Dialogue;
-        FName                      ActionId;
-        FName                      ExpressionId;
-        FName                      ExpressionVariantId;
-        TArray<FWAINStateMutation> StateChanges;
+        TArray<FWAINPresentationStep> PresentationSteps;
+        FName                         ActionId;
+        TArray<FWAINStateMutation>    StateChanges;
     };
 
 #pragma endregion
@@ -110,6 +116,10 @@
     struct FWAINCharacterState
     {
         int32             Trust = 0;
+        int32             Affection = 0;
+        int32             Familiarity = 0;
+        int32             Comfort = 0;
+        int32             RomanticAttraction = 0;
         FWAINEmotionState Emotion;
     };
 
@@ -140,14 +150,12 @@
 
     struct FWAINInteractionResult
     {
-        FGuid                 TurnId;
-        EWAINInteractionError Error = EWAINInteractionError::None;
-        FString               ErrorMessage;
-        uint64                CommittedRevision = 0;
-        FString               Dialogue;
-        FName                 ExpressionId;
-        FName                 ExpressionVariantId;
-        bool                  bReplayed = false;
+        FGuid                         TurnId;
+        EWAINInteractionError         Error = EWAINInteractionError::None;
+        FString                       ErrorMessage;
+        uint64                        CommittedRevision = 0;
+        TArray<FWAINPresentationStep> PresentationSteps;
+        bool                          bReplayed = false;
 
         bool Succeeded() const
         {

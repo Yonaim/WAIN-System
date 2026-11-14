@@ -17,12 +17,6 @@
 
     namespace WAINLLMPrivateTests
     {
-        FString ProposalText()
-        {
-            return TEXT("{\"dialogue\":\"좋아.\",\"actionId\":\"\",\"expressionId\":\"\","
-                        "\"expressionVariantId\":\"\",\"mutations\":[]}");
-        }
-
         FWAINInteractionRequest MakeRequest()
         {
             FWAINInteractionRequest Request;
@@ -47,14 +41,14 @@
 
     bool FWAINLLMResponseValidTest::RunTest(const FString &Parameters)
     {
-        const FString Envelope = TEXT("{\"status\":\"completed\",\"output\":[{\"type\":\"message\","
-                                      "\"content\":[{\"type\":\"output_text\",\"text\":\"{\\\"dialogue\\\":\\\"좋아.\\\","
-                                      "\\\"actionId\\\":\\\"\\\",\\\"expressionId\\\":\\\"\\\","
-                                      "\\\"expressionVariantId\\\":\\\"\\\",\\\"mutations\\\":[]}\"}]}]}");
+        const FString Envelope =
+            TEXT("{\"status\":\"completed\",\"output\":[{\"type\":\"message\",\"content\":[{\"type\":\"output_text\","
+                 "\"text\":\"{\\\"presentationSteps\\\":[{\\\"dialogue\\\":\\\"좋아.\\\",\\\"expressionId\\\":\\\"\\\","
+                 "\\\"expressionVariantId\\\":\\\"\\\"}],\\\"actionId\\\":\\\"\\\",\\\"mutations\\\":[]}\"}]}]}");
         FWAINResponseProposal Proposal;
         FString               Error;
         TestTrue(TEXT("Response parse"), FWAINOpenAIClient::ExtractProposal(Envelope, Proposal, Error));
-        TestEqual(TEXT("Dialogue"), Proposal.Dialogue, FString(TEXT("좋아.")));
+        TestEqual(TEXT("Dialogue"), Proposal.PresentationSteps[0].Dialogue, FString(TEXT("좋아.")));
         return true;
     }
 
@@ -95,7 +89,7 @@
     {
         FWAINQueuedProposalProvider Provider;
         FWAINResponseProposal       Submitted, Output;
-        Submitted.Dialogue = TEXT("안녕");
+        Submitted.PresentationSteps.Add({TEXT("안녕"), FName(), FName()});
         const auto Request = WAINLLMPrivateTests::MakeRequest();
         Provider.SetReady(Request.TurnId, 5, Submitted);
         FWAINSessionRoot Current;
@@ -115,7 +109,7 @@
     {
         FWAINQueuedProposalProvider Provider;
         FWAINResponseProposal       Submitted, Output;
-        Submitted.Dialogue = TEXT("안녕");
+        Submitted.PresentationSteps.Add({TEXT("안녕"), FName(), FName()});
         const auto Request = WAINLLMPrivateTests::MakeRequest();
         Provider.SetReady(Request.TurnId, 2, Submitted);
         FWAINSessionRoot Current;
@@ -124,7 +118,7 @@
         Context.StateRevision = 2;
         FString Error;
         TestTrue(TEXT("First consume"), Provider.GenerateWithContext(Request, Current, Context, Output, Error));
-        TestEqual(TEXT("Dialogue"), Output.Dialogue, FString(TEXT("안녕")));
+        TestEqual(TEXT("Dialogue"), Output.PresentationSteps[0].Dialogue, FString(TEXT("안녕")));
         TestFalse(TEXT("Second consume rejected"), Provider.GenerateWithContext(Request, Current, Context, Output, Error));
         return true;
     }

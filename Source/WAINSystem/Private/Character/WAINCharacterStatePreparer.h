@@ -23,7 +23,7 @@ class FWAINCharacterStatePreparer final
 
   private:
     bool ApplyMutation(const FWAINStateMutation &Mutation, FWAINCharacterState &Character, FString &OutError) const;
-    bool ApplyTrust(const FWAINStateMutation &Mutation, FWAINCharacterState &Character, FString &OutError) const;
+    bool ApplyRelationship(const FWAINStateMutation &Mutation, FWAINCharacterState &Character, FString &OutError) const;
     bool ApplyEmotionDelta(const FWAINStateMutation &Mutation, FWAINCharacterState &Character, FString &OutError) const;
 
     static float *FindEmotionDimension(FWAINEmotionState &Emotion, const FName TargetId);

@@ -172,3 +172,17 @@ Host `FWAINTestbedDebugInspector`는 Plugin의 기록과 Game Snapshot의 전후
 | `Private/Tests/WAINPromptBuilderTests.cpp` | Prompt 경계 3개 신규 오프라인 테스트 |
 
 [ADR-019](../../03_Decisions/19_ADR-019-LLM-Internal-Layers.md) · [Host LLM Structure](../../../../../../Docs/02_Implementation/11_LLM-Internal-Structure.md)
+
+## 2026-11-14 — Relationship / PresentationStep Source Map
+
+- `Public/WAINRelationshipTypes.h`: 5개 관계 파라미터의 Semantic Anchors, 캐릭터 반응, Global Dialogue Rules 자료형
+- `Public/WAINRuntimeTypes.h`: 5개 관계 상태와 단일 필드를 제거한 `FWAINPresentationStep[]` 계약
+- `Private/Character/WAINCharacterStatePreparer.cpp`: 5 관계 Target Prepared Mutation
+- `Private/LLM/Prompt/WAINPromptBuilder.cpp`: Persona/Relationship/Expression 설명 Prompt
+- `Private/LLM/Validation/WAINDialogueValidator.{h,cpp}`: 모든 Step 금지 표현 검증
+- `Private/LLM/Validation/WAINStructuredProposal.cpp`: `presentationSteps` strict JSON Schema + Parser
+- `Source/WAINTestbed/Presentation/WAINTestbedPresentationSequencePlayer.{h,cpp}`: Step 단위 VN 페이지 전환
+- `Source/WAINTestbed/Data/WAINTestbedContentLoader.cpp`: 3개 신규 JSON 로더와 Persona 관계별 반응 로더
+- `Source/WAINTestbed/UI/WAINTestbedVNWidget.cpp`: NEXT 버튼, LOG Step 기록, 입력 잠금
+
+단일 `Dialogue/Expression` 출력 계약은 **삭제**했다. 호환 Parser/변환은 없다.

@@ -10,6 +10,7 @@
 #include "WAINInteractionDebug.h"
 #include "WAINInterfaces.h"
 #include "WAINMemoryReasoning.h"
+#include "WAINRelationshipTypes.h"
 #include "WAINWorldStateManager.h"
 
 // ============================================================
@@ -47,12 +48,14 @@
                                    const FWAINPresentationOptions *AvailablePresentations = nullptr,
                                    const IWAINMemoryReasoner      *MemoryReasoner = nullptr,
                                    const FWAINWorldStateManager   *WorldManager = nullptr,
-                                   FWAINInteractionDebugRecord    *OutDebug = nullptr) const;
+                                   FWAINInteractionDebugRecord    *OutDebug = nullptr,
+                                   const FWAINGlobalDialogueRules *DialogueRules = nullptr) const;
 
         private:
         bool ValidateProposal(const FWAINResponseProposal    &Proposal,
                               const FWAINPresentationOptions *AvailablePresentations,
-                              FString                        &OutError) const;
+                              FString                        &OutError,
+                              const FWAINGlobalDialogueRules *DialogueRules) const;
 
         TArray<FWAINStateMutation> CollectGameMutations(const FWAINResponseProposal &Proposal) const;
 

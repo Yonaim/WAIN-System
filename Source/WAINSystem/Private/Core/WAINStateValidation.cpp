@@ -77,10 +77,12 @@ namespace WAINStateValidation
             {
                 for (const TPair<FName, FWAINCharacterState> &Pair : Snapshot.Characters)
                 {
-                    if (Pair.Key.IsNone() || Pair.Value.Trust < 0 || Pair.Value.Trust > 100 ||
-                        !HasValidEmotionValues(Pair.Value.Emotion))
+                    if (Pair.Key.IsNone() || Pair.Value.Trust < 0 || Pair.Value.Trust > 100 || Pair.Value.Affection < 0 ||
+                        Pair.Value.Affection > 100 || Pair.Value.Familiarity < 0 || Pair.Value.Familiarity > 100 ||
+                        Pair.Value.Comfort < 0 || Pair.Value.Comfort > 100 || Pair.Value.RomanticAttraction < 0 ||
+                        Pair.Value.RomanticAttraction > 100 || !HasValidEmotionValues(Pair.Value.Emotion))
                     {
-                        OutError = TEXT("Character Trust 또는 6차원 Emotion이 허용 범위를 벗어났습니다.");
+                        OutError = TEXT("Character Relationship 또는 6차원 Emotion이 허용 범위를 벗어났습니다.");
                         return false;
                     }
                 }

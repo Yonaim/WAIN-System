@@ -26,7 +26,7 @@
                                   FWAINResponseProposal         &OutProposal,
                                   FString                       &OutError) const override
             {
-                OutProposal.Dialogue = bEmptyDialogue ? TEXT("") : TEXT("약속을 기억해.");
+                OutProposal.PresentationSteps.Add({bEmptyDialogue ? TEXT("") : TEXT("약속을 기억해."), FName(), FName()});
                 FWAINStateMutation Mutation;
                 Mutation.Owner = EWAINMutationOwner::Character;
                 Mutation.TargetId = TEXT("relationship.trust");

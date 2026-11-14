@@ -67,9 +67,9 @@
             {
                 ++GenerateCount;
                 Captured.Add(Context);
-                OutProposal.Dialogue = TEXT("안녕!");
-                OutProposal.ExpressionId = SelectedExpression;
-                OutProposal.ExpressionVariantId = SelectedVariant;
+                OutProposal.PresentationSteps.Add({TEXT("안녕!"), FName(), FName()});
+                OutProposal.PresentationSteps.Last().ExpressionId = SelectedExpression;
+                OutProposal.PresentationSteps.Last().ExpressionVariantId = SelectedVariant;
 
                 FWAINStateMutation Mutation;
                 Mutation.Owner = EWAINMutationOwner::Character;
@@ -81,7 +81,7 @@
             }
         };
 
-        class FLegacyProvider final : public IWAINProposalProvider
+        class FGenerateOnlyProvider final : public IWAINProposalProvider
         {
             public:
             mutable int32 GenerateCount = 0;
@@ -92,7 +92,7 @@
                                   FString                       &OutError) const override
             {
                 ++GenerateCount;
-                OutProposal.Dialogue = TEXT("Legacy");
+                OutProposal.PresentationSteps.Add({TEXT("테스트"), FName(), FName()});
                 return true;
             }
         };
@@ -183,8 +183,8 @@
         const auto Before = Processor->GetSnapshot();
         const auto Result = Processor->ProcessTurn(WAINPresentationTests::MakeRequest());
         TestTrue(TEXT("허용된 Expression Commit"), Result.Succeeded());
-        TestEqual(TEXT("결과 Expression"), Result.ExpressionId, FName(TEXT("EXP_MANA_SMILE")));
-        TestEqual(TEXT("결과 Variant"), Result.ExpressionVariantId, FName(TEXT("soft")));
+        TestEqual(TEXT("결과 Expression"), Result.PresentationSteps[0].ExpressionId, FName(TEXT("EXP_MANA_SMILE")));
+        TestEqual(TEXT("결과 Variant"), Result.PresentationSteps[0].ExpressionVariantId, FName(TEXT("soft")));
         TestEqual(TEXT("확정 Revision"), Processor->GetSnapshot()->Revision, uint64(1));
         TestEqual(TEXT("확정 Trust"), Processor->GetSnapshot()->WAIN.Characters.FindChecked(TEXT("MANA")).Trust, 35);
         TestTrue(TEXT("높은 불안과 미소 표현 독립"),
@@ -218,7 +218,7 @@
 
         const auto Result = Processor->ProcessTurn(WAINPresentationTests::MakeRequest());
         TestTrue(TEXT("Expression 미선택 턴 정상"), Result.Succeeded());
-        TestTrue(TEXT("Expression 자동 대체 없음"), Result.ExpressionId.IsNone());
+        TestTrue(TEXT("Expression 자동 대체 없음"), Result.PresentationSteps[0].ExpressionId.IsNone());
         return true;
     }
 
@@ -374,17 +374,17 @@
 #pragma endregion
 
 // ============================================================
-// 03. Provider Compatibility And Turn Replay
+// 03. Context-Only Generation And Turn Replay
 // ============================================================
-#pragma region 03_Provider_Compatibility_And_Turn_Replay
+#pragma region 03_Context_Only_Generation_And_Turn_Replay
 
-    IMPLEMENT_SIMPLE_AUTOMATION_TEST(FWAINPresentationLegacyProviderTest,
-                                     "WAIN.Presentation.LegacyProviderRejectsCatalog",
+    IMPLEMENT_SIMPLE_AUTOMATION_TEST(FWAINPresentationGenerateOnlyProviderTest,
+                                     "WAIN.Presentation.GenerateOnlyProviderRejectsCatalog",
                                      EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
 
-    bool FWAINPresentationLegacyProviderTest::RunTest(const FString &Parameters)
+    bool FWAINPresentationGenerateOnlyProviderTest::RunTest(const FString &Parameters)
     {
-        auto    Provider = MakeShared<WAINPresentationTests::FLegacyProvider>();
+        auto    Provider = MakeShared<WAINPresentationTests::FGenerateOnlyProvider>();
         FString Error;
         auto    Processor = WAINPresentationTests::MakeProcessor(Provider, WAINPresentationTests::MakeCatalog(), Error);
         if (!TestTrue(TEXT("세션 시작"), Processor != nullptr))
@@ -392,7 +392,7 @@
 
         const auto Result = Processor->ProcessTurn(WAINPresentationTests::MakeRequest());
         TestTrue(TEXT("Catalog 무시 Provider 거절"), Result.Error == EWAINInteractionError::ProposalGenerationFailed);
-        TestEqual(TEXT("Legacy 생성기 미호출"), Provider->GenerateCount, 0);
+        TestEqual(TEXT("GenerateOnly Provider 미호출"), Provider->GenerateCount, 0);
         TestTrue(TEXT("변경 없음"), WAINPresentationTests::IsUnchanged(*Processor));
         return true;
     }
@@ -417,7 +417,9 @@
         const auto Replay = Processor->ProcessTurn(Request);
         TestTrue(TEXT("첫 턴 성공"), First.Succeeded());
         TestTrue(TEXT("재전송 상태"), Replay.bReplayed);
-        TestEqual(TEXT("Expression 재생"), Replay.ExpressionId, First.ExpressionId);
+        TestEqual(TEXT("Expression 재생"),
+                  Replay.PresentationSteps[0].ExpressionId,
+                  First.PresentationSteps[0].ExpressionId);
         TestEqual(TEXT("Catalog 한 번 호출"), Catalog->QueryCount, 1);
         TestEqual(TEXT("생성기 한 번 호출"), Provider->GenerateCount, 1);
         TestEqual(TEXT("Commit 한 번"), Processor->GetSnapshot()->Revision, uint64(1));

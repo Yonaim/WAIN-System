@@ -17,7 +17,7 @@
     class FWAINPromptBuilder final
     {
         public:
-        static FString BuildSystemInstruction();
+        static FString BuildSystemInstruction(const FWAINCharacterContext *Context = nullptr);
         static FString BuildUserPrompt(const FWAINInteractionRequest &Request, const FWAINCharacterContext &Context);
     };
 

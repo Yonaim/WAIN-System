@@ -143,3 +143,13 @@ WAINTestbed는 설정/조직 사용량 사전 조회/상단 팝업/DEV 진단 UI
 - Responses API, Admin Usage GET, Transaction/No Commit, Mock 기본값, 240만·249만 토큰 경고, 로컬 Config 경로는 유지했다.
 - 신규 `WAIN.LLM.Prompt.*` 테스트 코드 3개 작성, 총 **118개 등록**. Unreal 5.8 UBT/Automation/PIE/실제 API 호출은 미검증.
 - [ADR-019](../03_Decisions/19_ADR-019-LLM-Internal-Layers.md) · [LLM Internal Structure](../../../../../Docs/02_Implementation/11_LLM-Internal-Structure.md).
+
+## 2026-11-14 — 다차원 관계와 PresentationStep (정적 구현)
+
+- 5개 관계 상태 + 의미 기준점 low/neutral/high + 마나 개별 반응
+- 전역 Dialogue Rules: 이모지·채팅체 금지
+- LLM Structured Output는 `PresentationSteps` **전용**; 이전 단일 Dialogue 계약은 없음
+- UI 순차 재생, 하나의 Turn/Commit, DEV Proposal 진단
+- **검증:** Unreal Engine 5.8 `WAINTestbedEditor Win64 Development` 빌드 성공
+- **미검증:** Automation 실행, PIE, API 실호출
+- 문서: `Docs/02_Implementation/12_Relationship-and-Presentation-Steps.md`, ADR-020
