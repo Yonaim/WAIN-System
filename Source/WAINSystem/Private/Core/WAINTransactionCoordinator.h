@@ -7,10 +7,10 @@
 
 #include "Core/WAINStateStore.h"
 #include "CoreMinimal.h"
+#include "WAINInteractionDebug.h"
 #include "WAINInterfaces.h"
 #include "WAINMemoryReasoning.h"
 #include "WAINWorldStateManager.h"
-#include "WAINInteractionDebug.h"
 
 // ============================================================
 // 00. Commit Outcome
@@ -47,7 +47,7 @@
                                    const FWAINPresentationOptions *AvailablePresentations = nullptr,
                                    const IWAINMemoryReasoner      *MemoryReasoner = nullptr,
                                    const FWAINWorldStateManager   *WorldManager = nullptr,
-                                   FWAINInteractionDebugRecord   *OutDebug = nullptr) const;
+                                   FWAINInteractionDebugRecord    *OutDebug = nullptr) const;
 
         private:
         bool ValidateProposal(const FWAINResponseProposal    &Proposal,

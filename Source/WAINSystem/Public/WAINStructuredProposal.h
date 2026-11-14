@@ -17,8 +17,8 @@
 
     class WAINSYSTEM_API FWAINStructuredProposal final
     {
-      public:
-        static bool Parse(const FString &Json, FWAINResponseProposal &OutProposal, FString &OutError);
+        public:
+        static bool    Parse(const FString &Json, FWAINResponseProposal &OutProposal, FString &OutError);
         static FString MakeJsonSchema();
     };
 

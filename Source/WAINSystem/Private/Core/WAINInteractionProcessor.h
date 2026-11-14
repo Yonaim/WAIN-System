@@ -9,9 +9,9 @@
 #include "Core/WAINStateStore.h"
 #include "Core/WAINTransactionCoordinator.h"
 #include "CoreMinimal.h"
+#include "WAINInteractionDebug.h"
 #include "WAINInterfaces.h"
 #include "WAINWorldStateManager.h"
-#include "WAINInteractionDebug.h"
 
 class FWAINInteractionProcessor final
 {
@@ -37,7 +37,8 @@ class FWAINInteractionProcessor final
 
     /** @brief 네트워크 대기 전에 현재 Revision의 LLM 입력 Context를 읽기 전용으로 조회한다. */
     bool PrepareTurnContext(const FWAINInteractionRequest &Request,
-                            FWAINCharacterContext &OutContext, FString &OutError) const;
+                            FWAINCharacterContext         &OutContext,
+                            FString                       &OutError) const;
 
     /** @brief 최신 48개 턴 기록에서 해당 TurnId를 조회한다. Replay는 기존 기록을 변경하지 않는다. */
     bool GetDebugRecord(const FGuid &TurnId, FWAINInteractionDebugRecord &OutRecord) const;
@@ -58,14 +59,15 @@ class FWAINInteractionProcessor final
 
     bool ValidateRequest(const FWAINInteractionRequest &Request, FString &OutError) const;
 
-    FWAINInteractionResult ExecuteTurn(const FWAINInteractionRequest &Request,
-                                      FWAINInteractionDebugRecord &OutDebug);
+    FWAINInteractionResult ExecuteTurn(const FWAINInteractionRequest &Request, FWAINInteractionDebugRecord &OutDebug);
 
     void SaveDebugRecord(FWAINInteractionDebugRecord &Record, const FWAINInteractionResult &Result);
 
-    bool BuildContext(const FWAINInteractionRequest &Request, const FWAINSessionRoot &Current,
-                      FWAINCharacterContext &OutContext, FString &OutError,
-                      FWAINInteractionDebugRecord *Debug = nullptr) const;
+    bool BuildContext(const FWAINInteractionRequest &Request,
+                      const FWAINSessionRoot        &Current,
+                      FWAINCharacterContext         &OutContext,
+                      FString                       &OutError,
+                      FWAINInteractionDebugRecord   *Debug = nullptr) const;
 
     static bool IsSameRequest(const FWAINInteractionRequest &Left, const FWAINInteractionRequest &Right);
 
@@ -88,11 +90,11 @@ class FWAINInteractionProcessor final
     TSharedPtr<const FWAINWorldStateManager>   WorldManager;
     FWAINCharacterContextBuilder               ContextBuilder;
 
-    FWAINStateStore             StateStore;
-    FWAINTransactionCoordinator Coordinator;
-    TMap<FGuid, FRecordedTurn>  CompletedTurns;
+    FWAINStateStore                          StateStore;
+    FWAINTransactionCoordinator              Coordinator;
+    TMap<FGuid, FRecordedTurn>               CompletedTurns;
     TMap<FGuid, FWAINInteractionDebugRecord> DebugRecords;
-    TArray<FGuid> DebugOrder;
-    bool                        bProcessing = false;
+    TArray<FGuid>                            DebugOrder;
+    bool                                     bProcessing = false;
 #pragma endregion
 };

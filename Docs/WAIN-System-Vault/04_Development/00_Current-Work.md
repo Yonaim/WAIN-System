@@ -121,3 +121,8 @@ Host `Content`를 Data/Images/UI/Maps로 정리하고 `Images/Characters/Mana/La
 - Local `FWAINStructuredProposal` 파서와 OpenAI JSON Schema 추가, 실제 Game/Narrative 검증은 기존 Transaction 유지.
 - 기본 Mock 경로 보존. 13개 테스트 소스 신규 작성·누적 106개, UE 컴파일/API 실증 미검증.
 - [Host 구현](../../../../../Docs/02_Implementation/09_LLM-Structured-Output-Implementation.md) · [ADR-016](../03_Decisions/16_ADR-016-Asynchronous-LLM-Proposal-Handoff.md)
+
+
+## 2026-11-13 — Host Usage Monitor (ADR-017 Proposed)
+
+WAINTestbed는 설정/조직 사용량 사전 조회/상단 팝업/DEV 진단 UI를 소유한다. WAINSystem Plugin은 해당 GET 호출이나 Admin 키와 무관하며 기존 Prepared Transaction만 수행한다. 조직 Usage는 무료 토큰의 확정 잔량이 아닌 모델 그룹별 지연 집계 추정이다. 신규 Automation 9개 코드 작성, UE 실제 빌드/PIE 미검증. [ADR-017](../03_Decisions/17_ADR-017-Host-Usage-Preflight-and-Warnings.md).

@@ -49,7 +49,8 @@ class WAINSYSTEM_API UWAINRuntimeSubsystem : public UGameInstanceSubsystem
     TSharedPtr<const FWAINSessionRoot> GetStateSnapshot() const;
 
     bool PrepareTurnContext(const FWAINInteractionRequest &Request,
-                            FWAINCharacterContext &OutContext, FString &OutError) const;
+                            FWAINCharacterContext         &OutContext,
+                            FString                       &OutError) const;
 
     /** @brief 개발 패널 전용 조회. State 정본이나 Turn 실행 결과를 변경하지 않는다. */
     bool GetDebugRecord(const FGuid &TurnId, FWAINInteractionDebugRecord &OutRecord) const;

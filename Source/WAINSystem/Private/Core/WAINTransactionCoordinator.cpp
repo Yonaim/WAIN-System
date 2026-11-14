@@ -42,14 +42,15 @@
                                                             const FWAINPresentationOptions *AvailablePresentations,
                                                             const IWAINMemoryReasoner      *MemoryReasoner,
                                                             const FWAINWorldStateManager   *WorldManager,
-                                                            FWAINInteractionDebugRecord   *OutDebug) const
+                                                            FWAINInteractionDebugRecord    *OutDebug) const
     {
         check(IsInGameThread());
 
         FString Error;
-        auto Trace = [OutDebug](const FName Name, const EWAINTraceStatus Status, const FString &Detail = FString())
+        auto    Trace = [OutDebug](const FName Name, const EWAINTraceStatus Status, const FString &Detail = FString())
         {
-            if (OutDebug) OutDebug->AddStep(Name, Status, Detail);
+            if (OutDebug)
+                OutDebug->AddStep(Name, Status, Detail);
         };
 
         if (!ValidateProposal(Proposal, AvailablePresentations, Error))

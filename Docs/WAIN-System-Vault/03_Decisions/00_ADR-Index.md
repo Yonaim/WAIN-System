@@ -24,3 +24,5 @@
 | [ADR-014](14_ADR-014-Testbed-VN-Presentation.md) | Host 소유 VN 배경·날짜·Backlog Presentation | **Proposed (Testbed 구현 선택)** |
 | [ADR-015](15_ADR-015-Turn-Diagnostics-and-DEV-Inspector.md) | 최근 48개 Turn Trace와 Host DEV Inspector, LOG 분리 | **Proposed (Host MVP)** |
 | [ADR-016](16_ADR-016-Asynchronous-LLM-Proposal-Handoff.md) | Async OpenAI 호스트 응답을 TurnId/Revision Bound Proposal로 기존 동기 Transaction에 인계 | **Proposed (Host MVP)** |
+
+- [ADR-017 — Host Usage Preflight and Warning-only Policy](17_ADR-017-Host-Usage-Preflight-and-Warnings.md) — **Proposed**, Host 조직 사용량 추정·경고/키 보호

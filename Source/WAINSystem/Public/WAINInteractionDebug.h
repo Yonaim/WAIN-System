@@ -22,24 +22,24 @@
 
     struct FWAINTraceStep
     {
-        FName Name;
+        FName            Name;
         EWAINTraceStatus Status = EWAINTraceStatus::Skipped;
-        FString Detail;
+        FString          Detail;
     };
 
     /** @brief WAIN이 실제 실행한 단계만 기록한다. 실행되지 않은 단계는 PASS로 추정하지 않는다. */
     struct FWAINInteractionDebugRecord
     {
         FWAINInteractionRequest Request;
-        FWAINInteractionResult Result;
-        uint64 RevisionBefore = 0;
-        uint64 RevisionAfter = 0;
-        double ElapsedMs = 0.0;
-        bool bHasContext = false;
-        FWAINCharacterContext Context;
-        bool bHasProposal = false;
-        FWAINResponseProposal Proposal;
-        TArray<FWAINTraceStep> Steps;
+        FWAINInteractionResult  Result;
+        uint64                  RevisionBefore = 0;
+        uint64                  RevisionAfter = 0;
+        double                  ElapsedMs = 0.0;
+        bool                    bHasContext = false;
+        FWAINCharacterContext   Context;
+        bool                    bHasProposal = false;
+        FWAINResponseProposal   Proposal;
+        TArray<FWAINTraceStep>  Steps;
 
         void AddStep(FName Name, EWAINTraceStatus Status, const FString &Detail = FString())
         {

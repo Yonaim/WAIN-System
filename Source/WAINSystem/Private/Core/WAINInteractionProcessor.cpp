@@ -64,7 +64,8 @@
         {
             if (!IsSameRequest(Previous->Request, Request))
             {
-                return Fail(Request, EWAINInteractionError::DuplicateTurnConflict,
+                return Fail(Request,
+                            EWAINInteractionError::DuplicateTurnConflict,
                             TEXT("동일 TurnId에 다른 입력을 사용할 수 없습니다."));
             }
             FWAINInteractionResult Replay = Previous->Result;
@@ -74,7 +75,7 @@
 
         FWAINInteractionDebugRecord Debug;
         Debug.Request = Request;
-        const double StartSeconds = FPlatformTime::Seconds();
+        const double                             StartSeconds = FPlatformTime::Seconds();
         const TSharedPtr<const FWAINSessionRoot> Before = StateStore.Read();
         Debug.RevisionBefore = Before.IsValid() ? Before->Revision : 0;
 
@@ -92,8 +93,8 @@
         if (bProcessing)
         {
             Debug.AddStep(TEXT("Turn Availability"), EWAINTraceStatus::Failed, TEXT("다른 Turn 처리 중"));
-            const FWAINInteractionResult Result = Fail(Request, EWAINInteractionError::Busy,
-                                                        TEXT("다른 Turn을 처리하고 있습니다."));
+            const FWAINInteractionResult Result =
+                Fail(Request, EWAINInteractionError::Busy, TEXT("다른 Turn을 처리하고 있습니다."));
             Debug.ElapsedMs = (FPlatformTime::Seconds() - StartSeconds) * 1000.0;
             SaveDebugRecord(Debug, Result);
             return Result;
@@ -117,8 +118,7 @@
         return StateStore.Read();
     }
 
-    bool FWAINInteractionProcessor::GetDebugRecord(const FGuid &TurnId,
-                                                   FWAINInteractionDebugRecord &OutRecord) const
+    bool FWAINInteractionProcessor::GetDebugRecord(const FGuid &TurnId, FWAINInteractionDebugRecord &OutRecord) const
     {
         if (const FWAINInteractionDebugRecord *Found = DebugRecords.Find(TurnId))
         {
@@ -128,15 +128,16 @@
         return false;
     }
 
-    void FWAINInteractionProcessor::SaveDebugRecord(FWAINInteractionDebugRecord &Record,
-                                                     const FWAINInteractionResult &Result)
+    void FWAINInteractionProcessor::SaveDebugRecord(FWAINInteractionDebugRecord  &Record,
+                                                    const FWAINInteractionResult &Result)
     {
         Record.Result = Result;
         const TSharedPtr<const FWAINSessionRoot> After = StateStore.Read();
         Record.RevisionAfter = After.IsValid() ? After->Revision : Record.RevisionBefore;
 
         // TurnId가 없는 잘못된 요청은 조회 키가 없으므로 기록을 남기지 않는다.
-        if (!Record.Request.TurnId.IsValid()) return;
+        if (!Record.Request.TurnId.IsValid())
+            return;
 
         // 최근 48건만 진단 Context/Proposal 사본을 보관한다. 권위 State와 Replay 캐시는 별개다.
         if (DebugOrder.Num() >= 48)
@@ -156,7 +157,7 @@
 #pragma region 01_Turn_Execution
 
     FWAINInteractionResult FWAINInteractionProcessor::ExecuteTurn(const FWAINInteractionRequest &Request,
-                                                                   FWAINInteractionDebugRecord &OutDebug)
+                                                                  FWAINInteractionDebugRecord   &OutDebug)
     {
         const TSharedPtr<const FWAINSessionRoot> Current = StateStore.Read();
         if (!Current.IsValid())
@@ -168,7 +169,7 @@
         OutDebug.AddStep(TEXT("Snapshot Read"), EWAINTraceStatus::Passed);
 
         FWAINCharacterContext Context;
-        FString Error;
+        FString               Error;
         if (!BuildContext(Request, *Current, Context, Error, &OutDebug))
         {
             return Fail(Request, EWAINInteractionError::ContextPreparationFailed, Error);
@@ -185,10 +186,16 @@
         OutDebug.Proposal = Proposal;
         OutDebug.bHasProposal = true;
 
-        const FWAINCommitOutcome Commit = Coordinator.Execute(
-            Request, Proposal, StateStore, *GameAdapter, *NarrativeEvaluator,
-            Context.bHasPresentationCatalog ? &Context.AvailablePresentations : nullptr,
-            MemoryReasoner.Get(), WorldManager.Get(), &OutDebug);
+        const FWAINCommitOutcome Commit =
+            Coordinator.Execute(Request,
+                                Proposal,
+                                StateStore,
+                                *GameAdapter,
+                                *NarrativeEvaluator,
+                                Context.bHasPresentationCatalog ? &Context.AvailablePresentations : nullptr,
+                                MemoryReasoner.Get(),
+                                WorldManager.Get(),
+                                &OutDebug);
         if (!Commit.Succeeded())
         {
             return Fail(Request, Commit.Error, Commit.Message);
@@ -211,31 +218,33 @@
 #pragma region 02_Shared_Read_Only_Context_Preparation
 
     bool FWAINInteractionProcessor::PrepareTurnContext(const FWAINInteractionRequest &Request,
-                                                       FWAINCharacterContext &OutContext,
-                                                       FString &OutError) const
+                                                       FWAINCharacterContext         &OutContext,
+                                                       FString                       &OutError) const
     {
         check(IsInGameThread());
         const TSharedPtr<const FWAINSessionRoot> Current = StateStore.Read();
         if (!Current.IsValid() || !ValidateRequest(Request, OutError))
         {
-            if (OutError.IsEmpty()) OutError = TEXT("WAIN 세션이 시작되지 않았습니다.");
+            if (OutError.IsEmpty())
+                OutError = TEXT("WAIN 세션이 시작되지 않았습니다.");
             return false;
         }
         return BuildContext(Request, *Current, OutContext, OutError);
     }
 
     bool FWAINInteractionProcessor::BuildContext(const FWAINInteractionRequest &Request,
-                                                 const FWAINSessionRoot &Current,
-                                                 FWAINCharacterContext &OutContext, FString &OutError,
-                                                 FWAINInteractionDebugRecord *Debug) const
+                                                 const FWAINSessionRoot        &Current,
+                                                 FWAINCharacterContext         &OutContext,
+                                                 FString                       &OutError,
+                                                 FWAINInteractionDebugRecord   *Debug) const
     {
         const auto Trace = [Debug](const TCHAR *Name, const EWAINTraceStatus Status, const FString &Message = FString())
         {
-            if (Debug) Debug->AddStep(Name, Status, Message);
+            if (Debug)
+                Debug->AddStep(Name, Status, Message);
         };
 
-        if (!ContextBuilder.Build(Request, Current, PersonaSource.Get(), PresentationCatalog.Get(),
-                                  OutContext, OutError))
+        if (!ContextBuilder.Build(Request, Current, PersonaSource.Get(), PresentationCatalog.Get(), OutContext, OutError))
         {
             Trace(TEXT("Character Context"), EWAINTraceStatus::Failed, OutError);
             return false;

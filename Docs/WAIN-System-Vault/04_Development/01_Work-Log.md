@@ -138,3 +138,11 @@
 - `OpenAI Responses API` 호출은 명시적인 환경변수 모드로만 허용. DEV Trace는 기존 Pipeline Commit의 실제 Stage를 기록한다.
 - 13개 자동화 테스트 코드 작성(누적 106개). Unreal Build/PIE/API 실증은 미검증.
 - [ADR-016](../03_Decisions/16_ADR-016-Asynchronous-LLM-Proposal-Handoff.md).
+
+
+## 2026-11-14 — indent_regions.py 사용자 제공본 교체
+
+- **읽은 기준:** Root README, Vault AGENTS·Document Map·Code Style·Pre-Build Formatting 및 기존 스크립트.
+- **변경:** `Tools/indent_regions.py`와 `Assets/Formatting/indent_regions.py`를 사용자 첨부 원문으로 교체.
+- **문서 검토:** CLI·포맷 계약·소스 경로 변경이 없어 관련 설계·소스 맵·테스트 계획은 유지.
+- **검증:** 두 파일의 첨부 원문 바이트 일치 확인 및 Python AST 구문 검사 통과. 파일 교체 범위이므로 Unreal 빌드와 전체 소스 포맷 실행은 생략.

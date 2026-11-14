@@ -88,7 +88,8 @@
     }
 
     bool UWAINRuntimeSubsystem::PrepareTurnContext(const FWAINInteractionRequest &Request,
-                                                    FWAINCharacterContext &OutContext, FString &OutError) const
+                                                   FWAINCharacterContext         &OutContext,
+                                                   FString                       &OutError) const
     {
         check(IsInGameThread());
         if (!Processor)
