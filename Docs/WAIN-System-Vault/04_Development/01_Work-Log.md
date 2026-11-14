@@ -160,3 +160,10 @@
 - Public LLM 계약을 Config, Types, TurnService로 제한하고 OpenAI/Usage/Structured Proposal 구현을 Private으로 옮겼다. Host Adapter/UI와 Automation 테스트도 새 API에 맞췄다.
 - Prompt 오프라인 테스트 3개를 추가했다. 정적 경로/헤더 검토만 수행했으며 UE 5.8 빌드, Automation, PIE, 외부 API 호출은 실행하지 않았다.
 - [ADR-019](../03_Decisions/19_ADR-019-LLM-Internal-Layers.md) · [Source Map](../02_Architecture/02_Source/00_Source-Map.md) · [Host Architecture](../../../../../Docs/02_Implementation/00_Testbed-Architecture.md).
+
+## 2026-11-14 — Universal Vault C++ Namespace Region 규칙 반영
+
+- **읽은 기준:** 최신 Universal Vault의 C++·Source Comments·Local Numbering, WAIN Vault AGENTS·Document Map 및 C++ 스타일 문서.
+- C++ 규칙에 익명 namespace 전체 Region, namespace 안의 책임 Region 허용, 파일 전용 유틸의 익명 namespace 배치를 동기화했다.
+- `WAINStateValidation.cpp`와 `WAINTestbedContentLoader.cpp`에서 익명 namespace 경계를 Region으로 감싸고 파일별 섹션 번호를 갱신했다. 동작/API는 변경하지 않았다.
+- 최신 `indent_regions.py`는 Plugin Tool 및 Vault Asset과 이미 동일해 교체하지 않았다. 해당 두 파일의 Region 포맷 검사는 통과했다. UE 빌드와 Automation은 실행하지 않았다.

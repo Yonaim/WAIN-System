@@ -11,11 +11,11 @@
 #include "Presentation/WAINPresentationValidator.h"
 
 // ============================================================
-// 00. Commit Result Helper
+// 00. File-Local Utilities
 // ============================================================
-#pragma region 00_Commit_Result_Helper
+#pragma region 00_File_Local_Utilities
 
-    namespace WAINTransaction
+    namespace
     {
         FWAINCommitOutcome Fail(const EWAINInteractionError Error, const FString &Message)
         {
@@ -25,7 +25,7 @@
             return Outcome;
         }
 
-    } // namespace WAINTransaction
+    } // namespace
 
 #pragma endregion
 

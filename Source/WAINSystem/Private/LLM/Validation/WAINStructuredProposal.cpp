@@ -8,135 +8,144 @@
 #include "Serialization/JsonReader.h"
 #include "Serialization/JsonSerializer.h"
 
-namespace WAINStructuredProposal
-{
-    constexpr int32 MaxResponseChars = 32768;
-    constexpr int32 MaxDialogueChars = 4096;
-    constexpr int32 MaxMutations = 8;
-
-    bool RequireExactFields(const TSharedPtr<FJsonObject> &Object, const TArray<FString> &Keys, FString &OutError)
+// ============================================================
+// 00. File-Local Utilities
+// ============================================================
+#pragma region 00_File_Local_Utilities
+    namespace
     {
-        if (!Object.IsValid() || Object->Values.Num() != Keys.Num())
+        namespace WAINStructuredProposal
         {
-            OutError = TEXT("Structured Proposal에 필수 필드가 없거나 알 수 없는 필드가 있습니다.");
-            return false;
-        }
-        for (const FString &Key : Keys)
-        {
-            if (!Object->HasField(Key))
+            constexpr int32 MaxResponseChars = 32768;
+            constexpr int32 MaxDialogueChars = 4096;
+            constexpr int32 MaxMutations = 8;
+
+            bool RequireExactFields(const TSharedPtr<FJsonObject> &Object, const TArray<FString> &Keys, FString &OutError)
             {
-                OutError = FString::Printf(TEXT("필수 필드가 없습니다: %s"), *Key);
-                return false;
+                if (!Object.IsValid() || Object->Values.Num() != Keys.Num())
+                {
+                    OutError = TEXT("Structured Proposal에 필수 필드가 없거나 알 수 없는 필드가 있습니다.");
+                    return false;
+                }
+                for (const FString &Key : Keys)
+                {
+                    if (!Object->HasField(Key))
+                    {
+                        OutError = FString::Printf(TEXT("필수 필드가 없습니다: %s"), *Key);
+                        return false;
+                    }
+                }
+                return true;
             }
-        }
-        return true;
-    }
 
-    bool ReadBoundedString(const TSharedPtr<FJsonObject> &Object,
-                           const TCHAR                   *Key,
-                           const int32                    Limit,
-                           FString                       &OutValue,
-                           FString                       &OutError)
-    {
-        if (!Object->TryGetStringField(Key, OutValue) || OutValue.Len() > Limit)
-        {
-            OutError = FString::Printf(TEXT("문자열 필드가 잘못되었습니다: %s"), Key);
-            return false;
-        }
-        return true;
-    }
+            bool ReadBoundedString(const TSharedPtr<FJsonObject> &Object,
+                                   const TCHAR                   *Key,
+                                   const int32                    Limit,
+                                   FString                       &OutValue,
+                                   FString                       &OutError)
+            {
+                if (!Object->TryGetStringField(Key, OutValue) || OutValue.Len() > Limit)
+                {
+                    OutError = FString::Printf(TEXT("문자열 필드가 잘못되었습니다: %s"), Key);
+                    return false;
+                }
+                return true;
+            }
 
-    bool ReadInteger(const TSharedPtr<FJsonObject> &Object, const TCHAR *Key, int32 &OutValue, FString &OutError)
-    {
-        double Number = 0.0;
-        if (!Object->TryGetNumberField(Key, Number) || !FMath::IsFinite(Number) ||
-            Number < static_cast<double>(MIN_int32) || Number > static_cast<double>(MAX_int32))
-        {
-            OutError = FString::Printf(TEXT("정수 필드가 잘못되었습니다: %s"), Key);
-            return false;
-        }
-        OutValue = static_cast<int32>(Number);
-        if (static_cast<double>(OutValue) != Number)
-        {
-            OutError = FString::Printf(TEXT("소수는 허용되지 않습니다: %s"), Key);
-            return false;
-        }
-        return true;
-    }
+            bool ReadInteger(const TSharedPtr<FJsonObject> &Object, const TCHAR *Key, int32 &OutValue, FString &OutError)
+            {
+                double Number = 0.0;
+                if (!Object->TryGetNumberField(Key, Number) || !FMath::IsFinite(Number) ||
+                    Number < static_cast<double>(MIN_int32) || Number > static_cast<double>(MAX_int32))
+                {
+                    OutError = FString::Printf(TEXT("정수 필드가 잘못되었습니다: %s"), Key);
+                    return false;
+                }
+                OutValue = static_cast<int32>(Number);
+                if (static_cast<double>(OutValue) != Number)
+                {
+                    OutError = FString::Printf(TEXT("소수는 허용되지 않습니다: %s"), Key);
+                    return false;
+                }
+                return true;
+            }
 
-    bool ReadFiniteFloat(const TSharedPtr<FJsonObject> &Object, const TCHAR *Key, float &OutValue, FString &OutError)
-    {
-        double Number = 0.0;
-        if (!Object->TryGetNumberField(Key, Number) || !FMath::IsFinite(Number) || Number < -1.0 || Number > 1.0)
-        {
-            OutError = FString::Printf(TEXT("감정 Delta 범위를 초과했습니다: %s"), Key);
-            return false;
-        }
-        OutValue = static_cast<float>(Number);
-        return true;
-    }
+            bool
+            ReadFiniteFloat(const TSharedPtr<FJsonObject> &Object, const TCHAR *Key, float &OutValue, FString &OutError)
+            {
+                double Number = 0.0;
+                if (!Object->TryGetNumberField(Key, Number) || !FMath::IsFinite(Number) || Number < -1.0 || Number > 1.0)
+                {
+                    OutError = FString::Printf(TEXT("감정 Delta 범위를 초과했습니다: %s"), Key);
+                    return false;
+                }
+                OutValue = static_cast<float>(Number);
+                return true;
+            }
 
-    bool ParseMutation(const TSharedPtr<FJsonObject> &Object, FWAINStateMutation &OutMutation, FString &OutError)
-    {
-        const TArray<FString> Keys = {TEXT("owner"),
-                                      TEXT("targetId"),
-                                      TEXT("operation"),
-                                      TEXT("integerValue"),
-                                      TEXT("floatValue")};
-        if (!RequireExactFields(Object, Keys, OutError))
-            return false;
+            bool ParseMutation(const TSharedPtr<FJsonObject> &Object, FWAINStateMutation &OutMutation, FString &OutError)
+            {
+                const TArray<FString> Keys = {TEXT("owner"),
+                                              TEXT("targetId"),
+                                              TEXT("operation"),
+                                              TEXT("integerValue"),
+                                              TEXT("floatValue")};
+                if (!RequireExactFields(Object, Keys, OutError))
+                    return false;
 
-        FString Owner, Target, Operation;
-        if (!ReadBoundedString(Object, TEXT("owner"), 16, Owner, OutError) ||
-            !ReadBoundedString(Object, TEXT("targetId"), 128, Target, OutError) ||
-            !ReadBoundedString(Object, TEXT("operation"), 32, Operation, OutError) ||
-            !ReadInteger(Object, TEXT("integerValue"), OutMutation.IntegerValue, OutError) ||
-            !ReadFiniteFloat(Object, TEXT("floatValue"), OutMutation.FloatValue, OutError))
-        {
-            return false;
-        }
-        if (Target.IsEmpty() || Target.TrimStartAndEnd() != Target)
-        {
-            OutError = TEXT("Mutation TargetId는 비어 있거나 공백을 포함할 수 없습니다.");
-            return false;
-        }
-        if (Owner == TEXT("character"))
-            OutMutation.Owner = EWAINMutationOwner::Character;
-        else if (Owner == TEXT("game"))
-            OutMutation.Owner = EWAINMutationOwner::Game;
-        else
-        {
-            OutError = TEXT("지원하지 않는 Mutation Owner입니다.");
-            return false;
-        }
+                FString Owner, Target, Operation;
+                if (!ReadBoundedString(Object, TEXT("owner"), 16, Owner, OutError) ||
+                    !ReadBoundedString(Object, TEXT("targetId"), 128, Target, OutError) ||
+                    !ReadBoundedString(Object, TEXT("operation"), 32, Operation, OutError) ||
+                    !ReadInteger(Object, TEXT("integerValue"), OutMutation.IntegerValue, OutError) ||
+                    !ReadFiniteFloat(Object, TEXT("floatValue"), OutMutation.FloatValue, OutError))
+                {
+                    return false;
+                }
+                if (Target.IsEmpty() || Target.TrimStartAndEnd() != Target)
+                {
+                    OutError = TEXT("Mutation TargetId는 비어 있거나 공백을 포함할 수 없습니다.");
+                    return false;
+                }
+                if (Owner == TEXT("character"))
+                    OutMutation.Owner = EWAINMutationOwner::Character;
+                else if (Owner == TEXT("game"))
+                    OutMutation.Owner = EWAINMutationOwner::Game;
+                else
+                {
+                    OutError = TEXT("지원하지 않는 Mutation Owner입니다.");
+                    return false;
+                }
 
-        if (Operation == TEXT("addInteger"))
-            OutMutation.Operation = EWAINMutationOperation::AddInteger;
-        else if (Operation == TEXT("setInteger"))
-            OutMutation.Operation = EWAINMutationOperation::SetInteger;
-        else if (Operation == TEXT("addFloat"))
-            OutMutation.Operation = EWAINMutationOperation::AddFloat;
-        else
-        {
-            OutError = TEXT("지원하지 않는 Mutation Operation입니다.");
-            return false;
-        }
+                if (Operation == TEXT("addInteger"))
+                    OutMutation.Operation = EWAINMutationOperation::AddInteger;
+                else if (Operation == TEXT("setInteger"))
+                    OutMutation.Operation = EWAINMutationOperation::SetInteger;
+                else if (Operation == TEXT("addFloat"))
+                    OutMutation.Operation = EWAINMutationOperation::AddFloat;
+                else
+                {
+                    OutError = TEXT("지원하지 않는 Mutation Operation입니다.");
+                    return false;
+                }
 
-        if ((OutMutation.Operation == EWAINMutationOperation::AddFloat && OutMutation.IntegerValue != 0) ||
-            (OutMutation.Operation != EWAINMutationOperation::AddFloat && OutMutation.FloatValue != 0.0F))
-        {
-            OutError = TEXT("Mutation에 사용되지 않는 숫자 필드는 0이어야 합니다.");
-            return false;
-        }
-        OutMutation.TargetId = FName(*Target);
-        return true;
-    }
-} // namespace WAINStructuredProposal
+                if ((OutMutation.Operation == EWAINMutationOperation::AddFloat && OutMutation.IntegerValue != 0) ||
+                    (OutMutation.Operation != EWAINMutationOperation::AddFloat && OutMutation.FloatValue != 0.0F))
+                {
+                    OutError = TEXT("Mutation에 사용되지 않는 숫자 필드는 0이어야 합니다.");
+                    return false;
+                }
+                OutMutation.TargetId = FName(*Target);
+                return true;
+            }
+        } // namespace WAINStructuredProposal
+    } // namespace
+#pragma endregion
 
 // ============================================================
-// 00. Local Strict Parsing
+// 01. Local Strict Parsing
 // ============================================================
-#pragma region 00_Local_Strict_Parsing
+#pragma region 01_Local_Strict_Parsing
 
     bool FWAINStructuredProposal::Parse(const FString &Json, FWAINResponseProposal &OutProposal, FString &OutError)
     {
@@ -212,9 +221,9 @@ namespace WAINStructuredProposal
 #pragma endregion
 
 // ============================================================
-// 01. API Structured Output Schema
+// 02. API Structured Output Schema
 // ============================================================
-#pragma region 01_API_Structured_Output_Schema
+#pragma region 02_API_Structured_Output_Schema
 
     FString FWAINStructuredProposal::MakeJsonSchema()
     {

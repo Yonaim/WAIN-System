@@ -29,3 +29,9 @@ Host DEV 버튼을 탭형 Debug Inspector로 확장했다. Plugin에서 최근 4
 - Testbed UI/Adapter는 공개 LLMTypes를 사용하고 기존 DEV 경고·Mock·Atomic Commit 경로를 유지한다.
 - Prompt 오프라인 테스트 3개 추가(전체 테스트 코드 118개). Unreal 빌드 및 API 연동은 별도 검증이 필요하다.
 - [ADR-019](03_Decisions/19_ADR-019-LLM-Internal-Layers.md).
+
+## 2026-11-14 — Universal Vault C++ Rules Synced
+
+- Synced the latest C++ guidance for file-local utilities, required anonymous namespace regions, and nested responsibility regions.
+- Wrapped file-local helper namespaces in anonymous namespaces and dedicated Regions across the Plugin LLM, Memory, Transaction, and State code plus the Host JSON loader and Debug Inspector. Updated section numbering; existing formatter copies already match the latest Universal Vault formatter.
+- No runtime contract changed; Unreal build and Automation execution remain unverified for this update.

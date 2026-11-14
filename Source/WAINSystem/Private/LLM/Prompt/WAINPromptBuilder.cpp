@@ -5,24 +5,33 @@
 
 #include "WAINPromptBuilder.h"
 
-namespace WAINPromptPrivate
-{
-    FString FormatEmotion(const FWAINEmotionState &State)
+// ============================================================
+// 00. File-Local Utilities
+// ============================================================
+#pragma region 00_File_Local_Utilities
+    namespace
     {
-        return FString::Printf(TEXT("Joy %.2f; Sadness %.2f; Anger %.2f; Disgust %.2f; Anxiety %.2f; Surprise %.2f"),
-                               State.Joy,
-                               State.Sadness,
-                               State.Anger,
-                               State.Disgust,
-                               State.Anxiety,
-                               State.Surprise);
-    }
-} // namespace WAINPromptPrivate
+        namespace WAINPromptPrivate
+        {
+            FString FormatEmotion(const FWAINEmotionState &State)
+            {
+                return FString::Printf(
+                    TEXT("Joy %.2f; Sadness %.2f; Anger %.2f; Disgust %.2f; Anxiety %.2f; Surprise %.2f"),
+                    State.Joy,
+                    State.Sadness,
+                    State.Anger,
+                    State.Disgust,
+                    State.Anxiety,
+                    State.Surprise);
+            }
+        } // namespace WAINPromptPrivate
+    } // namespace
+#pragma endregion
 
 // ============================================================
-// 00. System Instruction
+// 01. System Instruction
 // ============================================================
-#pragma region 00_System_Instruction
+#pragma region 01_System_Instruction
     // 시스템 규칙과 사용자·메모리 데이터는 서로 다른 메시지로 전달한다.
 
     FString FWAINPromptBuilder::BuildSystemInstruction()
@@ -39,9 +48,9 @@ namespace WAINPromptPrivate
 #pragma endregion
 
 // ============================================================
-// 01. Read-Only Context Prompt
+// 02. Read-Only Context Prompt
 // ============================================================
-#pragma region 01_Read_Only_Context_Prompt
+#pragma region 02_Read_Only_Context_Prompt
     // 원래 Context 필드, 표현 후보, 입력/메모리 길이 제한을 유지한다.
 
     FString FWAINPromptBuilder::BuildUserPrompt(const FWAINInteractionRequest &Request,

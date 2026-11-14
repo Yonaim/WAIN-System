@@ -13,36 +13,44 @@
 #include "Serialization/JsonReader.h"
 #include "Serialization/JsonSerializer.h"
 
-namespace WAINLLMPrivate
-{
-    constexpr int32 MaxEnvelopeChars = 131072;
-
-    TSharedPtr<FJsonObject> ParseObject(const FString &Text)
+// ============================================================
+// 00. File-Local Utilities
+// ============================================================
+#pragma region 00_File_Local_Utilities
+    namespace
     {
-        TSharedPtr<FJsonObject> Root;
-        if (Text.IsEmpty() || Text.Len() > MaxEnvelopeChars)
-            return nullptr;
-        const TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(Text);
-        if (!FJsonSerializer::Deserialize(Reader, Root))
-            return nullptr;
-        return Root;
-    }
+        namespace WAINLLMPrivate
+        {
+            constexpr int32 MaxEnvelopeChars = 131072;
 
-    FString SerializeObject(const TSharedRef<FJsonObject> &Root)
-    {
-        FString                         Result;
-        const TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&Result);
-        if (!FJsonSerializer::Serialize(Root, Writer))
-            return FString();
-        return Result;
-    }
+            TSharedPtr<FJsonObject> ParseObject(const FString &Text)
+            {
+                TSharedPtr<FJsonObject> Root;
+                if (Text.IsEmpty() || Text.Len() > MaxEnvelopeChars)
+                    return nullptr;
+                const TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(Text);
+                if (!FJsonSerializer::Deserialize(Reader, Root))
+                    return nullptr;
+                return Root;
+            }
 
-} // namespace WAINLLMPrivate
+            FString SerializeObject(const TSharedRef<FJsonObject> &Root)
+            {
+                FString                         Result;
+                const TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&Result);
+                if (!FJsonSerializer::Serialize(Root, Writer))
+                    return FString();
+                return Result;
+            }
+
+        } // namespace WAINLLMPrivate
+    } // namespace
+#pragma endregion
 
 // ============================================================
-// 00. OpenAI Response Validation
+// 01. OpenAI Response Validation
 // ============================================================
-#pragma region 00_OpenAI_Response_Validation
+#pragma region 01_OpenAI_Response_Validation
 
     bool FWAINOpenAIClient::ExtractProposal(const FString         &ResponseJson,
                                             FWAINResponseProposal &OutProposal,
@@ -114,9 +122,9 @@ namespace WAINLLMPrivate
 #pragma endregion
 
 // ============================================================
-// 01. Usage And Sanitized Error Classification
+// 02. Usage And Sanitized Error Classification
 // ============================================================
-#pragma region 01_Usage_And_Error_Classification
+#pragma region 02_Usage_And_Error_Classification
 
     // 인증 키나 원시 오류 본문은 기록하지 않고 API의 error.code만 검사한다.
 
@@ -184,9 +192,9 @@ namespace WAINLLMPrivate
 #pragma endregion
 
 // ============================================================
-// 02. Asynchronous HTTP Request
+// 03. Asynchronous HTTP Request
 // ============================================================
-#pragma region 02_Asynchronous_HTTP_Request
+#pragma region 03_Asynchronous_HTTP_Request
 
     bool FWAINOpenAIClient::Submit(const FWAINInteractionRequest &Request,
                                    const FWAINCharacterContext   &Context,

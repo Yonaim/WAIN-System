@@ -6,18 +6,26 @@
 #include "Memory/WAINMemoryReasoningPreparer.h"
 #include "Algo/Reverse.h"
 
-namespace WAINMemoryReasoning
-{
-    constexpr float ReflectionThreshold = 2.0F; // MVP 실험값: Observation 중요도 합
-    constexpr int32 MaxReflectionSources = 12;
-    constexpr int32 MaxPlanSources = 6;
-    constexpr int32 MaxPlanSteps = 8;
-} // namespace WAINMemoryReasoning
+// ============================================================
+// 00. File-Local Utilities
+// ============================================================
+#pragma region 00_File_Local_Utilities
+    namespace
+    {
+        namespace WAINMemoryReasoning
+        {
+            constexpr float ReflectionThreshold = 2.0F; // MVP 실험값: Observation 중요도 합
+            constexpr int32 MaxReflectionSources = 12;
+            constexpr int32 MaxPlanSources = 6;
+            constexpr int32 MaxPlanSteps = 8;
+        } // namespace WAINMemoryReasoning
+    } // namespace
+#pragma endregion
 
 // ============================================================
-// 00. Reasoning Pipeline
+// 01. Reasoning Pipeline
 // ============================================================
-#pragma region 00_Reasoning_Pipeline
+#pragma region 01_Reasoning_Pipeline
 
     // 턴의 Reasoning 처리 순서를 Reflection 평가와 Plan 평가로 분리한다.
 
@@ -37,9 +45,9 @@ namespace WAINMemoryReasoning
 #pragma endregion
 
 // ============================================================
-// 01. Reflection Preparation
+// 02. Reflection Preparation
 // ============================================================
-#pragma region 01_Reflection_Preparation
+#pragma region 02_Reflection_Preparation
 
     // 새 Observation의 중요도 누적량이 임계값을 넘으면 출처가 연결된 Reflection 후보를 생성한다.
 
@@ -116,9 +124,9 @@ namespace WAINMemoryReasoning
 #pragma endregion
 
 // ============================================================
-// 02. Plan Preparation And Reuse
+// 03. Plan Preparation And Reuse
 // ============================================================
-#pragma region 02_Plan_Preparation_And_Reuse
+#pragma region 03_Plan_Preparation_And_Reuse
 
     // 기존 Plan의 Scene/Beat 유효성을 확인한 뒤 필요할 때만 새 Plan 후보를 준비한다.
 
@@ -223,9 +231,9 @@ namespace WAINMemoryReasoning
 #pragma endregion
 
 // ============================================================
-// 03. Draft Validation And Append
+// 04. Draft Validation And Append
 // ============================================================
-#pragma region 03_Draft_Validation_And_Append
+#pragma region 04_Draft_Validation_And_Append
 
     // 생성된 메모리의 내용과 용량을 검사한 뒤 준비 중인 Snapshot에만 추가한다.
 

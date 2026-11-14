@@ -11,34 +11,42 @@
 #include "Serialization/JsonReader.h"
 #include "Serialization/JsonSerializer.h"
 
-namespace WAINOrganizationUsagePrivate
-{
-    constexpr int32 MaxUsageResponseChars = 1048576;
-
-    TSharedPtr<FJsonObject> ParseJson(const FString &Json)
+// ============================================================
+// 00. File-Local Utilities
+// ============================================================
+#pragma region 00_File_Local_Utilities
+    namespace
     {
-        if (Json.IsEmpty() || Json.Len() > MaxUsageResponseChars)
-            return nullptr;
-        TSharedPtr<FJsonObject>         Root;
-        const TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(Json);
-        return FJsonSerializer::Deserialize(Reader, Root) ? Root : nullptr;
-    }
+        namespace WAINOrganizationUsagePrivate
+        {
+            constexpr int32 MaxUsageResponseChars = 1048576;
 
-    bool ExtractTokenValue(const TSharedPtr<FJsonObject> &Object, const TCHAR *Field, int64 &OutTokens)
-    {
-        double Number = 0.0;
-        if (!Object.IsValid() || !Object->TryGetNumberField(Field, Number) || !FMath::IsFinite(Number) ||
-            Number < 0.0 || Number > 1000000000000.0 || Number != FMath::FloorToDouble(Number))
-            return false;
-        OutTokens = static_cast<int64>(Number);
-        return true;
-    }
-} // namespace WAINOrganizationUsagePrivate
+            TSharedPtr<FJsonObject> ParseJson(const FString &Json)
+            {
+                if (Json.IsEmpty() || Json.Len() > MaxUsageResponseChars)
+                    return nullptr;
+                TSharedPtr<FJsonObject>         Root;
+                const TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(Json);
+                return FJsonSerializer::Deserialize(Reader, Root) ? Root : nullptr;
+            }
+
+            bool ExtractTokenValue(const TSharedPtr<FJsonObject> &Object, const TCHAR *Field, int64 &OutTokens)
+            {
+                double Number = 0.0;
+                if (!Object.IsValid() || !Object->TryGetNumberField(Field, Number) || !FMath::IsFinite(Number) ||
+                    Number < 0.0 || Number > 1000000000000.0 || Number != FMath::FloorToDouble(Number))
+                    return false;
+                OutTokens = static_cast<int64>(Number);
+                return true;
+            }
+        } // namespace WAINOrganizationUsagePrivate
+    } // namespace
+#pragma endregion
 
 // ============================================================
-// 00. Model Group Classification
+// 01. Model Group Classification
 // ============================================================
-#pragma region 00_Model_Group_Classification
+#pragma region 01_Model_Group_Classification
 
     // 공개된 Data Sharing Incentive 소형 모델 그룹만 추정에 포함한다. 미분류 모델은 별도로 보고한다.
 
@@ -76,9 +84,9 @@ namespace WAINOrganizationUsagePrivate
 #pragma endregion
 
 // ============================================================
-// 01. Bounded Response Parsing
+// 02. Bounded Response Parsing
 // ============================================================
-#pragma region 01_Bounded_Response_Parsing
+#pragma region 02_Bounded_Response_Parsing
 
     // group_by=model 결과 중 입력+출력 토큰을 읽는다. service_tier는 무료 잔액 보증이 아니다.
 
@@ -165,9 +173,9 @@ namespace WAINOrganizationUsagePrivate
 #pragma endregion
 
 // ============================================================
-// 02. Warning And Inspector Formatting
+// 03. Warning And Inspector Formatting
 // ============================================================
-#pragma region 02_Warning_And_Inspector_Formatting
+#pragma region 03_Warning_And_Inspector_Formatting
 
     // 경고는 정보용이며 경고/조회 실패만으로 플레이어나 Transaction을 중단하지 않는다.
 
@@ -221,9 +229,9 @@ namespace WAINOrganizationUsagePrivate
 #pragma endregion
 
 // ============================================================
-// 03. Non-blocking Admin HTTP Query
+// 04. Non-blocking Admin HTTP Query
 // ============================================================
-#pragma region 03_Non_blocking_Admin_HTTP_Query
+#pragma region 04_Non_blocking_Admin_HTTP_Query
 
     // 매 턴 시작 전 조직 전체의 당일 집계를 조회한다. 결과를 받으면 Host가 반드시 LLM POST로 이어간다.
 

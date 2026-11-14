@@ -11,29 +11,37 @@
 #include "Serialization/JsonReader.h"
 #include "Serialization/JsonSerializer.h"
 
-namespace WAINLLMConfigPrivate
-{
-    TSharedPtr<FJsonObject> ParseObject(const FString &Json)
+// ============================================================
+// 00. File-Local Utilities
+// ============================================================
+#pragma region 00_File_Local_Utilities
+    namespace
     {
-        TSharedPtr<FJsonObject> Root;
-        if (Json.IsEmpty() || Json.Len() > 16384)
-            return nullptr;
-        const TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(Json);
-        return FJsonSerializer::Deserialize(Reader, Root) ? Root : nullptr;
-    }
+        namespace WAINLLMConfigPrivate
+        {
+            TSharedPtr<FJsonObject> ParseObject(const FString &Json)
+            {
+                TSharedPtr<FJsonObject> Root;
+                if (Json.IsEmpty() || Json.Len() > 16384)
+                    return nullptr;
+                const TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(Json);
+                return FJsonSerializer::Deserialize(Reader, Root) ? Root : nullptr;
+            }
 
-    void OverrideIfSet(const TCHAR *Variable, FString &OutValue)
-    {
-        const FString Override = FPlatformMisc::GetEnvironmentVariable(Variable);
-        if (!Override.IsEmpty())
-            OutValue = Override;
-    }
-} // namespace WAINLLMConfigPrivate
+            void OverrideIfSet(const TCHAR *Variable, FString &OutValue)
+            {
+                const FString Override = FPlatformMisc::GetEnvironmentVariable(Variable);
+                if (!Override.IsEmpty())
+                    OutValue = Override;
+            }
+        } // namespace WAINLLMConfigPrivate
+    } // namespace
+#pragma endregion
 
 // ============================================================
-// 00. Project Config Loading
+// 01. Project Config Loading
 // ============================================================
-#pragma region 00_Project_Config_Loading
+#pragma region 01_Project_Config_Loading
 
     // Host의 Config/WAIN 폴더에서 Secret과 일반 설정을 분리해 읽는다.
 
@@ -79,9 +87,9 @@ namespace WAINLLMConfigPrivate
 #pragma endregion
 
 // ============================================================
-// 01. Public And Local JSON Parsing
+// 02. Public And Local JSON Parsing
 // ============================================================
-#pragma region 01_Public_And_Local_JSON_Parsing
+#pragma region 02_Public_And_Local_JSON_Parsing
 
     bool FWAINLLMConfigLoader::ParsePublicJson(const FString &Json, FWAINLLMConfig &InOutConfig, FString &OutError)
     {
@@ -192,9 +200,9 @@ namespace WAINLLMConfigPrivate
 #pragma endregion
 
 // ============================================================
-// 02. Safe Configuration Validation
+// 03. Safe Configuration Validation
 // ============================================================
-#pragma region 02_Safe_Configuration_Validation
+#pragma region 03_Safe_Configuration_Validation
 
     bool FWAINLLMConfigLoader::Validate(const FWAINLLMConfig &Config, FString &OutError)
     {
