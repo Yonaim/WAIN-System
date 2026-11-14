@@ -146,3 +146,10 @@
 - **변경:** `Tools/indent_regions.py`와 `Assets/Formatting/indent_regions.py`를 사용자 첨부 원문으로 교체.
 - **문서 검토:** CLI·포맷 계약·소스 경로 변경이 없어 관련 설계·소스 맵·테스트 계획은 유지.
 - **검증:** 두 파일의 첨부 원문 바이트 일치 확인 및 Python AST 구문 검사 통과. 파일 교체 범위이므로 Unreal 빌드와 전체 소스 포맷 실행은 생략.
+
+## 2026-11-14 — Plugin LLM Ownership and Host Source Layout
+
+- `WAINTestbedLLM*` 및 Host Usage Monitor/Config 구현을 Plugin `Public/LLM`, `Private/LLM`으로 이동하고 `FWAINLLMTurnService`를 추가했다.
+- Testbed C++를 `Gameplay/Data/Integration/Presentation/UI/Tests`로 재배치하고 Host HTTP 의존성을 Plugin으로 옮겼다.
+- `Content/` 데이터·이미지와 로컬 비밀키는 보존했다. ADR-018, Architecture, LLM/Usage 문서를 갱신했다.
+- 정적 변경 검토만 수행했다. UE 5.8 빌드, Automation, PIE, API 실호출은 실행하지 않았다.

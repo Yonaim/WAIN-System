@@ -26,3 +26,5 @@
 | [ADR-016](16_ADR-016-Asynchronous-LLM-Proposal-Handoff.md) | Async OpenAI 호스트 응답을 TurnId/Revision Bound Proposal로 기존 동기 Transaction에 인계 | **Proposed (Host MVP)** |
 
 - [ADR-017 — Host Usage Preflight and Warning-only Policy](17_ADR-017-Host-Usage-Preflight-and-Warnings.md) — **Proposed**, Host 조직 사용량 추정·경고/키 보호
+
+- [ADR-018 — Plugin LLM Ownership and Host Directories](18_ADR-018-Plugin-LLM-and-Host-Directories.md) — **Proposed**, LLM 구현 Plugin 이동 / Host Data 명칭 확정

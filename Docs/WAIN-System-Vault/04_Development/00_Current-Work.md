@@ -126,3 +126,9 @@ Host `Content`를 Data/Images/UI/Maps로 정리하고 `Images/Characters/Mana/La
 ## 2026-11-13 — Host Usage Monitor (ADR-017 Proposed)
 
 WAINTestbed는 설정/조직 사용량 사전 조회/상단 팝업/DEV 진단 UI를 소유한다. WAINSystem Plugin은 해당 GET 호출이나 Admin 키와 무관하며 기존 Prepared Transaction만 수행한다. 조직 Usage는 무료 토큰의 확정 잔량이 아닌 모델 그룹별 지연 집계 추정이다. 신규 Automation 9개 코드 작성, UE 실제 빌드/PIE 미검증. [ADR-017](../03_Decisions/17_ADR-017-Host-Usage-Preflight-and-Warnings.md).
+
+## 2026-11-14 — LLM Plugin Ownership and Host Data Layout
+
+- OpenAI Client, Prompt/Structured Proposal, Config Loader, Usage Monitor, async Turn Service를 Plugin의 `Public/LLM` 및 `Private/LLM`로 이동했다.
+- Host C++를 `Gameplay / Data / Integration / Presentation / UI / Tests`로 분류하고 HTTP 의존성을 Plugin으로 옮겼다.
+- Host JSON/PNG와 로컬 키 설정은 보존했다. UE 5.8 빌드, Automation, PIE, API 실호출은 미검증이다. [Host Architecture](../../../../../Docs/02_Implementation/00_Testbed-Architecture.md) · [ADR-018](../03_Decisions/18_ADR-018-Plugin-LLM-and-Host-Directories.md).

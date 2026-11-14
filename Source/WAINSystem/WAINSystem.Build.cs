@@ -16,7 +16,8 @@ public class WAINSystem : ModuleRules
             "Core",
             "CoreUObject",
             "Engine",
-            "Json"
+            "Json",
+            "HTTP"
         });
     }
 }
