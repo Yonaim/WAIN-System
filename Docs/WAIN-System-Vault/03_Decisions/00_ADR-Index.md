@@ -32,3 +32,5 @@
 - [ADR-019 — Private LLM Layers and Public Contract Minimization](19_ADR-019-LLM-Internal-Layers.md) — **Proposed**, Prompt/Provider/Validation/Usage 책임 분리 및 최소 Public API
 
 - [[20_ADR-020-Relationship-Semantics-and-Presentation-Steps]] — 다차원 관계·PresentationStep 단일 계약 (Proposed)
+
+- [[21_ADR-021-Beat-Budget-Authored-Hooks-Save]] — Beat Turn Budget, 작가 고정 Hook 및 Safe Save

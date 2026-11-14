@@ -27,6 +27,15 @@
                                const TArray<FWAINStateMutation> &Mutations,
                                FString                          &OutError) const;
 
+        bool ValidateScriptedMutations(const IWAINGameStateSnapshot     &Current,
+                                       const TArray<FWAINStateMutation> &Mutations,
+                                       FString                          &OutError) const;
+
+        bool ValidateScriptedPrepared(const IWAINGameStateSnapshot     &Current,
+                                      const IWAINGameStateSnapshot     &Prepared,
+                                      const TArray<FWAINStateMutation> &Mutations,
+                                      FString                          &OutError) const;
+
         bool ValidatePrepared(const IWAINGameStateSnapshot     &Current,
                               const IWAINGameStateSnapshot     &Prepared,
                               const TArray<FWAINStateMutation> &Mutations,
@@ -41,7 +50,8 @@
         bool                            ComputeExpected(const IWAINGameStateSnapshot     &Current,
                                                         const TArray<FWAINStateMutation> &Mutations,
                                                         TMap<FName, int32>               &OutExpected,
-                                                        FString                          &OutError) const;
+                                                        FString                          &OutError,
+                                                        bool                              bScripted = false) const;
         const FWAINWorldFactDefinition *FindDefinition(FName Key) const;
 
         TArray<FWAINWorldFactDefinition>       Schema;

@@ -1,6 +1,6 @@
 # WAIN — Relationship Semantics & Presentation Steps
 
-> 구현 기준: `WAINTestbed-Source(3).zip`. UE 5.8 `WAINTestbedEditor Win64 Development` 빌드는 2026-11-14 성공했다. Automation·PIE 및 OpenAI 실호출은 아직 실행하지 않았다.
+> 구현 기준: `WAINTestbed-Source(3).zip` 및 Narrative v2 적용본. UE 5.8 `WAINTestbedEditor Win64 Development` 빌드는 2026-11-15 성공했다. Automation/PIE/OpenAI 실호출은 실행하지 않았다.
 
 ## 00. 계약 변경 (Breaking Change)
 
@@ -86,4 +86,5 @@ Content/Data/
 
 - JSON 형식·관계 파라미터 정합성·새 Structured Schema 정적 검사.
 - 테스트 코드: 파라미터 Add/Set과 범위 오류, 금지 표현, Prompt 기준점, 2 Step 파싱/재생 및 단일 Commit.
-- **검증 상태:** UE 5.8 `WAINTestbedEditor Win64 Development` 빌드 성공. UE Automation 실행, PIE UI/표정 이미지, 실제 GPT API 결과는 미검증.
+- **검증 완료:** UE 5.8 `WAINTestbedEditor Win64 Development` 컴파일·링크 성공.
+- **미실행:** UE Automation 실행, PIE UI/표정 이미지, 실제 GPT API 결과.

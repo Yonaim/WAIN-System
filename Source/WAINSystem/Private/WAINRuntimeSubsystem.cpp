@@ -47,6 +47,52 @@
         return true;
     }
 
+    bool UWAINRuntimeSubsystem::AdvanceScriptedBeat(FName ExpectedBeatId, FString &OutError)
+    {
+        check(IsInGameThread());
+        if (!Processor.IsValid())
+        {
+            OutError = TEXT("시작된 Session이 없습니다.");
+            return false;
+        }
+        return Processor->AdvanceScriptedBeat(ExpectedBeatId, OutError);
+    }
+
+    bool UWAINRuntimeSubsystem::ApplyScriptedWorldChanges(const TArray<FWAINStateMutation> &Mutations, FString &OutError)
+    {
+        check(IsInGameThread());
+        if (!Processor.IsValid())
+        {
+            OutError = TEXT("시작된 Session이 없습니다.");
+            return false;
+        }
+        return Processor->ApplyScriptedWorldChanges(Mutations, OutError);
+    }
+
+    bool UWAINRuntimeSubsystem::SetAuthoredGameFact(FName TargetId, int32 Value, FString &OutError)
+    {
+        check(IsInGameThread());
+        if (!Processor.IsValid())
+        {
+            OutError = TEXT("시작된 Session이 없습니다.");
+            return false;
+        }
+        return Processor->SetAuthoredGameFact(TargetId, Value, OutError);
+    }
+
+    bool UWAINRuntimeSubsystem::RestoreSnapshot(const FWAINStateSnapshot                &Snapshot,
+                                                TSharedPtr<const IWAINGameStateSnapshot> Game,
+                                                FString                                 &OutError)
+    {
+        check(IsInGameThread());
+        if (!Processor.IsValid())
+        {
+            OutError = TEXT("시작된 Session이 없습니다.");
+            return false;
+        }
+        return Processor->RestoreSnapshot(Snapshot, MoveTemp(Game), OutError);
+    }
+
     FWAINInteractionResult UWAINRuntimeSubsystem::ProcessMockTurn(const FWAINInteractionRequest &Request)
     {
         return ProcessTurn(Request);

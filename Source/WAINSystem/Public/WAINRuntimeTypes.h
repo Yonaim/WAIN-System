@@ -68,6 +68,7 @@
         FName          SceneId;
         EWAINInputKind InputKind = EWAINInputKind::Text;
         FString        Text;
+        bool           bExitRequested = false; // 플레이어가 현재 Beat를 마무리하려는 의사.
     };
 
     /** @brief LLM을 포함한 외부 생성기의 출력은 State 명령이 아닌 검증 대상이다. */
@@ -124,11 +125,20 @@
     };
 
     /** @brief Commit된 턴의 Beat 전이 이력. 이전 Snapshot은 변경되지 않는다. */
+    enum class EWAINBeatExitReason : uint8
+    {
+        GoalCompleted,
+        PlayerRequested,
+        TurnBudgetExhausted
+    };
+
     struct FWAINBeatTransitionRecord
     {
-        FName FromBeatId;
-        FName ToBeatId;
-        int32 Turn = 0;
+        FName               FromBeatId;
+        FName               ToBeatId;
+        int32               Turn = 0;
+        EWAINBeatExitReason Reason = EWAINBeatExitReason::GoalCompleted;
+        bool                bGoalSatisfied = false;
     };
 
     struct FWAINStateSnapshot
@@ -137,6 +147,7 @@
         TArray<FWAINMemoryRecord>         MemoryStream;
         TMap<FName, FGuid>                ActivePlanIds;
         FName                             ActiveBeatId;
+        int32                             ActiveBeatEntryTurn = 0; // 현재 Beat가 시작된 확정 TurnCount.
         TArray<FWAINBeatTransitionRecord> BeatHistory;
         int32                             TurnCount = 0;
     };

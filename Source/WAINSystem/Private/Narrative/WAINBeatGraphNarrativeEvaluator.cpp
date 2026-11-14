@@ -94,18 +94,17 @@
             return false;
         }
 
-        // Completion 조건이 비어 있는 Beat는 명시적 완료 판정 전까지 유지한다.
-        if (Beat->CompletionConditions.IsEmpty())
-        {
-            return true;
-        }
-
-        bool bCompleted = false;
-        if (!EvaluateConditions(Beat->CompletionConditions, Request, PreparedWAIN, PreparedGame, bCompleted, OutError))
+        // Goal 만족 여부와 장면을 떠나는 조건은 별개다. 시간을 소비하는 건 Commit된 Interaction Turn뿐이다.
+        bool bGoalSatisfied = false;
+        if (!Beat->CompletionConditions.IsEmpty() &&
+            !EvaluateConditions(Beat->CompletionConditions, Request, PreparedWAIN, PreparedGame, bGoalSatisfied, OutError))
         {
             return false;
         }
-        if (!bCompleted)
+        const int32 UsedTurns = PreparedWAIN.TurnCount - Current.WAIN.ActiveBeatEntryTurn;
+        const bool  bBudgetExhausted = Beat->MaxInteractionTurns > 0 && UsedTurns >= Beat->MaxInteractionTurns;
+        const bool  bShouldLeave = bBudgetExhausted || Request.bExitRequested || (bGoalSatisfied && !Beat->bHoldAfterGoal);
+        if (!bShouldLeave)
         {
             return true;
         }
@@ -124,8 +123,13 @@
         History.FromBeatId = Beat->Id;
         History.ToBeatId = NextBeat;
         History.Turn = PreparedWAIN.TurnCount;
+        History.bGoalSatisfied = bGoalSatisfied;
+        History.Reason = bBudgetExhausted ? EWAINBeatExitReason::TurnBudgetExhausted
+                                          : (Request.bExitRequested ? EWAINBeatExitReason::PlayerRequested
+                                                                    : EWAINBeatExitReason::GoalCompleted);
         PreparedWAIN.BeatHistory.Add(History);
         PreparedWAIN.ActiveBeatId = NextBeat;
+        PreparedWAIN.ActiveBeatEntryTurn = PreparedWAIN.TurnCount;
         return true;
     }
 
@@ -368,8 +372,8 @@
         for (const FWAINNarrativeBeat &Beat : Graph.Beats)
         {
             if (Beat.Id.IsNone() || Ids.Contains(Beat.Id) || !FindSequence(Beat.SequenceId) ||
-                Beat.Goal.TrimStartAndEnd().IsEmpty() || !ValidateHardRules(Beat.HardRules, OutError) ||
-                !ValidateConditions(Beat.CompletionConditions, OutError))
+                Beat.Goal.TrimStartAndEnd().IsEmpty() || Beat.MaxInteractionTurns < 0 || Beat.MaxInteractionTurns > 500 ||
+                !ValidateHardRules(Beat.HardRules, OutError) || !ValidateConditions(Beat.CompletionConditions, OutError))
             {
                 if (OutError.IsEmpty())
                     OutError = TEXT("Beat의 ID 또는 부모 Sequence가 유효하지 않습니다.");

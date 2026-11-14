@@ -42,6 +42,26 @@
 // ============================================================
 #pragma region 01_Snapshot_Read_And_Publication
 
+    bool FWAINStateStore::Restore(const FWAINStateSnapshot                &WAIN,
+                                  TSharedPtr<const IWAINGameStateSnapshot> Game,
+                                  FString                                 &OutError)
+    {
+        check(IsInGameThread());
+        if (!Game.IsValid() || !WAINStateValidation::Validate(WAIN, OutError))
+        {
+            if (OutError.IsEmpty())
+                OutError = TEXT("Restore Snapshot 검증 실패");
+            return false;
+        }
+        // 복원은 새로운 Revision이므로 대기 중이던 과거 응답의 Commit을 차단한다.
+        FWAINSessionRoot Next;
+        Next.Revision = CurrentRoot.IsValid() ? CurrentRoot->Revision + 1 : 1;
+        Next.WAIN = WAIN;
+        Next.Game = MoveTemp(Game);
+        CurrentRoot = MakeShared<FWAINSessionRoot>(MoveTemp(Next));
+        return true;
+    }
+
     TSharedPtr<const FWAINSessionRoot> FWAINStateStore::Read() const
     {
         check(IsInGameThread());

@@ -92,6 +92,8 @@ class IWAINGameStateSnapshot;
         TArray<FWAINNarrativeHardRule>  HardRules;
         TArray<FWAINNarrativeCondition> CompletionConditions;
         TArray<FWAINBeatTransition>     Transitions;
+        int32                           MaxInteractionTurns = 0; // 0이면 제한 없음.
+        bool                            bHoldAfterGoal = false;  // Goal 충족 후에도 명시적 종료/예산까지 대화.
     };
 
     struct FWAINNarrativeGraph

@@ -35,17 +35,22 @@ class IWAINGameStateSnapshot;
 
     struct FWAINWorldFactDefinition
     {
-        FName Key;
-        int32 MinValue = 0;
-        int32 MaxValue = MAX_int32;
-        bool  bExposeToAgent = false;
-        bool  bWritableByProposal = false;
+        FName                Key;
+        int32                MinValue = 0;
+        int32                MaxValue = MAX_int32;
+        bool                 bExposeToAgent = false;
+        bool                 bWritableByProposal = false;
+        bool                 bWritableByScript = false; // 작가 이벤트만 해당 Fact를 변경하도록 허가.
+        FString              Description;               // Character Agent에게 공개되는 Fact의 의미.
+        TMap<int32, FString> ValueLabels;               // enum 값이 공개된 경우에만 사용한다.
     };
 
     struct FWAINWorldFactValue
     {
-        FName Key;
-        int32 Value = 0;
+        FName   Key;
+        int32   Value = 0;
+        FString Description;
+        FString AllowedValues;
     };
 
     /** @brief Context에는 공개된 사실만 포함하며, 숨겨진 Fact의 ID도 노출하지 않는다. */

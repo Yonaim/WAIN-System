@@ -186,3 +186,14 @@ Host `FWAINTestbedDebugInspector`는 Plugin의 기록과 Game Snapshot의 전후
 - `Source/WAINTestbed/UI/WAINTestbedVNWidget.cpp`: NEXT 버튼, LOG Step 기록, 입력 잠금
 
 단일 `Dialogue/Expression` 출력 계약은 **삭제**했다. 호환 Parser/변환은 없다.
+
+## 2026-11-15 — Narrative Runtime v2 Source Map
+
+- `Public/WAINNarrativeTypes.h`: Beat별 Turn Budget, Authored Hook/종료 Script, Scripted Beat 전이 계약
+- `Private/Narrative/WAINBeatGraphNarrativeEvaluator.cpp`: Beat Budget과 Goal/Transition 평가, Scripted World Fact 권한 검증
+- `Private/Core/WAINInteractionProcessor.*`, `Private/Core/WAINStateStore.*`: Scripted Mutation/Beat 전이와 Snapshot 경계
+- `Public/WAINRuntimeSubsystem.h`, `Private/WAINRuntimeSubsystem.cpp`: Scripted Fact/Beat API와 Save/Load에 필요한 Snapshot 접근
+- `Source/WAINTestbed/Data/WAINTestbedContentLoader.*`: CH01 BeatContent/Scripts/Debug Preset 로더
+- `Source/WAINTestbed/Presentation/WAINTestbedScriptSequencePlayer.*`: 고정 Hook·종료 Script 순차 재생
+- `Source/WAINTestbed/Save/WAINTestbedSaveService.*`: 안전한 턴 경계의 수동 Save/Load
+- `Source/WAINTestbed/UI/WAINTestbedVNWidget.*`: Scene Preview, DEV Preset, Hook/Script, Save/Load UI

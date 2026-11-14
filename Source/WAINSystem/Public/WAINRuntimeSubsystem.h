@@ -43,6 +43,13 @@ class WAINSYSTEM_API UWAINRuntimeSubsystem : public UGameInstanceSubsystem
 
     FWAINInteractionResult ProcessTurn(const FWAINInteractionRequest &Request);
 
+    bool AdvanceScriptedBeat(FName ExpectedBeatId, FString &OutError);
+    bool SetAuthoredGameFact(FName TargetId, int32 Value, FString &OutError);
+    bool ApplyScriptedWorldChanges(const TArray<FWAINStateMutation> &Mutations, FString &OutError);
+    bool RestoreSnapshot(const FWAINStateSnapshot                &Snapshot,
+                         TSharedPtr<const IWAINGameStateSnapshot> Game,
+                         FString                                 &OutError);
+
     /** @brief 이전 Testbed 호출부 호환성 유지. Provider 구현에 따라 LLM Proposal도 처리할 수 있다. */
     FWAINInteractionResult ProcessMockTurn(const FWAINInteractionRequest &Request);
 

@@ -29,7 +29,8 @@ namespace WAINStateValidation
 
     bool Validate(const FWAINStateSnapshot &Snapshot, FString &OutError)
     {
-        if (Snapshot.ActiveBeatId.IsNone() || Snapshot.TurnCount < 0 || Snapshot.Characters.IsEmpty())
+        if (Snapshot.ActiveBeatId.IsNone() || Snapshot.TurnCount < 0 || Snapshot.ActiveBeatEntryTurn < 0 ||
+            Snapshot.ActiveBeatEntryTurn > Snapshot.TurnCount || Snapshot.Characters.IsEmpty())
         {
             OutError = TEXT("Snapshot에 유효한 ActiveBeat, TurnCount, Character가 필요합니다.");
             return false;
@@ -48,7 +49,7 @@ namespace WAINStateValidation
         for (const FWAINBeatTransitionRecord &Transition : Snapshot.BeatHistory)
         {
             if (Transition.FromBeatId.IsNone() || Transition.ToBeatId.IsNone() ||
-                Transition.FromBeatId == Transition.ToBeatId || Transition.Turn < 1 ||
+                Transition.FromBeatId == Transition.ToBeatId || Transition.Turn < 0 ||
                 Transition.Turn > Snapshot.TurnCount)
             {
                 OutError = TEXT("Beat 전이 이력이 유효하지 않습니다.");

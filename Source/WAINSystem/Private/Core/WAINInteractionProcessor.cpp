@@ -113,6 +113,119 @@
         return Result;
     }
 
+    bool FWAINInteractionProcessor::AdvanceScriptedBeat(const FName ExpectedBeatId, FString &OutError)
+    {
+        check(IsInGameThread());
+        if (bProcessing || ExpectedBeatId.IsNone())
+        {
+            OutError = TEXT("Script 전이는 처리 중이거나 Beat ID가 비어 있을 때 불가능합니다.");
+            return false;
+        }
+        const auto Current = StateStore.Read();
+        if (!Current.IsValid() || !Current->Game.IsValid() || Current->WAIN.ActiveBeatId != ExpectedBeatId)
+        {
+            OutError = TEXT("Script 전이 시작 Beat가 현재 상태와 일치하지 않습니다.");
+            return false;
+        }
+        FWAINStateSnapshot      Prepared = Current->WAIN;
+        FWAINInteractionRequest Request;
+        Request.bExitRequested = true;
+        if (!NarrativeEvaluator->Evaluate(Request, *Current, Prepared, *Current->Game, OutError))
+            return false;
+        if (Prepared.ActiveBeatId == ExpectedBeatId)
+        {
+            OutError = TEXT("조건에 맞는 Script 전이 대상 Beat가 없습니다.");
+            return false;
+        }
+        if (!GameAdapter->Validate(*Current->Game, OutError))
+            return false;
+        if (!StateStore.Publish(Current->Revision, MoveTemp(Prepared), Current->Game))
+        {
+            OutError = TEXT("Script 전이 중 Revision이 변경되었습니다.");
+            return false;
+        }
+        return true;
+    }
+
+    bool FWAINInteractionProcessor::ApplyScriptedWorldChanges(const TArray<FWAINStateMutation> &Mutations,
+                                                              FString                          &OutError)
+    {
+        check(IsInGameThread());
+        if (bProcessing || Mutations.IsEmpty())
+        {
+            OutError = TEXT("Scripted 변경은 처리 중 또는 빈 목록으로 실행할 수 없습니다.");
+            return false;
+        }
+        for (const FWAINStateMutation &Mutation : Mutations)
+        {
+            if (Mutation.Owner != EWAINMutationOwner::Game || Mutation.Operation != EWAINMutationOperation::SetInteger)
+            {
+                OutError = TEXT("Scripted World Event는 Game SetInteger만 허용합니다.");
+                return false;
+            }
+        }
+        const auto Current = StateStore.Read();
+        if (!Current.IsValid() || !Current->Game.IsValid())
+        {
+            OutError = TEXT("현재 Game Snapshot이 없습니다.");
+            return false;
+        }
+        if (WorldManager.IsValid() && !WorldManager->ValidateScriptedMutations(*Current->Game, Mutations, OutError))
+            return false;
+        const auto PreparedGame = GameAdapter->Prepare(*Current->Game, Mutations, OutError);
+        if (!PreparedGame.IsValid() ||
+            (WorldManager.IsValid() &&
+             !WorldManager->ValidateScriptedPrepared(*Current->Game, *PreparedGame, Mutations, OutError)) ||
+            !GameAdapter->Validate(*PreparedGame, OutError))
+            return false;
+        FWAINStateSnapshot Prepared = Current->WAIN;
+        if (!StateStore.Publish(Current->Revision, MoveTemp(Prepared), PreparedGame))
+        {
+            OutError = TEXT("Scripted World Commit이 Revision 충돌로 실패했습니다.");
+            return false;
+        }
+        return true;
+    }
+
+    bool FWAINInteractionProcessor::SetAuthoredGameFact(FName TargetId, int32 Value, FString &OutError)
+    {
+        if (TargetId.IsNone())
+        {
+            OutError = TEXT("Script Fact 대상이 비었습니다.");
+            return false;
+        }
+        FWAINStateMutation Mutation;
+        Mutation.Owner = EWAINMutationOwner::Game;
+        Mutation.TargetId = TargetId;
+        Mutation.Operation = EWAINMutationOperation::SetInteger;
+        Mutation.IntegerValue = Value;
+        TArray<FWAINStateMutation> Changes;
+        Changes.Add(Mutation);
+        return ApplyScriptedWorldChanges(Changes, OutError);
+    }
+
+    bool FWAINInteractionProcessor::RestoreSnapshot(const FWAINStateSnapshot                &Snapshot,
+                                                    TSharedPtr<const IWAINGameStateSnapshot> Game,
+                                                    FString                                 &OutError)
+    {
+        check(IsInGameThread());
+        if (bProcessing || !Game.IsValid())
+        {
+            OutError = TEXT("턴 처리 중이거나 복원 Game Snapshot이 없습니다.");
+            return false;
+        }
+        if (!GameAdapter->Validate(*Game, OutError) ||
+            (WorldManager.IsValid() && !WorldManager->ValidateInitial(*Game, OutError)) ||
+            !NarrativeEvaluator->ValidateInitialState(Snapshot, *Game, OutError))
+            return false;
+        if (!StateStore.Restore(Snapshot, MoveTemp(Game), OutError))
+            return false;
+        CompletedTurns.Reset();
+        DebugRecords.Reset();
+        DebugOrder.Reset();
+        return true;
+    }
+
     TSharedPtr<const FWAINSessionRoot> FWAINInteractionProcessor::GetSnapshot() const
     {
         return StateStore.Read();
@@ -317,7 +430,7 @@
     bool FWAINInteractionProcessor::IsSameRequest(const FWAINInteractionRequest &Left, const FWAINInteractionRequest &Right)
     {
         return Left.TurnId == Right.TurnId && Left.CharacterId == Right.CharacterId && Left.SceneId == Right.SceneId &&
-               Left.InputKind == Right.InputKind && Left.Text == Right.Text;
+               Left.InputKind == Right.InputKind && Left.Text == Right.Text && Left.bExitRequested == Right.bExitRequested;
     }
 
     FWAINInteractionResult FWAINInteractionProcessor::Fail(const FWAINInteractionRequest &Request,

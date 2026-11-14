@@ -440,6 +440,58 @@
         return true;
     }
 
+    IMPLEMENT_SIMPLE_AUTOMATION_TEST(FWAINNarrativePerBeatBudgetTest,
+                                     "WAIN.Narrative.PerBeatBudgetReset",
+                                     EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+
+    bool FWAINNarrativePerBeatBudgetTest::RunTest(const FString &Parameters)
+    {
+        auto Graph = WAINNarrativeTests::MakeGraph();
+        Graph.Beats[0].MaxInteractionTurns = 2;
+        Graph.Beats[0].bHoldAfterGoal = true;
+        auto    Provider = MakeShared<WAINNarrativeTests::FContextCapturingProvider>();
+        FString Error;
+        auto    Processor = WAINNarrativeTests::MakeProcessor(Provider, MoveTemp(Graph), Error);
+        if (!TestTrue(TEXT("Session"), Processor != nullptr))
+            return false;
+        TestTrue(TEXT("First turn"), Processor->ProcessTurn(WAINNarrativeTests::MakeRequest()).Succeeded());
+        TestTrue(TEXT("Same Beat"), Processor->GetSnapshot()->WAIN.ActiveBeatId == TEXT("INTRO"));
+        TestTrue(TEXT("Second turn"), Processor->ProcessTurn(WAINNarrativeTests::MakeRequest()).Succeeded());
+        const auto After = Processor->GetSnapshot();
+        TestTrue(TEXT("Budget transition"), After->WAIN.ActiveBeatId == TEXT("LOW_TRUST"));
+        TestEqual(TEXT("New Beat entry turn"), After->WAIN.ActiveBeatEntryTurn, 2);
+        TestEqual(TEXT("History count"), After->WAIN.BeatHistory.Num(), 1);
+        TestTrue(TEXT("Timeout reason"), After->WAIN.BeatHistory.Last().Reason == EWAINBeatExitReason::TurnBudgetExhausted);
+        TestTrue(TEXT("Next turn"), Processor->ProcessTurn(WAINNarrativeTests::MakeRequest()).Succeeded());
+        TestTrue(TEXT("Next Beat does not immediately expire"),
+                 Processor->GetSnapshot()->WAIN.ActiveBeatId == TEXT("LOW_TRUST"));
+        return true;
+    }
+
+    IMPLEMENT_SIMPLE_AUTOMATION_TEST(FWAINNarrativePlayerExitTest,
+                                     "WAIN.Narrative.PlayerExitBeforeBudget",
+                                     EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+
+    bool FWAINNarrativePlayerExitTest::RunTest(const FString &Parameters)
+    {
+        auto Graph = WAINNarrativeTests::MakeGraph();
+        Graph.Beats[0].MaxInteractionTurns = 10;
+        Graph.Beats[0].bHoldAfterGoal = true;
+        auto    Provider = MakeShared<WAINNarrativeTests::FContextCapturingProvider>();
+        FString Error;
+        auto    Processor = WAINNarrativeTests::MakeProcessor(Provider, MoveTemp(Graph), Error);
+        if (!TestTrue(TEXT("Session"), Processor != nullptr))
+            return false;
+        auto Request = WAINNarrativeTests::MakeRequest();
+        Request.bExitRequested = true;
+        const auto Result = Processor->ProcessTurn(Request);
+        TestTrue(TEXT("Requested exit succeeds"), Result.Succeeded());
+        TestTrue(TEXT("Exit selected"), Processor->GetSnapshot()->WAIN.ActiveBeatId == TEXT("LOW_TRUST"));
+        TestTrue(TEXT("Explicit reason"),
+                 Processor->GetSnapshot()->WAIN.BeatHistory.Last().Reason == EWAINBeatExitReason::PlayerRequested);
+        return true;
+    }
+
 #pragma endregion
 
 #endif // WITH_DEV_AUTOMATION_TESTS

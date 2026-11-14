@@ -1,13 +1,5 @@
 # Work Log
 
-## 2026-11-14 — Relationship Semantics / PresentationStep 패키지 적용
-
-- **입력:** `WAINTestbed-Relationship-PresentationSteps-Source-and-Data` 적용 패키지.
-- **Plugin:** 5개 Relationship 정수 파라미터, `FWAINPresentationStep` 단일 응답 계약, Strict Structured Output, 공통 대사 Validator, 단일 Commit 후 Step 재생을 반영했다.
-- **Testbed:** Relationship/Dialogue JSON Loader, CH01 시작 관계 상태, `PresentationSequencePlayer`, NEXT 기반 VN UI, DEV Inspector와 관련 자동화 테스트를 반영했다.
-- **문서:** ADR-020, Relationship/PresentationStep 구현 문서, Source Map, Current Work를 동기화했다. 기존 로컬 `Content/Images`·오디오·`AudioCatalog.json`은 보존했다.
-- **검증:** JSON 파싱·참조 경로·소스 계약 정적 검토와 `WAINTestbedEditor Win64 Development` 빌드를 수행해 성공했다. Automation Test, PIE, OpenAI 실호출은 아직 실행하지 않았다.
-
 ## 2026-11-10 — Vault & Data Contract Initialization
 
 - **입력:** `testbed.zip`, `Universal-Agent-Vault.zip`(v5.9), 기존 프로젝트 문서·중간발표 자료.
@@ -175,3 +167,11 @@
 - C++ 규칙에 익명 namespace 전체 Region, namespace 안의 책임 Region 허용, 파일 전용 유틸의 익명 namespace 배치를 동기화했다.
 - `WAINStateValidation.cpp`와 `WAINTestbedContentLoader.cpp`에서 익명 namespace 경계를 Region으로 감싸고 파일별 섹션 번호를 갱신했다. 동작/API는 변경하지 않았다.
 - 최신 `indent_regions.py`는 Plugin Tool 및 Vault Asset과 이미 동일해 교체하지 않았다. 해당 두 파일의 Region 포맷 검사는 통과했다. UE 빌드와 Automation은 실행하지 않았다.
+
+## 2026-11-15 — Narrative Runtime v2 적용
+
+- **입력:** `WAINTestbed-Narrative-v2-Source-and-Data` 패키지.
+- **Plugin/Testbed:** Beat별 Turn Budget, Authored Hook/종료 Script, Scripted World Fact 권한, Scene Preview, DEV Preset Jump, 수동 Save/Load와 관련 JSON/자동화 테스트를 병합했다. 구형 `CH01Script.json`은 제거하고 `CH01Scripts.json`을 정본으로 사용한다.
+- **보존:** 기존 `Content/Images`, 실제 오디오 파일, `Content/Data/AudioCatalog.json`, 기존 Tools 스크립트와 로컬 설정은 유지했다.
+- **검증:** 패키지 validator의 Windows UTF-8 읽기 오류를 수정하고 JSON 15개·6 Sequence·18 Beat·21 Script·그래프 도달성을 검증했다. UE 5.8 `WAINTestbedEditor Win64 Development` 컴파일·링크가 성공했다. Automation/PIE/API 실호출은 실행하지 않았다.
+- **문서:** ADR-021, Narrative Scene/Save 문서, Source Map, Current Work를 동기화했다.

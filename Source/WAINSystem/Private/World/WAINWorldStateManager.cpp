@@ -52,6 +52,13 @@
 
             FWAINWorldFactValue Fact;
             Fact.Key = Definition.Key;
+            Fact.Description = Definition.Description.Left(200);
+            for (const auto &Label : Definition.ValueLabels)
+            {
+                if (!Fact.AllowedValues.IsEmpty())
+                    Fact.AllowedValues += TEXT(", ");
+                Fact.AllowedValues += FString::Printf(TEXT("%d=%s"), Label.Key, *Label.Value.Left(80));
+            }
             if (!ReadValidated(Current, Definition, Fact.Value, OutError))
             {
                 return false;
@@ -77,6 +84,36 @@
     {
         TMap<FName, int32> Expected;
         return ComputeExpected(Current, Mutations, Expected, OutError);
+    }
+
+    bool FWAINWorldStateManager::ValidateScriptedMutations(const IWAINGameStateSnapshot     &Current,
+                                                           const TArray<FWAINStateMutation> &Mutations,
+                                                           FString                          &OutError) const
+    {
+        TMap<FName, int32> Expected;
+        return ComputeExpected(Current, Mutations, Expected, OutError, true);
+    }
+
+    bool FWAINWorldStateManager::ValidateScriptedPrepared(const IWAINGameStateSnapshot     &Current,
+                                                          const IWAINGameStateSnapshot     &Prepared,
+                                                          const TArray<FWAINStateMutation> &Mutations,
+                                                          FString                          &OutError) const
+    {
+        TMap<FName, int32> Expected;
+        if (!ComputeExpected(Current, Mutations, Expected, OutError, true))
+            return false;
+        for (const auto &Definition : Schema)
+        {
+            int32 Actual = 0;
+            if (!ReadValidated(Prepared, Definition, Actual, OutError) || !Expected.Contains(Definition.Key) ||
+                Actual != Expected.FindChecked(Definition.Key))
+            {
+                if (OutError.IsEmpty())
+                    OutError = TEXT("Scripted Fact Commit 결과가 예상 State와 다릅니다.");
+                return false;
+            }
+        }
+        return true;
     }
 
     bool FWAINWorldStateManager::ValidatePrepared(const IWAINGameStateSnapshot     &Current,
@@ -173,7 +210,8 @@
     bool FWAINWorldStateManager::ComputeExpected(const IWAINGameStateSnapshot     &Current,
                                                  const TArray<FWAINStateMutation> &Mutations,
                                                  TMap<FName, int32>               &OutExpected,
-                                                 FString                          &OutError) const
+                                                 FString                          &OutError,
+                                                 const bool                        bScripted) const
     {
         OutExpected.Reset();
         for (const FWAINWorldFactDefinition &Definition : Schema)
@@ -189,7 +227,8 @@
         for (const FWAINStateMutation &Mutation : Mutations)
         {
             const FWAINWorldFactDefinition *Definition = FindDefinition(Mutation.TargetId);
-            if (Mutation.Owner != EWAINMutationOwner::Game || !Definition || !Definition->bWritableByProposal ||
+            if (Mutation.Owner != EWAINMutationOwner::Game || !Definition ||
+                !(bScripted ? Definition->bWritableByScript : Definition->bWritableByProposal) ||
                 (Mutation.Operation != EWAINMutationOperation::AddInteger &&
                  Mutation.Operation != EWAINMutationOperation::SetInteger))
             {

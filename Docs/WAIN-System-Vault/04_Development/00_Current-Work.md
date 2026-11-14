@@ -150,6 +150,13 @@ WAINTestbed는 설정/조직 사용량 사전 조회/상단 팝업/DEV 진단 UI
 - 전역 Dialogue Rules: 이모지·채팅체 금지
 - LLM Structured Output는 `PresentationSteps` **전용**; 이전 단일 Dialogue 계약은 없음
 - UI 순차 재생, 하나의 Turn/Commit, DEV Proposal 진단
-- **검증:** Unreal Engine 5.8 `WAINTestbedEditor Win64 Development` 빌드 성공
-- **미검증:** Automation 실행, PIE, API 실호출
+- **미검증:** Unreal Engine 5.8 빌드, Automation 실행, PIE, API 실호출
 - 문서: `Docs/02_Implementation/12_Relationship-and-Presentation-Steps.md`, ADR-020
+
+## 2026-11-15 — Narrative Runtime v2 (Beat Budget / Authored Hooks / Save)
+
+- Chapter 1의 6 Sequence·18 Beat, Beat별 Turn Budget, Scene/Hook/종료 Script/World Fact 연결을 Testbed JSON과 Runtime에 반영했다.
+- 고정 Script 이벤트와 LLM `PresentationSteps`를 분리하고, 필수 Fact는 Script 권한으로만 변경하도록 연결했다.
+- Scene Preview, Editor DEV Preset Jump, 수동 `USaveGame` 슬롯 1개와 Snapshot/Backlog 복원을 추가했다.
+- `WAIN.Narrative.*`와 Testbed Narrative/Save 자동화 테스트 소스를 추가했다. 정적 검증과 UE 5.8 `WAINTestbedEditor Win64 Development` 컴파일·링크가 통과했다.
+- [ADR-021](../03_Decisions/21_ADR-021-Beat-Budget-Authored-Hooks-Save.md) · [Narrative 구현](../../../../../Docs/02_Implementation/13_Narrative-Scene-Data-And-Save.md)

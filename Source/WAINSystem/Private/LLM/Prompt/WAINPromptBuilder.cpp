@@ -161,7 +161,11 @@
         {
             for (const FWAINWorldFactValue &Fact : Context.World.VisibleFacts)
             {
-                Prompt += FString::Printf(TEXT("VisibleWorldFact %s=%d\n"), *Fact.Key.ToString(), Fact.Value);
+                Prompt += FString::Printf(TEXT("VisibleWorldFact %s=%d; meaning=%s; allowed_values=%s\n"),
+                                          *Fact.Key.ToString(),
+                                          Fact.Value,
+                                          *Fact.Description.Left(200),
+                                          *Fact.AllowedValues.Left(400));
             }
         }
         if (Context.bHasPresentationCatalog)

@@ -17,6 +17,8 @@ class FWAINStateStore final
 
     TSharedPtr<const FWAINSessionRoot> Read() const;
 
+    bool Restore(const FWAINStateSnapshot &WAIN, TSharedPtr<const IWAINGameStateSnapshot> Game, FString &OutError);
+
     bool Publish(uint64                                   ExpectedRevision,
                  FWAINStateSnapshot                     &&PreparedWAIN,
                  TSharedPtr<const IWAINGameStateSnapshot> PreparedGame);

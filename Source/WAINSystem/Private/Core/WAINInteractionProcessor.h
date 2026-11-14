@@ -33,6 +33,18 @@ class FWAINInteractionProcessor final
 
     FWAINInteractionResult ProcessTurn(const FWAINInteractionRequest &Request);
 
+    /** @brief Script-only Beat의 출구 전이를 검증해 게시한다. LLM/Memory/TurnCount는 변경하지 않는다. */
+    bool AdvanceScriptedBeat(FName ExpectedBeatId, FString &OutError);
+
+    /** @brief 작가 Script가 확정한 단일 World Fact를 별도 Revision으로 게시한다. */
+    bool SetAuthoredGameFact(FName TargetId, int32 Value, FString &OutError);
+    bool ApplyScriptedWorldChanges(const TArray<FWAINStateMutation> &Mutations, FString &OutError);
+
+    /** @brief Save에서 복원한 Root를 모든 기존 계약으로 검증한 뒤 단일 게시한다. */
+    bool RestoreSnapshot(const FWAINStateSnapshot                &Snapshot,
+                         TSharedPtr<const IWAINGameStateSnapshot> Game,
+                         FString                                 &OutError);
+
     TSharedPtr<const FWAINSessionRoot> GetSnapshot() const;
 
     /** @brief 네트워크 대기 전에 현재 Revision의 LLM 입력 Context를 읽기 전용으로 조회한다. */
